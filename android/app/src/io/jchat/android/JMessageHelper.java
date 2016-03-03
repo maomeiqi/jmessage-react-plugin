@@ -1,5 +1,6 @@
 package io.jchat.android;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -54,13 +55,31 @@ public class JMessageHelper extends ReactContextBaseJavaModule {
             } else {
                 result = "login";
             }
-        } else if (TextUtils.isEmpty(JMessageClient.getMyInfo().getNickname()) && !flag) {
+        } else if (TextUtils.isEmpty(JMessageClient.getMyInfo().getNickname()) && flag) {
             result = "fillInfo";
         } else {
-            result = "";
+            result = "error";
         }
         map.putString("result", result);
         callback.invoke(map);
+    }
+
+    @ReactMethod
+    public void loginWithoutDialog(String username, String password, final Callback successCallback,
+                                   final Callback errorCallback) {
+        mContext = getCurrentActivity();
+        Log.i(TAG, "username: " + username + " is logging in");
+        JMessageClient.login(username, password, new BasicCallback() {
+            @Override
+            public void gotResult(int status, String desc) {
+                if (status == 0) {
+                    successCallback.invoke();
+                } else {
+                    HandleResponseCode.onHandle(mContext, status, false);
+                    errorCallback.invoke();
+                }
+            }
+        });
     }
 
     @ReactMethod
@@ -104,9 +123,7 @@ public class JMessageHelper extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void register(String username, String password, final Callback callback) {
-        username = username.trim();
-        password = password.trim();
+    public void register(final String username, final String password, final Callback callback) {
         mContext = getCurrentActivity();
         Log.i(TAG, "username: " + username + " password: " + password);
         if (TextUtils.isEmpty(username) || TextUtils.isEmpty(password)) {
@@ -120,7 +137,16 @@ public class JMessageHelper extends ReactContextBaseJavaModule {
                 public void gotResult(int status, String desc) {
                     mDialog.dismiss();
                     if (status == 0) {
-                        callback.invoke();
+                        JMessageClient.login(username, password, new BasicCallback() {
+                            @Override
+                            public void gotResult(int status, String desc) {
+                                if (status == 0) {
+                                    callback.invoke();
+                                } else {
+                                    HandleResponseCode.onHandle(mContext, status, false);
+                                }
+                            }
+                        });
                         Toast.makeText(mContext, "Register succeed", Toast.LENGTH_SHORT).show();
                     } else {
                         HandleResponseCode.onHandle(mContext, status, false);
@@ -160,6 +186,7 @@ public class JMessageHelper extends ReactContextBaseJavaModule {
         if (TextUtils.isEmpty(nickname)) {
             Toast.makeText(mContext, mContext.getString(R.string.nickname_not_null_toast), Toast.LENGTH_SHORT).show();
         } else {
+            Log.i(TAG, "nickname: " + nickname);
             mDialog = new ProgressDialog(mContext);
             mDialog.setMessage(mContext.getString(R.string.saving_hint));
             mDialog.show();

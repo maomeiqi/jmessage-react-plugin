@@ -6,6 +6,7 @@ var LoginActivity = require('./login_activity');
 var RegisterActivity = require('./register_activity');
 var ReloginActivity = require('./re-login_activity');
 var FillInfoActivity = require('./fill_info_activity');
+var LoginDialog = require('./login_dialog');
 var {
   Text,
   TextInput,
@@ -42,6 +43,9 @@ var MyAwesomeApp = React.createClass({
       case 'fillInfoActivity':
         Component = FillInfoActivity;
         break;
+      case 'loginDialog':
+        Component = LoginDialog;
+        break;
     }
 
     //navigator作为props传递给了这个component,在Component中就可以直接拿到: props.navigator
@@ -75,7 +79,8 @@ var MyAwesomeApp = React.createClass({
           });
           break;
         default:
-        console.log('user has logged in');
+          console.log('user has logged in');
+          break;
       }
     });
   },

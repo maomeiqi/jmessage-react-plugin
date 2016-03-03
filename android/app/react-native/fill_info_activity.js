@@ -25,9 +25,16 @@ var FillInfoActivity = React.createClass({
 	},
 
 	finishClick() {
-		JMessageHelper.finishFillInfo(this.state.nickname, () => {
-			this.props.navigator.replace({name: 'mainActivity'});
-		});
+		if (this.state.nickname != '') {
+			JMessageHelper.finishFillInfo(this.state.nickname, () => {
+				this.props.navigator.replace({name: 'mainActivity'});
+			});
+		}
+	},
+
+	componentWillUnmount() {
+		console.log('ComponentWillUnmount!');
+
 	},
 
 	render() {
@@ -55,7 +62,7 @@ var FillInfoActivity = React.createClass({
 						</TouchableHighlight>
 					</View>
 					<TouchableHighlight
-						underlayColor = { '#b9ebb8'}
+						underlayColor = { '#6fd66b' }
 						style = { styles.finishBtn }
 						onPress = { this.finishClick }>
 						<Text style = { styles.btnText }>

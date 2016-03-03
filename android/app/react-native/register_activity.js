@@ -29,7 +29,13 @@ var RegisterActivity = React.createClass({
 		console.log('Begin registering');
 		JMessageHelper.register(this.state.username, this.state.password, () => {
 			console.log('user register succeed');
-			this.props.navigator.replace({name: 'fillInfoActivity'});
+			this.props.navigator.push({
+				name: 'loginDialog',
+				params: {
+					username: this.state.username,
+					password: this.state.password,
+				}
+			});
 		});
 	},
 
