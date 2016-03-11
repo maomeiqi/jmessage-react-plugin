@@ -35,7 +35,8 @@ var LoginActivity  = React.createClass({
 		console.log('username: ' + this.state.username);
 		JMessageHelper.login(false, this.state.username, this.state.password, () => {
 			console.log('Login success!');
-			this.props.navigator.replace({name: 'mainActivity'});
+			//相当于重新Start MainActivity，finish掉其他Activity
+			this.props.navigator.immediatelyResetRouteStack([{name: 'mainActivity'}]);
 		});
 	},
 

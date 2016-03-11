@@ -29,6 +29,9 @@ public class HandleResponseCode {
             case 1002:
                 content.setText(context.getString(R.string.user_already_exist_toast));
                 break;
+            case 1003:
+                content.setText(context.getString(R.string.user_add_self_toast));
+                break;
             case 800002:
                 content.setText(context.getString(R.string.server_800002));
                 break;

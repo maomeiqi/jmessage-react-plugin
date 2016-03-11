@@ -14,7 +14,12 @@ var LoginDialog = React.createClass({
 	componentDidMount() {
 		JMessageHelper.loginWithoutDialog(this.props.username, this.props.password, () => {
 			console.log('User login success');
-			this.props.navigator.immediatelyResetRouteStack([{name: 'fillInfoActivity'}]);
+			this.props.navigator.immediatelyResetRouteStack([{
+				name: 'fillInfoActivity',
+				params: {
+					username: this.props.username,
+				}
+			}]);
 		}, () => {
 			this.props.navigator.pop();
 		});

@@ -1,26 +1,23 @@
 package io.jchat.android;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
+import android.app.Application;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 
-import com.facebook.infer.annotation.Assertions;
+import com.facebook.react.LifecycleState;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactRootView;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
-import com.facebook.react.modules.core.DeviceEventManagerModule;
-import com.facebook.react.modules.core.RCTNativeAppEventEmitter;
-import com.facebook.react.uimanager.events.RCTEventEmitter;
+import com.facebook.react.shell.MainReactPackage;
+import com.github.yamill.orientation.OrientationPackage;
+import com.lwansbrough.RCTCamera.RCTCameraPackage;
 
 import java.lang.Override;
 
 import cn.jpush.android.api.JPushInterface;
-import io.jchat.android.ReactInstanceHelper;
 
 public class MainActivity extends Activity implements DefaultHardwareBackBtnHandler {
 
@@ -32,7 +29,17 @@ public class MainActivity extends Activity implements DefaultHardwareBackBtnHand
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mReactRootView = new ReactRootView(this);
-        mReactInstanceManager = ReactInstanceHelper.getInstance();
+        mReactInstanceManager = ReactInstanceManager.builder()
+                .setApplication((Application) JChatApplication.getContext())
+                .setBundleAssetName("index.android.bundle")
+                .setJSMainModuleName("android/app/react-native/index.android")
+                .addPackage(new MainReactPackage())
+                .addPackage(new CustomReactPackage())
+                .addPackage(new RCTCameraPackage())
+                .addPackage(new OrientationPackage(this))
+                .setUseDeveloperSupport(BuildConfig.DEBUG)
+                .setInitialLifecycleState(LifecycleState.RESUMED)
+                .build();
         mReactRootView.startReactApplication(mReactInstanceManager, "JChatApp", null);
 
         setContentView(mReactRootView);
@@ -80,6 +87,7 @@ public class MainActivity extends Activity implements DefaultHardwareBackBtnHand
         }
         return super.onKeyUp(keyCode, event);
     }
+
 
 
 }

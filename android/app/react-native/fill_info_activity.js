@@ -10,18 +10,24 @@ var {
 	NativeModules,
 } = React;
 var JMessageHelper = NativeModules.JMessageHelper;
-
 var FillInfoActivity = React.createClass({
 
 	getInitialState() {
 		return {
 			takePhotoPressed: false,
 			nickname: '',
+			hasSetAvatar: false,
+			avatarPath: '',
 		}
 	},
 
 	takePhoto() {
-		
+		this.setState({takePhotoPressed: true});
+		console.log('take photo btn pressed!');
+		// this.props.navigator.push({name: 'cameraActivity'});
+		JMessageHelper.takePhoto(this.props.username, (path) => {
+			this.setState({avatarPath: path, hasSetAvatar: true});
+		});
 	},
 
 	finishClick() {
@@ -30,6 +36,10 @@ var FillInfoActivity = React.createClass({
 				this.props.navigator.replace({name: 'mainActivity'});
 			});
 		}
+	},
+
+	componentDidMount() {
+		console.log('this.props.username ' + this.props.username);
 	},
 
 	componentWillUnmount() {
@@ -54,10 +64,12 @@ var FillInfoActivity = React.createClass({
 							onChangeText = { (text) => this.setState({nickname: text}) }/>
 						<TouchableHighlight
 							underlayColor = { '#808080' }
-							onPress = { () => { this.setState({takePhotoPressed: true}); this.takePhoto }}>
+							onPress = { this.takePhoto }>
 							<View>
 								<Image style = { styles.takePhotoBtn }
-									source = { this.state.takePhotoPressed ? {uri: 'take_photo_fill_info_pre'} : {uri: 'take_photo_fill_info'}}/>
+									source = { this.state.hasSetAvatar ? 
+									(this.state.avatarPath == '' ? {uri: 'take_photo_fill_info'} : {uri: this.state.avatarPath}) : 
+									(this.state.takePhotoPressed ? {uri: 'take_photo_fill_info_pre'} : {uri: 'take_photo_fill_info'}) }/>
 							</View>
 						</TouchableHighlight>
 					</View>
@@ -101,7 +113,7 @@ var styles = React.StyleSheet.create({
 	},
 	input: {
 		flex: 1,
-
+		fontSize: 16,
 	},
 	takePhotoBtn: {
 		width: 70,

@@ -7,6 +7,9 @@ var RegisterActivity = require('./register_activity');
 var ReloginActivity = require('./re-login_activity');
 var FillInfoActivity = require('./fill_info_activity');
 var LoginDialog = require('./login_dialog');
+var CameraActivity = require('./camera');
+var ChatActivity = require('./chat_activity');
+var SendTextCell= require('./send_text_cell');
 var {
   Text,
   TextInput,
@@ -16,6 +19,7 @@ var {
   BackAndroid,
   NativeModules,
 } = React;
+
 var JMessageHelper = NativeModules.JMessageHelper;
 var _navigator;
 var MyAwesomeApp = React.createClass({
@@ -45,6 +49,15 @@ var MyAwesomeApp = React.createClass({
         break;
       case 'loginDialog':
         Component = LoginDialog;
+        break;
+      case 'cameraActivity':
+        Component = CameraActivity;
+        break;
+      case 'chatActivity':
+        Component = ChatActivity;
+        break;
+        case 'sendTextCell':
+        Component = SendTextCell;
         break;
     }
 

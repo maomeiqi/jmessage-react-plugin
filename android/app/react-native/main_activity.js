@@ -4,7 +4,9 @@ var React = require('react-native');
 var Conv = require('./conv_fragment');
 var Contact = require('./contact_fragment');
 var Me = require('./me_fragment');
+var Orientation = require('react-native-orientation');
 var {
+    BackAndroid,
     Text,
     View,
     Image,
@@ -16,17 +18,12 @@ var {
 } = React;
 
 var Actionbar = React.createClass({
-    getInitialState() {
-        return {
-            currentPage: 0,
-        };
-    },
+
     isActive(index) {
-        return this.state.currentPage == index;
+        return this.props.currentPage == index;
     },
     onPageSelected(index) {
         this.props.onselect(index);
-        this.setState({currentPage: index});
     },
     render() {
         var TouchableElement = TouchableHighlight;
@@ -92,38 +89,47 @@ var MainActivity = React.createClass({
             page: 0,
         };
     },
-    onPageScroll(e) {
-        this.setState({ page: e.nativeEvent.position });
-    },
+    
     onPageSelected(e) {
+        console.log('Page selected!');
         this.setState({ page: e.nativeEvent.position });
     },
-    componentDidMount() {
 
+    componentDidMount() {
+        Orientation.lockToPortrait();
+        BackAndroid.addEventListener('hardwareBackPress', () => {
+            if (this.props.navigator.getCurrentRoutes() > 0) {
+                this.props.navigator.pop();
+                return true;
+            }
+            return false;
+        });
     },
+
     onSelectMenu(index) {
         if (index != this.state.page) {
             this.viewPager.setPage(index);
             this.setState({ page: index });
         };
     },
+
     render() {
         var pages = [];
         var pageStyle = {
                 flex: 1
             };
         pages.push(
-            <View key = { 0 } style = { pageStyle } collapsable = { false }>
+            <View key = { 0 } style = { pageStyle } collapsable = { true }>
                 <Conv navigator = { this.props.navigator }/>
             </View>
         );
         pages.push(
-            <View key = { 1 } style = { pageStyle } collapsable = { false }>
+            <View key = { 1 } style = { pageStyle } collapsable = { true }>
                 <Contact navigator = { this.props.navigator }/>
             </View>
         );
         pages.push(
-            <View key = { 2 } style = { pageStyle } collapsable = { false }>
+            <View key = { 2 } style = { pageStyle } collapsable = { true }>
                 <Me navigator = { this.props.navigator } />
             </View>
         );
@@ -133,7 +139,6 @@ var MainActivity = React.createClass({
 					<ViewPagerAndroid
 						style = { styles.viewPager }
 						initialPage = {0}
-						onPageScroll = { this.onPageScroll }
 						onPageSelected = { this.onPageSelected }
 						ref = { viewPager => { this.viewPager = viewPager; } }>
 						{ pages }

@@ -5,6 +5,8 @@ import com.facebook.react.bridge.JavaScriptModule;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.ViewManager;
+import com.lwansbrough.RCTCamera.RCTCamera;
+import com.lwansbrough.RCTCamera.RCTCameraPackage;
 
 import java.util.ArrayList;
 import java.util.Collections;
