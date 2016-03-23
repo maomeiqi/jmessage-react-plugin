@@ -2,6 +2,7 @@
 
 var React = require('react-native');
 var {
+	Component,
 	Text,
 	View,
 	TouchableHighlight,
@@ -10,40 +11,49 @@ var {
 	ScrollView,
 	NativeModules,
 } = React;
+import MainActivity from './main_activity';
+import LoginActivity from './login_activity';
+import RegisterActivity from './register_activity';
+import LoadingAnimation from './loading_animation';
 var JMessageHelper = NativeModules.JMessageHelper;
-var LoadingAnimation = require('./loading_animation');
+class ReloginActivity extends Component {
 
-var ReloginActivity = React.createClass({
+	constructor(props) {
+		super(props);
 
-	getInitialState() {
-		return {
+		this.state = {
 			password: '',
 		};
-	},
+
+		this.reLogin = this.reLogin.bind(this);
+		this.jumpLoginActivity = this.jumpLoginActivity.bind(this);
+		this.jumpRegisterActivity = this.jumpRegisterActivity.bind(this);
+	}
 
 	reLogin() {
 		JMessageHelper.login(true, '', this.state.password, () => {
 			console.log('Re-login success ');
-			this.props.navigator.replace({name: 'mainActivity'});
+			this.props.navigator.replace({name: 'mainActivity', component: MainActivity});
 		});
-	},
+	}
 
 	jumpLoginActivity() {
 		this.props.navigator.push({
-			name: 'loginActivity', 
+			name: 'loginActivity',
+			component: LoginActivity,
 			params: {
 				showBackBtn: true
 			}
 		});
-	},
+	}
 
 	componentDidMount() {
 		console.log('this.props.username: ' + this.props.username);
-	},
+	}
 
 	jumpRegisterActivity() {
-		this.props.navigator.push({name: 'registerActivity'});
-	},
+		this.props.navigator.push({name: 'registerActivity', component: RegisterActivity});
+	}
 
 	render() {
 		return (
@@ -101,8 +111,8 @@ var ReloginActivity = React.createClass({
 				</View>
 			</View>
 		);
-	},
-});
+	}
+}
 
 var styles = React.StyleSheet.create({
 	container: {

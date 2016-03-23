@@ -13,6 +13,8 @@ var {
 	NativeModules,
 	BackAndroid,
 } = React;
+import RegisterActivity from './register_activity';
+import MainActivity from './main_activity';
 var JMessageHelper = NativeModules.JMessageHelper;
 var LoadingAnimation = require('./loading_animation');
 var LoginActivity  = React.createClass({
@@ -36,12 +38,12 @@ var LoginActivity  = React.createClass({
 		JMessageHelper.login(false, this.state.username, this.state.password, () => {
 			console.log('Login success!');
 			//相当于重新Start MainActivity，finish掉其他Activity
-			this.props.navigator.immediatelyResetRouteStack([{name: 'mainActivity'}]);
+			this.props.navigator.immediatelyResetRouteStack([{name: 'mainActivity', component: MainActivity}]);
 		});
 	},
 
 	jumpRegisterActivity() {
-		this.props.navigator.push({name: 'registerActivity'});
+		this.props.navigator.push({name: 'registerActivity', component: RegisterActivity});
 	},
 
 	componentDidMount() {

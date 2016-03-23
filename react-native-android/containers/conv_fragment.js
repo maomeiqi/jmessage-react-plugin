@@ -1,12 +1,17 @@
 'use strict'
 
-var React = require('react-native');
-var Immutable = require('immutable');
-var PureRenderMixin = require('react-addons-pure-render-mixin');
+import React from 'react-native';
+import { bindActionsCreators } from 'redux';
+import { connect } from 'react-redux';
+import * as types from '../actions/ActionTypes';
+import actions from '../actions/conversationList';
+import Immutable from 'immutable';
+import PureRenderMixin from 'react-addons-pure-render-mixin';
 var {
     Alert,
     Animated,
     BackAndroid,
+    Component,
     Dimensions,
     Image,
     ListView,
@@ -17,21 +22,17 @@ var {
     TouchableHighlight,
     View,
 } = React;
+import ChatActivity from './chat_activity';
 import Modal from 'react-native-root-modal';
 var JMessageHelper = NativeModules.JMessageHelper;
 var _convList = [];
 
-var Conv = React.createClass({
+export default class Conv extends Component {
 
-	mixins: [PureRenderMixin],
-	_panResponder: {},
-
-    getInitialState() {
-        var ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
-        return {
-            isLoading: true,
+    constructor(props) {
+        super(props);
+        this.state = {
             disconnected: false,
-            dataSource: ds,
             showDropDownMenu: false,
             menuSelected: '',
             showAddFriendDialog: false,
@@ -40,54 +41,70 @@ var Conv = React.createClass({
             scaleAnimation: new Animated.Value(1),
             y: new Animated.Value(0),
             friendId: '',
-        };
-    },
+        }
+
+        this.showAddFriendDialog = this.showAddFriendDialog.bind(this);
+        this.showDropDownMenu = this.showDropDownMenu.bind(this);
+        this.dismissDropDownMenu = this.dismissDropDownMenu.bind(this);
+        this.dismissAddFriendDialog = this.dismissAddFriendDialog.bind(this);
+        this.dismissDelConvDialog = this.dismissDelConvDialog.bind(this);
+        this.addFriend = this.addFriend.bind(this);
+        this.createGroup = this.createGroup.bind(this);
+        this.renderHeader = this.renderHeader.bind(this);
+        this.renderRow = this.renderRow.bind(this);
+        this.longPressRow = this.longPressRow.bind(this);
+        this.pressRow = this.pressRow.bind(this);
+    }
 
     componentWillMount() {
         this._panResponder = PanResponder.create({
         	onStartShouldSetPanResponder: this.handleStartShouldSetPanResponder,
         });
-    },
+    }
 
     componentDidMount() {
-    	this.setState({ isLoading: true });
-        JMessageHelper.getConvList((result) => {
-        	_convList = JSON.parse(result);
-            this.setState({
-                isLoading: false,
-                dataSource: this.getDataSource(_convList),
-            });
-        }, () => {
-        	this.setState({isLoading: false});
-        });
+        const { loadConversations } = this.props.actions;
+        loadConversations();
+        // JMessageHelper.getConvList((result) => {
+        // 	_convList = JSON.parse(result);
+        //     this.setState({
+        //         isLoading: false,
+        //         dataSource: this.getDataSource(_convList),
+        //     });
+        // }, () => {
+        // 	this.setState({isLoading: false});
+        // });
         JMessageHelper.checkNetwork((value) => {
             this.setState({ disconnected: value });
         });
-        BackAndroid.addEventListener('hardwareBackPress', () => {
-        	if (this.state.showDropDownMenu) {
-        		this.dismissDropDownMenu();
-        		return true;
-        	} else if (this.state.showAddFriendDialog) {
-        		this.dismissAddFriendDialog();
-        		return true;
-        	} else if (this.state.showDelConvDialog) {
-        		this.dismissDelConvDialog();
-        		return true;
-        	} 
-        	return false;
-        });
-    },
+        BackAndroid.addEventListener('hardwareBackPress', this.hardwareBackPress);
+    }
+
+    hardwareBackPress = () => {
+        if (this.state.showDropDownMenu) {
+                this.dismissDropDownMenu();
+                return true;
+            } else if (this.state.showAddFriendDialog) {
+                this.dismissAddFriendDialog();
+                return true;
+            } else if (this.state.showDelConvDialog) {
+                this.dismissDelConvDialog();
+                return true;
+            } 
+        return false;
+    };
 
     componentWillUnmount() {
-    	BackAndroid.removeEventListener('hardwareBackPress');
-    },
+    	BackAndroid.removeEventListener('hardwareBackPress', this.hardwareBackPress);
+    }
 
 
-    _renderRow(convItem: Object, sectionID: number, rowID: number) {
+    renderRow(convItem: Object, sectionID: number, rowID: number) {
+
         return (
             <TouchableHighlight 
             	onLongPress = { () => this.longPressRow(rowID) }
-            	onPress = { () => this._pressRow(rowID)}>
+            	onPress = { () => this.pressRow(rowID) }>
 				<View>
 					<View style = { styles.row }>
 						<View style = { {flexDirection: 'row'} }>
@@ -118,22 +135,23 @@ var Conv = React.createClass({
 				</View>
 			</TouchableHighlight>
         );
-    },
+    }
 
-    getDataSource: function(conversations: Array < any > ): ListView.DataSource {
+    getDataSource(conversations: Array < any > ): ListView.DataSource {
         return this.state.dataSource.cloneWithRows(conversations);
-    },
+    }
 
-    _pressRow(rowID: number) {
+    pressRow(rowID: number) {
         this.props.navigator.push({
         	name: 'chatActivity',
+            component: ChatActivity,
         	params: {
         		title: _convList[rowID].title,
         		username: _convList[rowID].username,
         		groupId: _convList[rowID].groupId,
         	}
         });
-    },
+    }
 
     longPressRow(rowID: number) {
     	if (!this.state.showDelConvDialog && !this.state.showAddFriendDialog) {
@@ -145,7 +163,7 @@ var Conv = React.createClass({
     			title: _convList[rowID].title,
     		}));
     	}
-    },
+    }
 
     renderHeader() {
         if (this.state.disconnected) {
@@ -159,7 +177,7 @@ var Conv = React.createClass({
 				</View>
             );
         } else return null;
-    },
+    }
 
     showDropDownMenu() {
         if (!this.state.showAddFriendDialog && !this.state.showDelConvDialog) {
@@ -174,7 +192,7 @@ var Conv = React.createClass({
             	this.setState({ showDropDownMenu: true });
         	}
         }
-    },
+    }
 
     dismissDropDownMenu() {
     	Animated.timing(this.state.y, {
@@ -182,22 +200,23 @@ var Conv = React.createClass({
        	}).start(() => {
    			this.setState({ showDropDownMenu: false});
    		});
-    },
+    }
 
 
     createGroup() {
         console.log('Create group ');
         this.dismissDropDownMenu();
-    },
+    }
 
     addFriend() {
+
         JMessageHelper.addFriend(this.state.friendId, (result) => {
             this.dismissAddFriendDialog();
             var newDs = JSON.parse(result);
             this.setState({ dataSource: this.getDataSource([newDs, ..._convList]) });
             _convList = [newDs, ..._convList];
         });
-    },
+    }
 
     showAddFriendDialog() {
         this.dismissDropDownMenu();
@@ -206,7 +225,7 @@ var Conv = React.createClass({
             toValue: 1
         }).start();
         this.setState({ showAddFriendDialog: true });
-    },
+    }
 
     dismissAddFriendDialog() {
     	console.log('dismissing dialog');
@@ -215,22 +234,25 @@ var Conv = React.createClass({
         }).start(() => {
             this.setState({ showAddFriendDialog: false });
         });
-    },
+    }
 
     deleteConversation() {
+
     	this.dismissDelConvDialog();
-    },
+    }
 
     dismissDelConvDialog() {
     	Animated.timing(this.state.scaleAnimation, {
     		toValue: 0,
     	}).start( () => this.setState({showDelConvDialog: false}));
-    },
+    }
 
     render() {
-        var content = this.state.dataSource.getRowCount() === 0 ?
+        const { conversationList } = this.props.state;
+        console.log('conversationList: ' + conversationList);
+        var content = conversationList.dataSource.length === 0 ?
             <View style = { styles.container }>
-			{ this.state.isLoading && <View style = { {alignItems: 'center', justifyContent: 'center'} }>
+			{ conversationList.fetching && <View style = { {alignItems: 'center', justifyContent: 'center'} }>
 					<Text style = { {fontSize: 24, }}>
 						正在加载...
 					</Text>
@@ -238,9 +260,9 @@ var Conv = React.createClass({
 			</View> :
             <ListView style = { styles.listView }
 				ref = 'listView'
-				dataSource = { this.state.dataSource }
+				dataSource = { conversationList.dataSource }
 				renderHeader = { this.renderHeader }
-				renderRow = { this._renderRow }
+				renderRow = { this.renderRow }
 				keyboardDismissMode="on-drag"
    				keyboardShouldPersistTaps={ true }
    				showsVerticalScrollIndicator={ false }/>;
@@ -351,7 +373,7 @@ var Conv = React.createClass({
 				</View>
         );
     }
-});
+}
 
 var styles = React.StyleSheet.create({
     container: {
@@ -513,5 +535,3 @@ var styles = React.StyleSheet.create({
     }
 
 });
-
-module.exports = Conv

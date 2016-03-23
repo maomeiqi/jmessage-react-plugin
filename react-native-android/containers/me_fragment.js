@@ -2,26 +2,34 @@
 
 var React = require('react-native');
 var {
+	Component,
 	View,
 	Text,
 	TouchableHighlight,
 	NativeModules,
 } = React;
-
+import ReloginActivity from './re-login_activity';
 var JMessageHelper = NativeModules.JMessageHelper;
-var Me = React.createClass({
+class Me extends Component {
+
+	constructor(props) {
+		super(props);
+
+		this.logout = this.logout.bind(this);
+	}
 
 	logout() {
 			JMessageHelper.logout((username) => {
 			console.log('User has logged out ');
 			this.props.navigator.replace({
 				name: 'reloginActivity',
+				component: ReloginActivity,
 				params: {
 					username: username
 				}
 			});
 		});
-	},
+	}
 
 	render() {
 		return (
@@ -30,7 +38,7 @@ var Me = React.createClass({
 						Me Fragment
 					</Text>
 					<TouchableHighlight
-						onPress = { () => this.logout() }
+						onPress = { this.logout }
 						style = { styles.logoutBtn }>
 						<Text style = { styles.btnText }>
 							登出
@@ -39,7 +47,7 @@ var Me = React.createClass({
 				</View>
 			);
 	}
-});
+}
 
 var styles = React.StyleSheet.create({
 	container: {
@@ -63,4 +71,4 @@ var styles = React.StyleSheet.create({
 	}
 });
 
-module.exports = Me
+export default Me

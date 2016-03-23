@@ -32,7 +32,7 @@ public class MainActivity extends Activity implements DefaultHardwareBackBtnHand
         mReactInstanceManager = ReactInstanceManager.builder()
                 .setApplication((Application) JChatApplication.getContext())
                 .setBundleAssetName("index.android.bundle")
-                .setJSMainModuleName("android/app/react-native/index.android")
+                .setJSMainModuleName("index.android")
                 .addPackage(new MainReactPackage())
                 .addPackage(new CustomReactPackage())
                 .addPackage(new RCTCameraPackage())

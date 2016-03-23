@@ -2,11 +2,12 @@
 
 var React = require('react-native');
 var {
+	Component,
 	View,
 	Text,
 } = React;
 
-var Contact = React.createClass({
+class Contact extends Component {
 	render() {
 		return (
 				<View style = { styles.container }>
@@ -16,7 +17,7 @@ var Contact = React.createClass({
 				</View>
 			);
 	}
-});
+}
 
 var styles = React.StyleSheet.create({
 	container: {
@@ -30,4 +31,4 @@ var styles = React.StyleSheet.create({
 	}
 });
 
-module.exports = Contact
+export default Contact

@@ -1,12 +1,13 @@
 'use strict'
 
-var React = require('react-native');
-var Conv = require('./conv_fragment');
-var Contact = require('./contact_fragment');
-var Me = require('./me_fragment');
-var Orientation = require('react-native-orientation');
+import React from 'react-native';
+import Conv from './conv_fragment';
+import Contact from './contact_fragment';
+import Me from './me_fragment';
+import Orientation from 'react-native-orientation';
 var {
     BackAndroid,
+    Component,
     Text,
     View,
     Image,
@@ -17,14 +18,16 @@ var {
     ViewPagerAndroid,
 } = React;
 
-var Actionbar = React.createClass({
+class Actionbar extends Component {
 
     isActive(index) {
         return this.props.currentPage == index;
-    },
+    }
+
     onPageSelected(index) {
         this.props.onselect(index);
-    },
+    }
+
     render() {
         var TouchableElement = TouchableHighlight;
         if (Platform.OS === 'android') {
@@ -80,20 +83,24 @@ var Actionbar = React.createClass({
 
         );
     }
-});
+}
 
 
-var MainActivity = React.createClass({
-    getInitialState() {
-        return {
+export default class MainActivity extends Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
             page: 0,
         };
-    },
+
+        this.onSelectMenu = this.onSelectMenu.bind(this);
+    }
     
     onPageSelected(e) {
         console.log('Page selected!');
         this.setState({ page: e.nativeEvent.position });
-    },
+    }
 
     componentDidMount() {
         Orientation.lockToPortrait();
@@ -104,14 +111,14 @@ var MainActivity = React.createClass({
             }
             return false;
         });
-    },
+    }
 
     onSelectMenu(index) {
         if (index != this.state.page) {
             this.viewPager.setPage(index);
             this.setState({ page: index });
         };
-    },
+    }
 
     render() {
         var pages = [];
@@ -120,7 +127,11 @@ var MainActivity = React.createClass({
             };
         pages.push(
             <View key = { 0 } style = { pageStyle } collapsable = { true }>
-                <Conv navigator = { this.props.navigator }/>
+                <Conv
+                    state = { this.props.state }
+                    actions = { this.props.actions }
+                    navigator = { this.props.navigator }
+                />
             </View>
         );
         pages.push(
@@ -133,7 +144,6 @@ var MainActivity = React.createClass({
                 <Me navigator = { this.props.navigator } />
             </View>
         );
-        var { page } = this.state;
         return (
             <View style = { styles.container }>
 					<ViewPagerAndroid
@@ -149,8 +159,8 @@ var MainActivity = React.createClass({
 				</View>
 
         );
-    },
-});
+    }
+}
 
 var styles = React.StyleSheet.create({
     container: {
@@ -198,5 +208,3 @@ var styles = React.StyleSheet.create({
         flex: 1,
     }
 });
-
-module.exports = MainActivity
