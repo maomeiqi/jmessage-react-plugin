@@ -95,6 +95,7 @@ export default class MainActivity extends Component {
         };
 
         this.onSelectMenu = this.onSelectMenu.bind(this);
+        this.onPageSelected = this.onPageSelected.bind(this);
     }
     
     onPageSelected(e) {

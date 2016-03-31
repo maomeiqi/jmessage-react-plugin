@@ -37,7 +37,14 @@ export default function conversationList(state, action) {
 				dataSource,
 				fetching: false
 			}
-		case types.ADD_CONVERSATION:
+		case types.ADDING_FRIEND:
+			return {
+				...state,
+				...action,
+				fetching: true
+			}
+			break;
+		case types.ADD_FRIEND_SUCCESS:
 			var convList = [...state.convList];
 			convList.unshift(action.conversation);
 			dataSource = state.dataSource.cloneWithRows(convList);
@@ -45,7 +52,8 @@ export default function conversationList(state, action) {
 				...state,
 				...action,
 				convList,
-				dataSource
+				dataSource,
+				fetching: false
 			}
 		case types.DELETE_CONVERSATION:
 			var selected = action.selected;

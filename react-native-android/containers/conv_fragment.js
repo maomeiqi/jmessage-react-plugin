@@ -209,13 +209,19 @@ export default class Conv extends Component {
     }
 
     addFriend() {
-
-        JMessageHelper.addFriend(this.state.friendId, (result) => {
+        const { addFriend } = this.props.actions;
+        addFriend(this.state.friendId);
+        const { fetching } = this.props.state;
+        if (!fetching) {
             this.dismissAddFriendDialog();
-            var newDs = JSON.parse(result);
-            this.setState({ dataSource: this.getDataSource([newDs, ..._convList]) });
-            _convList = [newDs, ..._convList];
-        });
+        }
+
+        // JMessageHelper.addFriend(this.state.friendId, (result) => {
+        //     this.dismissAddFriendDialog();
+        //     var newDs = JSON.parse(result);
+        //     this.setState({ dataSource: this.getDataSource([newDs, ..._convList]) });
+        //     _convList = [newDs, ..._convList];
+        // });
     }
 
     showAddFriendDialog() {
@@ -249,6 +255,7 @@ export default class Conv extends Component {
 
     render() {
         const { conversationList } = this.props.state;
+        _convList = conversationList.convList;
         console.log('conversationList: ' + conversationList);
         var content = conversationList.dataSource.length === 0 ?
             <View style = { styles.container }>

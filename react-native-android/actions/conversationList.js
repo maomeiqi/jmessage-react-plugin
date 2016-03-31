@@ -25,3 +25,15 @@ export function loadConversations() {
 		});
 	}
 }
+
+export function addFriend(username) {
+	return dispatch => {
+		type: types.ADDING_FRIEND,
+		JMessageHelper.addFriend(username, (result) => {
+			dispatch ({
+				type: types.ADD_FRIEND_SUCCESS,
+				conversation: JSON.parse(result)
+			});
+		})
+	}
+}
