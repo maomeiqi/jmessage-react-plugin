@@ -208,14 +208,7 @@ export default class Conv extends Component {
     addFriend() {
         const { addFriend } = this.props.actions;
         addFriend(this.state.friendId);
-        var adding = convReducer.adding;
-        var error  = convReducer.error;
-        console.log('adding:  ' + adding);
-        if (adding !== undefined && !adding) {
-            this.dismissAddFriendDialog();
-        } else if (error !== undefined && error) {
-            this.setState({friendId: ''});
-        }
+        this.dismissAddFriendDialog();
         // JMessageHelper.addFriend(this.state.friendId, (result) => {
         //     this.dismissAddFriendDialog();
         //     var newDs = JSON.parse(result);

@@ -32,10 +32,6 @@ export function addFriend(username) {
 				type: types.ADD_FRIEND_SUCCESS,
 				conversation: JSON.parse(result)
 			});
-		}, () => {
-			dispatch ({
-				type: types.ADD_FRIEND_ERROR,
-			});
 		})
 	}
 }

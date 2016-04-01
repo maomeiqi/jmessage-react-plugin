@@ -51,21 +51,12 @@ export default function conversationList(state, action) {
 			var convList = [...state.convList];
 			convList.unshift(action.conversation);
 			dataSource = state.dataSource.cloneWithRows(convList);
-			console.log('convList: ' + convList);
 			return {
 				...state,
 				...action,
 				convList: convList,
 				dataSource,
 				adding: false
-			}
-		case types.ADD_FRIEND_ERROR:
-			console.log('error: ');
-			return {
-				...state,
-				...action,
-				adding: true,
-				error: true
 			}
 		case types.DELETE_CONVERSATION:
 			var selected = action.selected;

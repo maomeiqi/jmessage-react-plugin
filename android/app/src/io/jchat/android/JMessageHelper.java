@@ -323,17 +323,14 @@ public class JMessageHelper extends ReactContextBaseJavaModule implements Activi
      * @param callback 回调
      */
     @ReactMethod
-    public void addFriend(final String username, final Callback callback, final Callback failCallback) {
+    public void addFriend(final String username, final Callback callback) {
         mContext = getCurrentActivity();
         if (TextUtils.isEmpty(username)) {
             HandleResponseCode.onHandle(mContext, 802001, true);
-            failCallback.invoke();
         } else if (username.equals(JMessageClient.getMyInfo().getUserName())) {
             HandleResponseCode.onHandle(mContext, 1003, true);
-            failCallback.invoke();
         } else if (isExistConv(username)) {
             HandleResponseCode.onHandle(mContext, 810007, true);
-            failCallback.invoke();
         } else {
             final ProgressDialog dialog = new ProgressDialog(mContext);
             dialog.setMessage(mContext.getString(R.string.adding_hint));
@@ -350,7 +347,6 @@ public class JMessageHelper extends ReactContextBaseJavaModule implements Activi
                         callback.invoke(result);
                     } else {
                         HandleResponseCode.onHandle(mContext, status, false);
-                        failCallback.invoke();
                     }
                 }
             });
