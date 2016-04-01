@@ -3,18 +3,21 @@
 import React from 'react-native';
 import * as types from '../actions/ActionTypes';
 import { combineReducers } from 'redux';
+import Immutable from 'immutable';
 var {
 	ListView,
 	NativeModules,
 } = React;
 var JMessageHelper = NativeModules.JMessageHelper;
 
+
 export default function conversationList(state, action) {
 	state = state || {
 		type: types.INITIAL_CONVERSATION_LIST,
-		convList: [],
 		dataSource: [],
 		fetching: true,
+		adding: true,
+		error: false,
 	}
 
 	switch(action.type) {
@@ -25,7 +28,7 @@ export default function conversationList(state, action) {
 			return {
 				...state,
 				...action,
-				convList,
+				convList: convList,
 				dataSource,
 				fetching: false
 			}
@@ -41,30 +44,40 @@ export default function conversationList(state, action) {
 			return {
 				...state,
 				...action,
-				fetching: true
+				adding: true
 			}
 			break;
 		case types.ADD_FRIEND_SUCCESS:
 			var convList = [...state.convList];
 			convList.unshift(action.conversation);
 			dataSource = state.dataSource.cloneWithRows(convList);
+			console.log('convList: ' + convList);
 			return {
 				...state,
 				...action,
-				convList,
+				convList: convList,
 				dataSource,
-				fetching: false
+				adding: false
+			}
+		case types.ADD_FRIEND_ERROR:
+			console.log('error: ');
+			return {
+				...state,
+				...action,
+				adding: true,
+				error: true
 			}
 		case types.DELETE_CONVERSATION:
 			var selected = action.selected;
 			var convList = [...state.convList];
-			var index = convList.indexOf(selected);
-			convList = convList.splice(index, 1);
-			dataSource = state.dataSource.cloneWithRows(convList);
+			convList.splice(selected, 1);
+			var newList = new Array();
+			newList = convList;
+			dataSource = state.dataSource.cloneWithRows(newList);
 			return {
 				...state,
 				...action,
-				convList,
+				convList: newList,
 				dataSource
 			}
 		default:

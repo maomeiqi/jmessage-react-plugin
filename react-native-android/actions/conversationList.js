@@ -7,8 +7,6 @@ var {
 } = React;
 var JMessageHelper = NativeModules.JMessageHelper;
 
-
-
 export function loadConversations() {
 	return dispatch => {
 		type: types.INITIAL_CONVERSATION_LIST,
@@ -33,6 +31,22 @@ export function addFriend(username) {
 			dispatch ({
 				type: types.ADD_FRIEND_SUCCESS,
 				conversation: JSON.parse(result)
+			});
+		}, () => {
+			dispatch ({
+				type: types.ADD_FRIEND_ERROR,
+			});
+		})
+	}
+}
+
+export function deleteConversation(conversation: Object, selected: number) {
+	return dispatch => {
+		JMessageHelper.deleteConversation(conversation.username, conversation.groupId, conversation.appKey, () => {
+			dispatch ({
+				type: types.DELETE_CONVERSATION,
+				selected: selected,
+				conversation: conversation
 			});
 		})
 	}

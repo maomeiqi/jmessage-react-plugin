@@ -75,7 +75,8 @@ public class ConversationToJSON {
                     lastMsg = ((TextContent) message.getContent()).getText();
             }
         }
-        myConversation = new MyConversation(title, username, groupId, avatarPath, unreadMsgCnt, date, lastMsg);
+        myConversation = new MyConversation(title, username, groupId, avatarPath, unreadMsgCnt,
+                date, lastMsg, conv.getTargetAppKey());
         Gson gson = new Gson();
         mResult = gson.toJson(myConversation);
     }
@@ -134,7 +135,8 @@ public class ConversationToJSON {
                         lastMsg = ((TextContent) message.getContent()).getText();
                 }
             }
-            myConversation = new MyConversation(title, username, groupId, avatarPath, unreadMsgCnt, date, lastMsg);
+            myConversation = new MyConversation(title, username, groupId, avatarPath, unreadMsgCnt,
+                    date, lastMsg, conv.getTargetAppKey());
             list.add(myConversation);
         }
         Gson gson = new Gson();

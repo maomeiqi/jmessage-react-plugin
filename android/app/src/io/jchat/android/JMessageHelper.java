@@ -323,14 +323,17 @@ public class JMessageHelper extends ReactContextBaseJavaModule implements Activi
      * @param callback 回调
      */
     @ReactMethod
-    public void addFriend(final String username, final Callback callback) {
+    public void addFriend(final String username, final Callback callback, final Callback failCallback) {
         mContext = getCurrentActivity();
         if (TextUtils.isEmpty(username)) {
             HandleResponseCode.onHandle(mContext, 802001, true);
+            failCallback.invoke();
         } else if (username.equals(JMessageClient.getMyInfo().getUserName())) {
             HandleResponseCode.onHandle(mContext, 1003, true);
+            failCallback.invoke();
         } else if (isExistConv(username)) {
             HandleResponseCode.onHandle(mContext, 810007, true);
+            failCallback.invoke();
         } else {
             final ProgressDialog dialog = new ProgressDialog(mContext);
             dialog.setMessage(mContext.getString(R.string.adding_hint));
@@ -347,6 +350,7 @@ public class JMessageHelper extends ReactContextBaseJavaModule implements Activi
                         callback.invoke(result);
                     } else {
                         HandleResponseCode.onHandle(mContext, status, false);
+                        failCallback.invoke();
                     }
                 }
             });
@@ -356,6 +360,17 @@ public class JMessageHelper extends ReactContextBaseJavaModule implements Activi
     public boolean isExistConv(String username) {
         Conversation conv = JMessageClient.getSingleConversation(username);
         return conv != null;
+    }
+
+    @ReactMethod
+    public void deleteConversation(String username, int groupId, String appKey, Callback callback) {
+        if (groupId != 0) {
+            JMessageClient.deleteGroupConversation(groupId);
+            callback.invoke();
+        } else {
+            JMessageClient.deleteSingleConversation(username, appKey);
+            callback.invoke();
+        }
     }
 
     @Override

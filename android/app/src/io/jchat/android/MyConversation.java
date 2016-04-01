@@ -10,9 +10,10 @@ public class MyConversation {
     private int unreadMsgCnt;
     private String date;
     private String lastMsg;
+    private String appKey;
 
     public MyConversation(String title, String username, long groupId, String avatarPath,
-                          int unreadMsgCnt, String date, String lastMsg) {
+                          int unreadMsgCnt, String date, String lastMsg, String appKey) {
         this.title = title;
         this.username = username;
         this.groupId = groupId;
@@ -20,5 +21,6 @@ public class MyConversation {
         this.unreadMsgCnt = unreadMsgCnt;
         this.date = date;
         this.lastMsg = lastMsg;
+        this.appKey = appKey;
     }
 }

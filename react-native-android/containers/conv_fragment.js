@@ -26,6 +26,7 @@ import ChatActivity from './chat_activity';
 import Modal from 'react-native-root-modal';
 var JMessageHelper = NativeModules.JMessageHelper;
 var _convList = [];
+var convReducer;
 
 export default class Conv extends Component {
 
@@ -38,6 +39,7 @@ export default class Conv extends Component {
             showAddFriendDialog: false,
             showDelConvDialog: false,
             title: '',
+            rowID: '',
             scaleAnimation: new Animated.Value(1),
             y: new Animated.Value(0),
             friendId: '',
@@ -54,6 +56,7 @@ export default class Conv extends Component {
         this.renderRow = this.renderRow.bind(this);
         this.longPressRow = this.longPressRow.bind(this);
         this.pressRow = this.pressRow.bind(this);
+        this.delConvClick = this.delConvClick.bind(this);
     }
 
     componentWillMount() {
@@ -64,16 +67,9 @@ export default class Conv extends Component {
 
     componentDidMount() {
         const { loadConversations } = this.props.actions;
+        const { conversationList } = this.props.state;
         loadConversations();
-        // JMessageHelper.getConvList((result) => {
-        // 	_convList = JSON.parse(result);
-        //     this.setState({
-        //         isLoading: false,
-        //         dataSource: this.getDataSource(_convList),
-        //     });
-        // }, () => {
-        // 	this.setState({isLoading: false});
-        // });
+
         JMessageHelper.checkNetwork((value) => {
             this.setState({ disconnected: value });
         });
@@ -156,6 +152,7 @@ export default class Conv extends Component {
     longPressRow(rowID: number) {
     	if (!this.state.showDelConvDialog && !this.state.showAddFriendDialog) {
     		console.log('rowID ' +rowID + ' long pressed!');
+            this.setState({rowID: rowID});
     		Animated.spring(this.state.scaleAnimation, {
     			toValue: 1
     		}).start( () => this.setState({
@@ -211,11 +208,14 @@ export default class Conv extends Component {
     addFriend() {
         const { addFriend } = this.props.actions;
         addFriend(this.state.friendId);
-        const { fetching } = this.props.state;
-        if (!fetching) {
+        var adding = convReducer.adding;
+        var error  = convReducer.error;
+        console.log('adding:  ' + adding);
+        if (adding !== undefined && !adding) {
             this.dismissAddFriendDialog();
+        } else if (error !== undefined && error) {
+            this.setState({friendId: ''});
         }
-
         // JMessageHelper.addFriend(this.state.friendId, (result) => {
         //     this.dismissAddFriendDialog();
         //     var newDs = JSON.parse(result);
@@ -242,9 +242,11 @@ export default class Conv extends Component {
         });
     }
 
-    deleteConversation() {
-
-    	this.dismissDelConvDialog();
+    delConvClick() {
+        const { deleteConversation } = this.props.actions;
+        var conversation = _convList[this.state.rowID];
+        deleteConversation(conversation, this.state.rowID);
+        this.dismissDelConvDialog();
     }
 
     dismissDelConvDialog() {
@@ -256,7 +258,6 @@ export default class Conv extends Component {
     render() {
         const { conversationList } = this.props.state;
         _convList = conversationList.convList;
-        console.log('conversationList: ' + conversationList);
         var content = conversationList.dataSource.length === 0 ?
             <View style = { styles.container }>
 			{ conversationList.fetching && <View style = { {alignItems: 'center', justifyContent: 'center'} }>
@@ -354,7 +355,7 @@ export default class Conv extends Component {
 						<TouchableHighlight style = { {position: 'absolute', bottom: 0, left: 0, right: 0,
 							paddingTop: 10, paddingBottom: 10, paddingLeft: 20} }
 							underlayColor = { '#dddddd' }
-							onPress = { this.deleteConversation }>
+							onPress = { this.delConvClick }>
 							<Text style = { {fontSize: 18, color: '#4e4e4e'}}>
 								删除该聊天
 							</Text>
