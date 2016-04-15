@@ -1,4 +1,4 @@
-package io.jchat.android;
+package io.jchat.android.tools;
 
 import android.content.Context;
 import android.util.Log;

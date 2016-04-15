@@ -30,7 +30,7 @@ export default function conversationList(state, action) {
 				...action,
 				convList: convList,
 				dataSource,
-				fetching: false
+				fetching: false,
 			}
 		case types.LOAD_ERROR:
 			var dataSource = action.convList;
@@ -38,7 +38,6 @@ export default function conversationList(state, action) {
 				...state,
 				...action,
 				dataSource,
-				fetching: false
 			}
 		case types.ADDING_FRIEND:
 			return {
@@ -70,6 +69,17 @@ export default function conversationList(state, action) {
 				...action,
 				convList: newList,
 				dataSource
+			}
+		case types.CREATE_GROUP_SUCCESS:
+			var convList = [...state.convList];
+			convList.unshift(action.conversation);
+			dataSource = state.dataSource.cloneWithRows(convList);
+			return {
+				...state,
+				...action,
+				convList: convList,
+				dataSource,
+				createGroup: true,
 			}
 		default:
 			return {

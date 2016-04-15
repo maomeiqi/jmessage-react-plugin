@@ -1,4 +1,4 @@
-package io.jchat.android;
+package io.jchat.android.tools;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -10,6 +10,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.List;
+
+import io.jchat.android.JChatApplication;
 
 public class BitmapLoader {
 

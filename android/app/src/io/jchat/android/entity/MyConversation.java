@@ -1,4 +1,4 @@
-package io.jchat.android;
+package io.jchat.android.entity;
 
 
 public class MyConversation {

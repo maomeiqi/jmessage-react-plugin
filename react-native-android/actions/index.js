@@ -1,7 +1,9 @@
 'use strict';
 
 var React = require('react-native');
-var conversationList = require('./conversationList');
+var conversationActions = require('./conversationActions');
+var messageActions = require('./messageActions');
 var actions = {};
-Object.assign(actions, conversationList);
+Object.assign(actions, conversationActions);
+Object.assign(actions, messageActions);
 module.exports = actions;

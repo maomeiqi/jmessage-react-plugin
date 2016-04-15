@@ -1,7 +1,9 @@
 'use strict'
 
-var React = require('react-native');
+import React from 'react-native';
 var {
+	BackAndroid,
+	Component,
 	View,
 	Text,
 	Image,
@@ -13,29 +15,60 @@ var {
 
 var messages = [];
 var JMessageHelper = NativeModules.JMessageHelper;
-var ChatActivity = React.createClass({
+export default class ChatActivity extends Component {
 
-	getInitialState() {
-		var ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
-		return {
-			dataSource: ds,
+	constructor(props) {
+		super(props);
+		this.state = {
 			menuVisible: false,
 			isKeyboard: true,
 			single: this.props.groupId === 0,
-			groupNum: '(10)',
-			inputContent: '',
+			groupNum: '(1)',
+			inputContent : '',
 			recordText: '按住 说话',
-			sending: true,
-		};
-	},
+			sending: true
+		}
+
+		this.backPress = this.backPress.bind(this);
+		this.renderRow = this.renderRow.bind(this);
+		this.renderHeader = this.renderHeader.bind(this);
+		this.sendMsg = this.sendMsg.bind(this);
+	}
+
+	componentWillMount() {
+		const { updateGroupTitle, getMessages } = this.props.actions;
+		if (!this.state.single) {
+			updateGroupTitle(this.props.groupId);
+		}
+		getMessages(this.props.username, this.props.groupId, this.props.appKey);
+	}
+
+	componentDidMount() {
+		BackAndroid.addEventListener('hardwareBackPress', this.hardwareBackPress);
+	}
+
+	hardwareBackPress = () => {
+		var navigator = this.props.navigator;
+		if (navigator) {
+			navigator.pop();
+			return true;
+		} else {
+			return false;
+		}
+	};
+
+	componentWillUnmount() {
+		BackAndroid.removeEventListener('hardwareBackPress', this.hardwareBackPress);
+	}
+
 
 	backPress() {
 		this.props.navigator.pop();
-	},
+	}
 
-	getDataSource: function(messages: Array<any>) : ListView.DataSource {
-		return this.state.dataSource.cloneWithRows(messages);
-	},
+	renderHeader() {
+
+	}
 
 	renderRow(message: Object, sectionID: number, rowID: number) {
 		if (message.direction === 'send') {
@@ -83,6 +116,10 @@ var ChatActivity = React.createClass({
 						date = { message.date }
 						content = { message.content }/>
 					break;
+				case 'custom':
+					break;
+				case 'event':
+					break;
 				default:
 					<ReceiveTextCell
 						avatar = { message.avatar }
@@ -90,21 +127,23 @@ var ChatActivity = React.createClass({
 						content = { message.content }/>
 			}
 		}
-	},
+	}
 
 	sendMsg() {
 		JMessageHelper.sendMsg(this.state.inputContent, () => {
 			this.setState({sending: false});
 		});
-	},
+	}
 
 	render() {
-		var content = this.state.dataSource.getRowCount === 0 ?
+		const { messageReducer } = this.props.state;
+		messages = messageReducer.msgList;
+		var content = messageReducer.dataSource.length === 0 ?
 			<View style = { styles.container }>
 			</View>
 			:
 			<View style = { styles.container }>
-				{ this.state.isLoading ? 
+				{ messageReducer.fetching ? 
 					<View style = { {alignItems: 'center', justifyContent: 'center'} }>
 						<Text style = { {fontSize: 24, } }>
 							正在加载...
@@ -113,7 +152,7 @@ var ChatActivity = React.createClass({
 			 		:
             		<ListView style = { styles.listView }
 						ref = 'listView'
-						dataSource = { this.state.dataSource }
+						dataSource = { messageReducer.dataSource }
 						renderHeader = { this.renderHeader }
 						renderRow = { this.renderRow }
 						keyboardDismissMode="on-drag"
@@ -202,7 +241,7 @@ var ChatActivity = React.createClass({
 			</View>
 		);
 	}
-});
+}
 
 var styles = React.StyleSheet.create({
 	container: {
@@ -291,5 +330,3 @@ var styles = React.StyleSheet.create({
 		color: '#ffffff',
 	}
 });
-
-module.exports = ChatActivity

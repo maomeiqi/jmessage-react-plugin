@@ -1,4 +1,4 @@
-package io.jchat.android;
+package io.jchat.android.tools;
 
 import android.net.Uri;
 import android.os.Environment;
@@ -7,6 +7,8 @@ import android.text.format.DateFormat;
 import java.io.File;
 import java.util.Calendar;
 import java.util.Locale;
+
+import io.jchat.android.JChatApplication;
 
 public class FileHelper {
 

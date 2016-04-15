@@ -58,6 +58,10 @@ var LoginActivity  = React.createClass({
       });
 	},
 
+	componentWillUnmount() {
+		BackAndroid.removeEventListener('hardwareBackPress');
+	},
+
 	render() {
 		return (
 			<View style = { styles.container }>

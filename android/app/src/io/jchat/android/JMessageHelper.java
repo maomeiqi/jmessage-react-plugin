@@ -23,18 +23,22 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableMap;
 
-import org.json.JSONArray;
-
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
 
 import cn.jpush.im.android.api.JMessageClient;
+import cn.jpush.im.android.api.callback.CreateGroupCallback;
 import cn.jpush.im.android.api.callback.GetUserInfoCallback;
 import cn.jpush.im.android.api.model.Conversation;
 import cn.jpush.im.android.api.model.UserInfo;
 import cn.jpush.im.api.BasicCallback;
+import io.jchat.android.tools.BitmapLoader;
+import io.jchat.android.tools.ConversationToJSON;
+import io.jchat.android.tools.FileHelper;
+import io.jchat.android.tools.HandleResponseCode;
+import io.jchat.android.tools.SortConvList;
 
 public class JMessageHelper extends ReactContextBaseJavaModule implements ActivityEventListener {
 
@@ -358,6 +362,30 @@ public class JMessageHelper extends ReactContextBaseJavaModule implements Activi
         return conv != null;
     }
 
+    @ReactMethod
+    public void createGroup(final Callback callback) {
+        mContext = getCurrentActivity();
+        final ProgressDialog dialog = new ProgressDialog(mContext);
+        dialog.setMessage(mContext.getString(R.string.creating_hint));
+        dialog.show();
+        JMessageClient.createGroup("", "", new CreateGroupCallback() {
+            @Override
+            public void gotResult(int status, String desc, long groupId) {
+                dialog.dismiss();
+                if (status == 0) {
+                    Conversation conv = Conversation.createGroupConversation(groupId);
+                    ConversationToJSON convJSON = new ConversationToJSON(mContext, conv);
+                    String result = convJSON.getResult();
+                    Log.i(TAG, "Create Group, Result: " + result);
+                    callback.invoke(result);
+                } else {
+                    HandleResponseCode.onHandle(mContext, status, false);
+                }
+            }
+        });
+    }
+
+    //groupId从native传到JS,再从JS传回来,变成了int64,此处可能存在类型转换错误
     @ReactMethod
     public void deleteConversation(String username, int groupId, String appKey, Callback callback) {
         if (groupId != 0) {

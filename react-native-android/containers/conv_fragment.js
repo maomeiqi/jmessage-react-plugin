@@ -1,12 +1,7 @@
 'use strict'
 
 import React from 'react-native';
-import { bindActionsCreators } from 'redux';
-import { connect } from 'react-redux';
-import * as types from '../actions/ActionTypes';
-import actions from '../actions/conversationList';
 import Immutable from 'immutable';
-import PureRenderMixin from 'react-addons-pure-render-mixin';
 var {
     Alert,
     Animated,
@@ -39,7 +34,7 @@ export default class Conv extends Component {
             showAddFriendDialog: false,
             showDelConvDialog: false,
             title: '',
-            rowID: '',
+            rowID: 0,
             scaleAnimation: new Animated.Value(1),
             y: new Animated.Value(0),
             friendId: '',
@@ -133,10 +128,6 @@ export default class Conv extends Component {
         );
     }
 
-    getDataSource(conversations: Array < any > ): ListView.DataSource {
-        return this.state.dataSource.cloneWithRows(conversations);
-    }
-
     pressRow(rowID: number) {
         this.props.navigator.push({
         	name: 'chatActivity',
@@ -145,7 +136,8 @@ export default class Conv extends Component {
         		title: _convList[rowID].title,
         		username: _convList[rowID].username,
         		groupId: _convList[rowID].groupId,
-        	}
+                appKey: _convList[rowID].appKey,
+        	},
         });
     }
 
@@ -203,6 +195,8 @@ export default class Conv extends Component {
     createGroup() {
         console.log('Create group ');
         this.dismissDropDownMenu();
+        const { createGroup } = this.props.actions;
+        createGroup();
     }
 
     addFriend() {
@@ -249,11 +243,11 @@ export default class Conv extends Component {
     }
 
     render() {
-        const { conversationList } = this.props.state;
-        _convList = conversationList.convList;
-        var content = conversationList.dataSource.length === 0 ?
+        const { conversationReducer } = this.props.state;
+        _convList = conversationReducer.convList;
+        var content = conversationReducer.dataSource.length === 0 ?
             <View style = { styles.container }>
-			{ conversationList.fetching && <View style = { {alignItems: 'center', justifyContent: 'center'} }>
+			{ conversationReducer.fetching && <View style = { {alignItems: 'center', justifyContent: 'center'} }>
 					<Text style = { {fontSize: 24, }}>
 						正在加载...
 					</Text>
@@ -261,7 +255,7 @@ export default class Conv extends Component {
 			</View> :
             <ListView style = { styles.listView }
 				ref = 'listView'
-				dataSource = { conversationList.dataSource }
+				dataSource = { conversationReducer.dataSource }
 				renderHeader = { this.renderHeader }
 				renderRow = { this.renderRow }
 				keyboardDismissMode="on-drag"
@@ -484,6 +478,7 @@ var styles = React.StyleSheet.create({
     thumb: {
         width: 50,
         height: 50,
+        borderRadius: 25,
     },
     msgHint: {
         borderColor: '#ffffff',

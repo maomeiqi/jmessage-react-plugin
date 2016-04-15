@@ -47,3 +47,14 @@ export function deleteConversation(conversation: Object, selected: number) {
 		})
 	}
 }
+
+export function createGroup() {
+	return dispatch => {
+		JMessageHelper.createGroup((result) => {
+			dispatch ({
+				type: types.CREATE_GROUP_SUCCESS,
+				conversation: JSON.parse(result)
+			});
+		});
+	}
+}

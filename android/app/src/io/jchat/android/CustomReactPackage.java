@@ -17,6 +17,7 @@ public class CustomReactPackage implements ReactPackage {
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
         List<NativeModule> result = new ArrayList<>();
         result.add(new JMessageHelper(reactContext));
+        result.add(new MessageController(reactContext));
         return result;
     }
 
