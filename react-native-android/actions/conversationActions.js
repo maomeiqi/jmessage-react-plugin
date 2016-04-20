@@ -7,6 +7,7 @@ var {
 } = React;
 var JMessageHelper = NativeModules.JMessageHelper;
 
+
 export function loadConversations() {
 	return dispatch => {
 		type: types.INITIAL_CONVERSATION_LIST,

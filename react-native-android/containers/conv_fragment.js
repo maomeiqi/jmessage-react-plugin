@@ -7,6 +7,7 @@ var {
     Animated,
     BackAndroid,
     Component,
+    DeviceEventEmitter,
     Dimensions,
     Image,
     ListView,
@@ -64,11 +65,10 @@ export default class Conv extends Component {
         const { loadConversations } = this.props.actions;
         const { conversationList } = this.props.state;
         loadConversations();
-
-        JMessageHelper.checkNetwork((value) => {
-            this.setState({ disconnected: value });
+        DeviceEventEmitter.addListener('networkError', (state) => {
+            this.setState({ disconnected: state });
         });
-        BackAndroid.addEventListener('hardwareBackPress', this.hardwareBackPress);
+        // BackAndroid.addEventListener('hardwareBackPress', this.hardwareBackPress);
     }
 
     hardwareBackPress = () => {
@@ -81,12 +81,13 @@ export default class Conv extends Component {
             } else if (this.state.showDelConvDialog) {
                 this.dismissDelConvDialog();
                 return true;
-            } 
+            }
         return false;
     };
 
     componentWillUnmount() {
-    	BackAndroid.removeEventListener('hardwareBackPress', this.hardwareBackPress);
+    	// BackAndroid.removeEventListener('hardwareBackPress', this.hardwareBackPress);
+        DeviceEventEmitter.removeAllListeners();
     }
 
 
@@ -155,17 +156,21 @@ export default class Conv extends Component {
     }
 
     renderHeader() {
+        console.log('disconnected: ' + this.state.disconnected);
         if (this.state.disconnected) {
             return (
                 <View style = { styles.header }>
-						<Image style = { styles.networkError }
-							source  = { {uri: 'disconnect_icon'} }/>
-						<Text style = { styles.disconnect }>
-							当前网络不可使用
-						</Text>
-				</View>
+                        <Image style = { styles.networkError }
+                            source  = { {uri: 'disconnect_icon'} }/>
+                        <Text style = { styles.disconnect }>
+                            当前网络不可使用
+                        </Text>
+                </View>
             );
-        } else return null;
+        } else {
+            return null; 
+        }
+            
     }
 
     showDropDownMenu() {

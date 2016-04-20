@@ -104,14 +104,20 @@ export default class MainActivity extends Component {
     }
 
     componentDidMount() {
+        var navigator = this.props.navigator;
         Orientation.lockToPortrait();
-        BackAndroid.addEventListener('hardwareBackPress', () => {
-            if (this.props.navigator.getCurrentRoutes() > 0) {
-                this.props.navigator.pop();
-                return true;
-            }
-            return false;
-        });
+
+        // BackAndroid.addEventListener('hardwareBackPress', () => {
+        //     if (navigator && navigator.getCurrentRoutes() > 0) {
+        //         navigator.pop();
+        //         return true;
+        //     }
+        //     return false;
+        // });
+    }
+
+    componentWillUnmount() {
+        // BackAndroid.removeEventListener('hardwareBackPress', this.hardwareBackPress);
     }
 
     onSelectMenu(index) {

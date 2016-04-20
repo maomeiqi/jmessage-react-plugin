@@ -2,15 +2,22 @@ package io.jchat.android;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.KeyEvent;
 
+import com.facebook.infer.annotation.Assertions;
 import com.facebook.react.LifecycleState;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactRootView;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.shell.MainReactPackage;
 import com.github.yamill.orientation.OrientationPackage;
 import com.lwansbrough.RCTCamera.RCTCameraPackage;
@@ -55,7 +62,7 @@ public class MainActivity extends Activity implements DefaultHardwareBackBtnHand
         super.onPause();
         isForeground = false;
         if (mReactInstanceManager != null) {
-            mReactInstanceManager.onPause();
+            mReactInstanceManager.onHostPause();
         }
         JPushInterface.onPause(this);
     }
@@ -65,7 +72,7 @@ public class MainActivity extends Activity implements DefaultHardwareBackBtnHand
         super.onResume();
         isForeground = true;
         if (mReactInstanceManager != null) {
-            mReactInstanceManager.onResume(this, this);
+            mReactInstanceManager.onHostResume(this, this);
         }
         JPushInterface.onResume(this);
     }
@@ -77,6 +84,11 @@ public class MainActivity extends Activity implements DefaultHardwareBackBtnHand
         } else {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     @Override

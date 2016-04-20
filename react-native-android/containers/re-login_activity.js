@@ -2,6 +2,7 @@
 
 var React = require('react-native');
 var {
+	BackAndroid,
 	Component,
 	Text,
 	View,
@@ -49,6 +50,18 @@ class ReloginActivity extends Component {
 
 	componentDidMount() {
 		console.log('this.props.username: ' + this.props.username);
+		var navigator = this.props.navigator;
+		BackAndroid.addEventListener('hardwareBackPress', () => {
+            if (navigator && navigator.getCurrentRoutes() > 0) {
+                navigator.pop();
+                return true;
+            }
+            return false;
+        });
+	}
+
+	componentWillUnmount() {
+		BackAndroid.removeEventListener('hardwareBackPress', this.hardwareBackPress);
 	}
 
 	jumpRegisterActivity() {

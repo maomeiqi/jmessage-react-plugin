@@ -1,8 +1,9 @@
 'use strict'
 
-var React = require('react-native');
+import React from 'react-native';
 var {
 	Animated,
+	Component,
 	Text,
 	View,
 	TextInput,
@@ -16,22 +17,26 @@ var {
 import RegisterActivity from './register_activity';
 import MainActivity from './main_activity';
 var JMessageHelper = NativeModules.JMessageHelper;
-var LoadingAnimation = require('./loading_animation');
-var LoginActivity  = React.createClass({
+export default class LoginActivity  extends Component {
 
-	getInitialState() {
-		return {
+	constructor(props) {
+		super(props);
+
+		this.state = {
 			switchIsOn: false,
 			testEnvironment: false,
 			username: '',
 			password: '',
-			
-		};
-	},
+		}
+
+		this.backOnClick = this.backOnClick.bind(this);
+		this.login = this.login.bind(this);
+		this.jumpRegisterActivity = this.jumpRegisterActivity.bind(this);
+	}
 
 	backOnClick() {
 		this.props.navigator.pop();
-	},
+	}
 
 	login() {
 		console.log('username: ' + this.state.username);
@@ -40,27 +45,27 @@ var LoginActivity  = React.createClass({
 			//相当于重新Start MainActivity，finish掉其他Activity
 			this.props.navigator.immediatelyResetRouteStack([{name: 'mainActivity', component: MainActivity}]);
 		});
-	},
+	}
 
 	jumpRegisterActivity() {
 		this.props.navigator.push({name: 'registerActivity', component: RegisterActivity});
-	},
+	}
 
 	componentDidMount() {
 		console.log('this.props.showBackBtn: ' + this.props.showBackBtn);
 		var navigator = this.props.navigator;
 		BackAndroid.addEventListener('hardwareBackPress', function() {
-          if (navigator && navigator.getCurrentRoutes().length > 1) {
+          if (navigator) {
             navigator.pop();
             return true;
           }
           return false;
       });
-	},
+	}
 
 	componentWillUnmount() {
 		BackAndroid.removeEventListener('hardwareBackPress');
-	},
+	}
 
 	render() {
 		return (
@@ -141,7 +146,7 @@ var LoginActivity  = React.createClass({
 			</View>
 		);
 	}
-});
+}
 
 var styles = React.StyleSheet.create({
 	container: {
@@ -211,5 +216,3 @@ var styles = React.StyleSheet.create({
 	}
 
 });
-
-module.exports = LoginActivity

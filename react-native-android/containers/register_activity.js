@@ -1,7 +1,9 @@
 'use strict'
 
-var React = require('react-native');
+import React from 'react-native';
 var {
+	BackAndroid,
+	Component,
 	Text,
 	View,
 	Image,
@@ -10,20 +12,40 @@ var {
 	NativeModules,
 } = React;
 var JMessageHelper = NativeModules.JMessageHelper;
-var LoadingAnimation = require('./loading_animation');
 
-var RegisterActivity = React.createClass({
+export default class RegisterActivity extends Component {
 
-	getInitialState() {
-		return {
+	constructor(props) {
+		super(props);
+
+		this.state = {
 			username: '',
 			password: '',
 		};
-	},
+
+		this.backOnClick = this.backOnClick.bind(this);
+		this.register = this.register.bind(this);
+	}
+
+	componentDidMount() {
+		var navigator = this.props.navigator;
+		console.log('RegisterActivity navigator: ' + navigator);
+		BackAndroid.addEventListener('hardwareBackPress', () => {
+			if (navigator) {
+				navigator.pop();
+			}
+			return false;
+		});
+	}
+
+	componentWillUnmount() {
+		BackAndroid.removeEventListener('hardwareBackPress');
+	}
+
 
 	backOnClick() {
 		this.props.navigator.pop();
-	},
+	}
 
 	register() {
 		console.log('Begin registering');
@@ -37,7 +59,7 @@ var RegisterActivity = React.createClass({
 				}
 			});
 		});
-	},
+	}
 
 	render() {
 		return (
@@ -88,7 +110,7 @@ var RegisterActivity = React.createClass({
 			</View>
 		)
 	}
-});
+}
 
 var styles = React.StyleSheet.create({
 container: {
@@ -147,5 +169,3 @@ container: {
 	},
 
 });
-
-module.exports = RegisterActivity

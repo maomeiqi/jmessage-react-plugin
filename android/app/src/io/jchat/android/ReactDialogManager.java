@@ -3,9 +3,9 @@ package io.jchat.android;
 import android.app.Dialog;
 import android.support.annotation.Nullable;
 
-import com.facebook.react.uimanager.ReactProp;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
+import com.facebook.react.uimanager.annotations.ReactProp;
 
 public class ReactDialogManager extends SimpleViewManager<ReactDialog> {
     @Override

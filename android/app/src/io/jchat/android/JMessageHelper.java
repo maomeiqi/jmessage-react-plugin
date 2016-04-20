@@ -278,25 +278,6 @@ public class JMessageHelper extends ReactContextBaseJavaModule implements Activi
     }
 
     /**
-     * JS端调用的检查网络是否连接的方法
-     * @param callback 回调返回是否显示HeaderView
-     */
-    @ReactMethod
-    public void checkNetwork(Callback callback) {
-        mContext = getCurrentActivity();
-        if (mContext != null) {
-            ConnectivityManager manager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo activeInfo = manager.getActiveNetworkInfo();
-            if (null == activeInfo) {
-                //显示Header
-                callback.invoke(true);
-            } else {
-                callback.invoke(false);
-            }
-        }
-    }
-
-    /**
      * JS端调用的获取所有会话的方法
      * @param successCallback 回调返回一个Map对象
      */
