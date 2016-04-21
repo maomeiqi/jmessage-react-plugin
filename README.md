@@ -2,7 +2,11 @@
 
 ##Android
 
-####这是一个使用JMessage-sdk的混合的React Native应用，在本项目中使用了[Redux架构](http://camsong.github.io/redux-in-chinese/)来管理状态。
+####这是一个使用JMessage-sdk的混合的React Native应用，在本项目中使用了[Redux架构](http://camsong.github.io/redux-in-chinese/)来管理状态。先来看一下效果图：
+
+![JChat](https://github.com/KenChoi1992/SomeArticles/blob/master/screenshots/react-native-JChat.gif)
+
+目前还没有实现收发消息，后续会陆续实现。。-_-
 
 ####Android用法
 - 下载并解压这个项目的zip
