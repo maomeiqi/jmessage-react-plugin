@@ -68,11 +68,8 @@ export default class Conv extends Component {
         DeviceEventEmitter.addListener('networkError', (state) => {
             this.setState({ disconnected: state });
         });
-        // BackAndroid.addEventListener('hardwareBackPress', this.hardwareBackPress);
-    }
-
-    hardwareBackPress = () => {
-        if (this.state.showDropDownMenu) {
+        BackAndroid.addEventListener('hardwareBackPress', () => {
+            if (this.state.showDropDownMenu) {
                 this.dismissDropDownMenu();
                 return true;
             } else if (this.state.showAddFriendDialog) {
@@ -83,16 +80,16 @@ export default class Conv extends Component {
                 return true;
             }
         return false;
-    };
+        });
+    }
 
     componentWillUnmount() {
-    	// BackAndroid.removeEventListener('hardwareBackPress', this.hardwareBackPress);
+    	BackAndroid.removeEventListener('hardwareBackPress');
         DeviceEventEmitter.removeAllListeners();
     }
 
 
     renderRow(convItem: Object, sectionID: number, rowID: number) {
-
         return (
             <TouchableHighlight 
             	onLongPress = { () => this.longPressRow(rowID) }
@@ -156,7 +153,6 @@ export default class Conv extends Component {
     }
 
     renderHeader() {
-        console.log('disconnected: ' + this.state.disconnected);
         if (this.state.disconnected) {
             return (
                 <View style = { styles.header }>
@@ -178,7 +174,7 @@ export default class Conv extends Component {
         	if (this.state.showDropDownMenu) {
         		this.dismissDropDownMenu();
         	} else {
-				this.state.y.setValue(-200);
+				this.state.y.setValue(-600);
             	this.state.scaleAnimation.setValue(1);
             	Animated.spring(this.state.y, {
                 	toValue: 0
@@ -190,7 +186,7 @@ export default class Conv extends Component {
 
     dismissDropDownMenu() {
     	Animated.timing(this.state.y, {
-        	toValue: -200
+        	toValue: -600
        	}).start(() => {
    			this.setState({ showDropDownMenu: false});
    		});
@@ -218,17 +214,18 @@ export default class Conv extends Component {
 
     showAddFriendDialog() {
         this.dismissDropDownMenu();
-        this.state.scaleAnimation.setValue(0);
-        Animated.spring(this.state.scaleAnimation, {
-            toValue: 1
+        this.state.y.setValue(-600);
+        this.state.scaleAnimation.setValue(1);
+        Animated.spring(this.state.y, {
+            toValue: 0
         }).start();
         this.setState({ showAddFriendDialog: true });
     }
 
     dismissAddFriendDialog() {
     	console.log('dismissing dialog');
-        Animated.timing(this.state.scaleAnimation, {
-            toValue: 0,
+        Animated.timing(this.state.y, {
+            toValue: -600,
         }).start(() => {
             this.setState({ showAddFriendDialog: false });
         });
@@ -263,6 +260,7 @@ export default class Conv extends Component {
 				dataSource = { conversationReducer.dataSource }
 				renderHeader = { this.renderHeader }
 				renderRow = { this.renderRow }
+                enableEmptySections = { true }
 				keyboardDismissMode="on-drag"
    				keyboardShouldPersistTaps={ true }
    				showsVerticalScrollIndicator={ false }/>;
@@ -273,8 +271,14 @@ export default class Conv extends Component {
 					style = { [styles.dropDownMenu, {transform: [{translateY: this.state.y}, {scale: this.state.scaleAnimation}]}] }
 					visible = { this.state.showDropDownMenu }>
 					<View style = { styles.dropDownMenuContent }>
-						<Image style = { styles.menuBackground }
-							source = { {uri: 'drop_down_menu_bg'}}>
+						<View style = { styles.menuBackground }>
+                            <TouchableHighlight
+                                onPress = { this.dismissDropDownMenu }
+                                underlayColor = { '#346fc3' }
+                                style = { {position: 'absolute', top: 10, right: 10} }>
+                                <Image style = { {width: 25, height: 25,} }
+                                    source = { {uri: 'del_btn'} } />
+                            </TouchableHighlight>
 							<TouchableHighlight
 								onPress = { this.createGroup }
 								underlayColor = { '#346fc3' }
@@ -291,12 +295,12 @@ export default class Conv extends Component {
 									添加朋友
 								</Text>
 							</TouchableHighlight>
-						</Image>
+						</View>
 					</View>
 				</Animated.Modal>
 
 				<Animated.Modal
-					style = { [styles.addFriendDialog, {transform: [{scale: this.state.scaleAnimation}]}] }
+					style = { [styles.addFriendDialog, {transform: [{translateY: this.state.y}, {scale: this.state.scaleAnimation}]}] }
 					visible = { this.state.showAddFriendDialog }>
 					<View style = { styles.container }>
 						<Text style = { {fontSize: 18, marginTop: 15, color: '#008000', alignSelf: 'center'}}>
@@ -409,10 +413,11 @@ var styles = React.StyleSheet.create({
     },
     dropDownMenu: {
         borderRadius: 5,
-        left: Dimensions.get('window').width - 105,
-        top: 40,
-        right: 0,
-        bottom: Dimensions.get('window').height - 160,
+        left: Dimensions.get('window').width / 3,
+        top: Dimensions.get('window').height / 4,
+        right: Dimensions.get('window').width / 4,
+        bottom: Dimensions.get('window').height / 2,
+        backgroundColor: '#3f80dc',
     },
     dropDownMenuContent: {
         flex: 1
@@ -423,7 +428,8 @@ var styles = React.StyleSheet.create({
         paddingBottom: 12,
     },
     menuItem0: {
-        marginTop: 30,
+        marginTop: 10,
+        marginRight: 35,
         paddingLeft: 15,
     },
     menuItem1: {
@@ -432,10 +438,10 @@ var styles = React.StyleSheet.create({
     },
     addFriendDialog: {
         borderRadius: 10,
+        left: Dimensions.get('window').width / 8,
         top: Dimensions.get('window').height / 4,
         right: Dimensions.get('window').width / 8,
         bottom: Dimensions.get('window').height / 3,
-        left: Dimensions.get('window').width / 8,
         backgroundColor: '#ffffff',
     },
     bottomLeftBtn: {

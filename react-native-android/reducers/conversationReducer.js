@@ -50,6 +50,7 @@ export default function conversationList(state, action) {
 			var convList = [...state.convList];
 			convList.unshift(action.conversation);
 			dataSource = state.dataSource.cloneWithRows(convList);
+			console.log('add success convList: ' + convList.toString());
 			return {
 				...state,
 				...action,

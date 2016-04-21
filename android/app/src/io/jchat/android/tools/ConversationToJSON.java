@@ -107,6 +107,7 @@ public class ConversationToJSON {
                 avatar = "data:image/png;base64," + getBinaryData(avatarFile);
             }
             if (conv.getType() == ConversationType.single){
+                avatar = "head_icon";
                 username = ((UserInfo) conv.getTargetInfo()).getUserName();
             } else {
                 avatar = "group";

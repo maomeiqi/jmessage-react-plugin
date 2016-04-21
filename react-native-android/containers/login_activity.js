@@ -42,8 +42,8 @@ export default class LoginActivity  extends Component {
 		console.log('username: ' + this.state.username);
 		JMessageHelper.login(false, this.state.username, this.state.password, () => {
 			console.log('Login success!');
-			//相当于重新Start MainActivity，finish掉其他Activity
-			this.props.navigator.immediatelyResetRouteStack([{name: 'mainActivity', component: MainActivity}]);
+			//用一个新路由即MainActivity替换掉当前路由
+			this.props.navigator.replace({name: 'mainActivity', component: MainActivity});
 		});
 	}
 
@@ -105,6 +105,7 @@ export default class LoginActivity  extends Component {
 							placeholder = { '用户密码' }
 							placeholderTextColor = { '#808080' }
 							maxLength = { 128 }
+							secureTextEntry = { true }
 							onChangeText = { (text) => this.setState({password: text}) }/>
 					</View>
 					<View style = { styles.separator }/>

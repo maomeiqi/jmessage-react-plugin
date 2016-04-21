@@ -94,6 +94,7 @@ class ReloginActivity extends Component {
 							placeholder = { '用户密码' }
 							placeholderTextColor = { '#808080' }
 							maxLength = { 128 }
+							secureTextEntry = { true }
 							onChangeText = { (text) => this.setState({password: text}) }/>
 					</View>
 					<View style = { styles.separator }/>

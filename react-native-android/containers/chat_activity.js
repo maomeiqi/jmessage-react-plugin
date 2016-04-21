@@ -155,6 +155,7 @@ export default class ChatActivity extends Component {
 						dataSource = { messageReducer.dataSource }
 						renderHeader = { this.renderHeader }
 						renderRow = { this.renderRow }
+						enableEmptySections = { true }
 						keyboardDismissMode="on-drag"
    						keyboardShouldPersistTaps={ true }
    						showsVerticalScrollIndicator={ false }/> 
