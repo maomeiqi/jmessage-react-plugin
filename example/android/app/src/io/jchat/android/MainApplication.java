@@ -2,7 +2,6 @@ package io.jchat.android;
 
 import android.app.Application;
 
-import com.aakashns.reactnativedialogs.ReactNativeDialogsPackage;
 import com.facebook.react.ReactApplication;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
@@ -13,7 +12,6 @@ import com.lwansbrough.RCTCamera.RCTCameraPackage;
 import java.util.Arrays;
 import java.util.List;
 
-import cn.jpush.im.android.api.JMessageClient;
 
 
 public class MainApplication extends Application implements ReactApplication {
@@ -34,7 +32,6 @@ public class MainApplication extends Application implements ReactApplication {
         protected List<ReactPackage> getPackages() {
             return Arrays.<ReactPackage>asList(
                     new MainReactPackage(),
-                    new CustomReactPackage(),
                     new RCTCameraPackage(),
                     new OrientationPackage()
             );
@@ -44,9 +41,6 @@ public class MainApplication extends Application implements ReactApplication {
     @Override
     public void onCreate() {
         super.onCreate();
-        JMessageClient.init(getApplicationContext());
-        JMessageClient.setNotificationMode(JMessageClient.NOTI_MODE_DEFAULT);
-        SharePreferenceManager.init(getApplicationContext(), "JChatConfigs");
     }
 
     @Override
