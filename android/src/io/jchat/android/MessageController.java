@@ -20,6 +20,7 @@ import cn.jpush.im.android.api.JMessageClient;
 import cn.jpush.im.android.api.model.Conversation;
 import cn.jpush.im.android.api.model.GroupInfo;
 import cn.jpush.im.android.api.model.Message;
+import io.jchat.android.tools.MessageToJSON;
 
 public class MessageController extends ReactContextBaseJavaModule implements ActivityEventListener {
 
@@ -90,12 +91,7 @@ public class MessageController extends ReactContextBaseJavaModule implements Act
     }
 
     @Override
-    public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
-
-    }
-
-    @Override
-    public void onNewIntent(Intent intent) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
     }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "ReactJChat",
+  "name": "jmessage-react-plugin",
   "version": "0.0.2",
   "description": "a jpush plugin for react native application",
   "main": "index.js",

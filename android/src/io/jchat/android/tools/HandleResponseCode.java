@@ -17,8 +17,8 @@ public class HandleResponseCode {
     public static void onHandle(Context context, int status, boolean isCenter){
         Toast toast = new Toast(context);
         LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.toast_default_style, null);
-        TextView content = (TextView) view.findViewById(R.id.toast_content_tv);
+        View view = inflater.inflate(R.layout.jmui_default_toast, null);
+        TextView content = (TextView) view.findViewById(R.id.jmui_toast_content_tv);
         switch (status){
             case 0:
                 break;
