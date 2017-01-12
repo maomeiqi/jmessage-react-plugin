@@ -48,6 +48,20 @@ export default class JMessage {
 		JMessageModule.init(mode);
 	}
 
+	static isLogin(cb) {
+		JMessageModule.isLogin((map) => {
+			cb(map);
+		});
+	}
+
+	// static login(username, password, cb) {
+	// 	JMessageModule.login(username, password).then((resp) => {
+	// 		cb(resp);
+	// 	}).catch((e) => {
+	// 		cb(e);
+	// 	});
+	// }
+
 
 	/**
 	 * Android

@@ -114,15 +114,6 @@
 
         </service>
 
-        <!-- Required. Enable it you can get statistics data with channel -->
-        <meta-data
-            android:name="JPUSH_CHANNEL"
-            android:value="developer-default" />
-        <!-- Required. AppKey copied from Portal -->
-        <meta-data
-            android:name="JPUSH_APPKEY"
-            android:value="4f7aef34fb361292c566a1cd" />
-
         <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
     </application>
 
