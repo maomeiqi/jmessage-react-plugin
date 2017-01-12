@@ -1,7 +1,8 @@
 'use strict'
 
-var React = require('react');
-var ReactNative = require('react-native');
+import React from 'react';
+import ReactNative from 'react-native';
+import JMessageModule from 'jmessage-react-plugin';
 
 var {
 	View,
@@ -12,7 +13,6 @@ var {
 	NativeModules,
 	StyleSheet
 } = ReactNative;
-var JMessageHelper = NativeModules.JMessageHelper;
 var FillInfoActivity = React.createClass({
 
 	getInitialState() {
@@ -30,7 +30,7 @@ var FillInfoActivity = React.createClass({
 		});
 		console.log('take photo btn pressed!');
 		// this.props.navigator.push({name: 'cameraActivity'});
-		JMessageHelper.takePhoto(this.props.username, (path) => {
+		JMessageModule.takePhoto(this.props.username, (path) => {
 			this.setState({
 				avatarPath: path,
 				hasSetAvatar: true
@@ -40,7 +40,7 @@ var FillInfoActivity = React.createClass({
 
 	finishClick() {
 		if (this.state.nickname != '') {
-			JMessageHelper.finishFillInfo(this.state.nickname, () => {
+			JMessageModule.finishFillInfo(this.state.nickname, () => {
 				this.props.navigator.replace({
 					name: 'mainActivity'
 				});

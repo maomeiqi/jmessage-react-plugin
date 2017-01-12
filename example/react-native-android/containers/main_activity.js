@@ -5,7 +5,6 @@ import ReactNative from 'react-native';
 import Conv from './conv_fragment';
 import Contact from './contact_fragment';
 import Me from './me_fragment';
-import Orientation from 'react-native-orientation';
 var {
     BackAndroid,
     Text,
@@ -110,7 +109,6 @@ export default class MainActivity extends React.Component {
 
     componentDidMount() {
         var navigator = this.props.navigator;
-        Orientation.lockToPortrait();
 
         BackAndroid.addEventListener('hardwareBackPress', () => {
             console.log('MainActivity backPressed');

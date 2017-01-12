@@ -2,6 +2,8 @@
 
 import React from 'react';
 import ReactNative from 'react-native';
+import JMessageModule from 'jmessage-react-plugin';
+
 var {
 	BackAndroid,
 	Text,
@@ -17,7 +19,6 @@ import MainActivity from './main_activity';
 import LoginActivity from './login_activity';
 import RegisterActivity from './register_activity';
 import LoadingAnimation from './loading_animation';
-var JMessageHelper = NativeModules.JMessageHelper;
 class ReloginActivity extends React.Component {
 
 	constructor(props) {
@@ -33,7 +34,7 @@ class ReloginActivity extends React.Component {
 	}
 
 	reLogin() {
-		JMessageHelper.login(true, '', this.state.password, () => {
+		JMessageModule.login(true, '', this.state.password, () => {
 			console.log('Re-login success ');
 			this.props.navigator.replace({
 				name: 'mainActivity',

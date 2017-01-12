@@ -2,6 +2,7 @@
 
 import React from 'react';
 import ReactNative from 'react-native';
+import JMessageModule from 'jmessage-react-plugin';
 
 var {
 	BackAndroid,
@@ -16,7 +17,6 @@ var {
 } = ReactNative;
 
 var messages = [];
-var JMessageHelper = NativeModules.JMessageHelper;
 export default class ChatActivity extends React.Component {
 
 	constructor(props) {
@@ -135,7 +135,7 @@ export default class ChatActivity extends React.Component {
 	}
 
 	sendMsg() {
-		JMessageHelper.sendMsg(this.state.inputContent, () => {
+		JMessageModule.sendMsg(this.state.inputContent, () => {
 			this.setState({
 				sending: false
 			});

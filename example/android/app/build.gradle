@@ -81,16 +81,16 @@ android {
     buildToolsVersion "25.0.0"
 
     defaultConfig {
-        applicationId "io.jchat.android"
+        applicationId "com.sample.application"
         minSdkVersion 16
-        targetSdkVersion 23
+        targetSdkVersion 22
         versionCode 1
         versionName "1.0"
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
         manifestPlaceholders = [
-                JPUSH_APPKEY: "4f7aef34fb361292c566a1cd",	//在此替换你的APPKey
+                JPUSH_APPKEY: "426251cac0146ce0a08ca38f",	//在此替换你的APPKey
                 APP_CHANNEL: "developer-default"		//应用渠道号
         ]
     }
@@ -139,6 +139,5 @@ dependencies {
     compile "com.android.support:appcompat-v7:23.0.1"
     compile project(':jmessage-react-plugin')
     compile project(':react-native-camera')
-    compile project(':react-native-orientation')
-    compile "com.facebook.react:react-native:+"
+    compile "com.facebook.react:react-native:0.37.0"
 }

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import ReactNative from 'react-native';
+import JMessageModule from 'jmessage-react-plugin';
 
 var {
 	BackAndroid,
@@ -13,7 +14,6 @@ var {
 	NativeModules,
 	StyleSheet
 } = ReactNative;
-var JMessageHelper = NativeModules.JMessageHelper;
 
 export default class RegisterActivity extends React.Component {
 
@@ -51,7 +51,7 @@ export default class RegisterActivity extends React.Component {
 
 	register() {
 		console.log('Begin registering');
-		JMessageHelper.register(this.state.username, this.state.password, () => {
+		JMessageModule.register(this.state.username, this.state.password, () => {
 			console.log('user register succeed');
 			this.props.navigator.push({
 				name: 'loginDialog',

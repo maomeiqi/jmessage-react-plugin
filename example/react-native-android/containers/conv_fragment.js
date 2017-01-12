@@ -2,6 +2,7 @@
 
 import React from 'react';
 import ReactNative from 'react-native';
+import JMessageModule from 'jmessage-react-plugin';
 import Immutable from 'immutable';
 var {
     Alert,
@@ -21,7 +22,6 @@ var {
 } = ReactNative;
 import ChatActivity from './chat_activity';
 import DialogAndroid from 'react-native-dialogs';
-var JMessageHelper = NativeModules.JMessageHelper;
 var _convList = [];
 var convReducer;
 

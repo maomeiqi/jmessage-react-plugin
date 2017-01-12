@@ -2,6 +2,7 @@
 
 import React from 'react';
 import ReactNative from 'react-native';
+import JMessageModule from 'jmessage-react-plugin';
 
 var {
 	Animated,
@@ -18,7 +19,7 @@ var {
 } = ReactNative;
 import RegisterActivity from './register_activity';
 import MainActivity from './main_activity';
-var JMessageHelper = NativeModules.JMessageHelper;
+
 export default class LoginActivity extends React.Component {
 
 	constructor(props) {
@@ -42,13 +43,15 @@ export default class LoginActivity extends React.Component {
 
 	login() {
 		console.log('username: ' + this.state.username);
-		JMessageHelper.login(false, this.state.username, this.state.password, () => {
-			console.log('Login success!');
-			//用一个新路由即MainActivity替换掉当前路由
-			this.props.navigator.replace({
-				name: 'mainActivity',
-				component: MainActivity
-			});
+		JMessageModule.login(this.state.username, this.state.password, (resp) => {
+			if (resp == 0) {
+				console.log('Login success!');
+				//用一个新路由即MainActivity替换掉当前路由
+				this.props.navigator.replace({
+					name: 'mainActivity',
+					component: MainActivity
+				});
+			}
 		});
 	}
 

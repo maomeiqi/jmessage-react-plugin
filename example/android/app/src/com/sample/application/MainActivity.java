@@ -1,11 +1,8 @@
-package io.jchat.android;
+package com.sample.application;
 
 import android.os.Bundle;
-import android.view.KeyEvent;
 
 import com.facebook.react.ReactActivity;
-import com.facebook.react.ReactInstanceManager;
-import com.facebook.react.ReactRootView;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
 
 import java.lang.Override;
@@ -13,7 +10,7 @@ import java.lang.Override;
 import cn.jiguang.api.JCoreInterface;
 
 
-public class MainActivity extends ReactActivity implements DefaultHardwareBackBtnHandler {
+public class MainActivity extends ReactActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,11 +32,6 @@ public class MainActivity extends ReactActivity implements DefaultHardwareBackBt
     protected void onResume() {
         super.onResume();
         JCoreInterface.onResume(this);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
     }
 
 }

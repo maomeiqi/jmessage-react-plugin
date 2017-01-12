@@ -1,7 +1,8 @@
 'use strict'
 
-var React = require('react');
-var ReactNative = require('react-native');
+import React from 'react';
+import ReactNative from 'react-native';
+import JMessageModule from 'jmessage-react-plugin';
 
 var {
 	View,

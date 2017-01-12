@@ -2,6 +2,7 @@
 
 import React from 'react';
 import ReactNative from 'react-native';
+import JMessageModule from 'jmessage-react-plugin';
 
 var {
   Text,
@@ -28,7 +29,6 @@ import LoginDialog from './login_dialog';
 import CameraActivity from './camera';
 import ChatActivity from './chat_activity';
 import configureStore from '../store/configureStore';
-var JMessageHelper = NativeModules.JMessageHelper;
 
 var _navigator;
 class BaseApp extends React.Component {
@@ -45,7 +45,7 @@ class BaseApp extends React.Component {
 
 
   componentWillMount() {
-    JMessageHelper.isLogin((map) => {
+    JMessageModule.isLogin((map) => {
       switch (map.result) {
         case 're-login':
           _navigator.replace({

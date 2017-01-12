@@ -1,7 +1,8 @@
 'use strict'
 
-var React = require('react');
-var ReactNative = require('react-native');
+import React from 'react';
+import ReactNative from 'react-native';
+import JMessageModule from 'jmessage-react-plugin';
 
 var {
 	View,
@@ -10,12 +11,11 @@ var {
 	NativeModules,
 	StyleSheet
 } = ReactNative;
-var JMessageHelper = NativeModules.JMessageHelper;
 
 var LoginDialog = React.createClass({
 
 	componentDidMount() {
-		JMessageHelper.loginWithoutDialog(this.props.username, this.props.password, () => {
+		JMessageModule.loginWithoutDialog(this.props.username, this.props.password, () => {
 			console.log('User login success');
 			this.props.navigator.immediatelyResetRouteStack([{
 				name: 'fillInfoActivity',
