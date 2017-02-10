@@ -49,10 +49,7 @@ public class SharePreferenceManager {
     }
 
     public static boolean getCachedFixProfileFlag(){
-        if(null != sp){
-            return sp.getBoolean(KEY_CACHED_FIX_PROFILE_FLAG, false);
-        }
-        return false;
+        return null != sp && sp.getBoolean(KEY_CACHED_FIX_PROFILE_FLAG, false);
     }
 
     private static final String SOFT_KEYBOARD_HEIGHT = "SoftKeyboardHeight";
@@ -78,9 +75,36 @@ public class SharePreferenceManager {
     }
 
     public static boolean getCachedWritableFlag(){
-        if(null != sp){
-            return sp.getBoolean(WRITABLE_FLAG, true);
+        return null == sp || sp.getBoolean(WRITABLE_FLAG, true);
+    }
+
+    private static final String CACHED_APP_KEY = "CachedAppKey";
+
+    public static void setCachedAppKey(String appKey) {
+        if (null != sp) {
+            sp.edit().putString(CACHED_APP_KEY, appKey).apply();
         }
-        return true;
+    }
+
+    public static String getCachedAppKey() {
+        if (null != sp) {
+            return sp.getString(CACHED_APP_KEY, "default");
+        }
+        return "default";
+    }
+
+    private static final String CACHED_NEW_FRIEND = "CachedNewFriend";
+
+    public static void setCachedNewFriendNum(int num) {
+        if (null != sp) {
+            sp.edit().putInt(CACHED_NEW_FRIEND, num).apply();
+        }
+    }
+
+    public static int getCachedNewFriendNum() {
+        if (null != sp) {
+            return sp.getInt(CACHED_NEW_FRIEND, 0);
+        }
+        return 0;
     }
 }

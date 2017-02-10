@@ -5,6 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
+
 import cn.jpush.im.android.api.JMessageClient;
 import cn.jpush.im.android.api.enums.ConversationType;
 import cn.jpush.im.android.api.event.NotificationClickEvent;
@@ -14,9 +19,9 @@ import cn.jpush.im.android.api.model.Message;
 public class NotificationClickEventReceiver {
     private static final String TAG = NotificationClickEventReceiver.class.getSimpleName();
 
-    private Context mContext;
+    private ReactApplicationContext mContext;
 
-    public NotificationClickEventReceiver(Context context) {
+    public NotificationClickEventReceiver(ReactApplicationContext context) {
         mContext = context;
         //注册接收消息事件
         JMessageClient.registerEventReceiver(this);
@@ -39,6 +44,12 @@ public class NotificationClickEventReceiver {
             ConversationType type = msg.getTargetType();
             Conversation conv;
             //TODO convert event to JS side
+            WritableMap map = Arguments.createMap();
+            map.putString("targetId",targetId);
+            map.putString("appKey", appKey);
+            map.putString("conversationType", type.toString());
+            mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                    .emit("onClickNotification", map);
 //            Intent notificationIntent = new Intent(mContext, ChatActivity.class);
 //            if (type == ConversationType.single) {
 //                conv = JMessageClient.getSingleConversation(targetId, appKey);

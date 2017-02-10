@@ -35,7 +35,7 @@ public class TimeFormat {
 
     public static String getTime(Context context, long timestamp) {
         long currentTime = JCoreInterface.getReportTime();
-        Date date1 = new Date(currentTime);
+        Date date1 = new Date(currentTime * 1000);
         Date date2 = new Date(timestamp);
         SimpleDateFormat format = new SimpleDateFormat(context.getString(R.string.time_format_hours),
                 Locale.CHINA);
@@ -77,7 +77,7 @@ public class TimeFormat {
     //用于显示会话时间
     public String getTime() {
         long currentTime = JCoreInterface.getReportTime();
-        Date date1 = new Date(currentTime);
+        Date date1 = new Date(currentTime * 1000);
         Date date2 = new Date(mTimeStamp);
         SimpleDateFormat format = new SimpleDateFormat(mContext.getString(R.string.time_format_hours),
                 Locale.CHINA);

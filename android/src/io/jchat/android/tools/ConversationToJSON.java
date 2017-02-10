@@ -35,10 +35,11 @@ public class ConversationToJSON {
         MyConversation myConversation;
         String title;
         String username = "";
-        long groupId = 0;
-        String avatar = "head_icon";
+        // 因为要传到 JS，如果是 long 类型，会转成 int64，再传回来可能会存在类型错误，因此转成 String 来处理
+        String groupId = "";
+        String avatar = "";
         int unreadMsgCnt;
-        String date;
+        long date;
         String lastMsg = "";
         title = conv.getTitle();
         File avatarFile = conv.getAvatarFile();
@@ -51,10 +52,10 @@ public class ConversationToJSON {
             username = ((UserInfo) conv.getTargetInfo()).getUserName();
         } else {
             avatar = "group";
-            groupId = ((GroupInfo) conv.getTargetInfo()).getGroupID();
+            groupId = ((GroupInfo) conv.getTargetInfo()).getGroupID() + "";
         }
         unreadMsgCnt = conv.getUnReadMsgCnt();
-        date = TimeFormat.getTime(context, conv.getLastMsgDate());
+        date = conv.getLastMsgDate();
         Message message = conv.getLatestMessage();
         if (message != null) {
             // 按照最后一条消息的消息类型进行处理
@@ -95,10 +96,10 @@ public class ConversationToJSON {
         MyConversation myConversation;
         String title;
         String username = "";
-        long groupId = 0;
-        String avatar = "head_icon";
+        String groupId = "";
+        String avatar = "";
         int unreadMsgCnt;
-        String date;
+        long date;
         String lastMsg = "";
         for (Conversation conv : data) {
             title = conv.getTitle();
@@ -107,14 +108,13 @@ public class ConversationToJSON {
                 avatar = "data:image/png;base64," + getBinaryData(avatarFile);
             }
             if (conv.getType() == ConversationType.single){
-                avatar = "head_icon";
                 username = ((UserInfo) conv.getTargetInfo()).getUserName();
             } else {
                 avatar = "group";
-                groupId = ((GroupInfo) conv.getTargetInfo()).getGroupID();
+                groupId = ((GroupInfo) conv.getTargetInfo()).getGroupID() + "";
             }
             unreadMsgCnt = conv.getUnReadMsgCnt();
-            date = TimeFormat.getTime(context, conv.getLastMsgDate());
+            date = conv.getLastMsgDate();
             Message message = conv.getLatestMessage();
             if (message != null) {
                 // 按照最后一条消息的消息类型进行处理

@@ -68,11 +68,63 @@ public class MessageToJSON {
                 default:
                     sendState = "";
             }
-            myMessage = new MyMessage(direction, type, date, content, sendState);
+            myMessage = new MyMessage(msg.getId(), direction, type, date, content, sendState);
             list.add(myMessage);
         }
         Gson gson = new Gson();
         mResult = gson.toJson(list);
+    }
+
+    public MessageToJSON(Context context, Message msg) {
+        String direction, type, date, content, sendState;
+        MyMessage myMessage;
+        direction = msg.getDirect() == MessageDirect.send ? "send" : "receive";
+        date = TimeFormat.getTime(context, msg.getCreateTime());
+        switch (msg.getContentType()) {
+            case image:
+                type = "image";
+                ImageContent imageContent = (ImageContent) msg.getContent();
+                content = imageContent.getLocalThumbnailPath();
+                break;
+            case voice:
+                type = "voice";
+                VoiceContent voiceContent = (VoiceContent) msg.getContent();
+                content = voiceContent.getDuration() + "'";
+                break;
+            case text:
+                type = "text";
+                TextContent textContent = (TextContent) msg.getContent();
+                content = textContent.getText();
+                break;
+            case location:
+                type = "location";
+                content = "";
+                break;
+            case custom:
+                type = "custom";
+                content = "";
+                break;
+            default:
+                type = "event";
+                content = ((EventNotificationContent) msg.getContent()).getEventText();
+                break;
+        }
+        switch (msg.getStatus()) {
+            case send_going:
+                sendState = "sending";
+                break;
+            case send_fail:
+                sendState = "sendFailed";
+                break;
+            case send_success:
+                sendState = "sendSuccess";
+                break;
+            default:
+                sendState = "";
+        }
+        myMessage = new MyMessage(msg.getId(), direction, type, date, content, sendState);
+        Gson gson = new Gson();
+        mResult = gson.toJson(myMessage);
     }
 
     public String getResult() {

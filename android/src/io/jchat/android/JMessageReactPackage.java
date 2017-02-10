@@ -15,7 +15,6 @@ public class JMessageReactPackage implements ReactPackage {
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
         List<NativeModule> result = new ArrayList<>();
         result.add(new JMessageModule(reactContext));
-        result.add(new MessageController(reactContext));
         return result;
     }
 
@@ -26,6 +25,8 @@ public class JMessageReactPackage implements ReactPackage {
 
     @Override
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
-        return Collections.emptyList();
+        List<ViewManager> viewManagers = new ArrayList<>();
+        viewManagers.add(new BubbleMsgManager());
+        return  viewManagers;
     }
 }
