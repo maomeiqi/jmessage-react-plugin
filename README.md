@@ -1,95 +1,176 @@
-# jmessage-react-plugin
-
+# jmessage-react-plugin （iOS 尚未支持）
 ##Android
 
-####这是一个使用JMessage-sdk的混合的React Native应用，在本项目中使用了[Redux架构](http://camsong.github.io/redux-in-chinese/)来管理状态。先来看一下效果图：
+####这是一个使用JMessage-sdk的混合的React Native应用，目前实现了收发文字消息。
 
-![JChat](https://github.com/KenChoi1992/SomeArticles/blob/master/screenshots/react-native-JChat.gif)
+#### 安装
+```
+npm install jmessage-react-plugin --save
+react-native link
+```
+安装完毕后，在 MainApplication 中加上 JMessagePackage 即可。
+```
+        @Override
+        protected List<ReactPackage> getPackages() {
+            return Arrays.<ReactPackage>asList(
+                    new MainReactPackage(),
+                    new JMessageReactPackage(),
+            );
+        }
+```
 
-目前还没有实现收发消息，后续会陆续实现。。-_-
-
-####Android用法
-- 下载并解压这个项目的zip
-- 在初始化好的React项目中将app文件夹替换为你刚刚解压的app文件夹（jmessage-react-plugin-master/android/app）（如果你还没有初始化，[参考这个](https://facebook.github.io/react-native/docs/getting-started.html#content)）
-- 修改android文件夹下的build.gradle将dependencies下的classpath修改为你当前Android Studio所用的版本
-- 修改app文件夹下的build.gradle，将compile "com.facebook.react:react-native:0.23.0"修改为你当前的版本
-- 在AndroidManifest中更改PackageName和build.gradle中的applicationId为你自己的包名
-- 在AndroidManifest中将appKey替换为你在极光推送控制台注册的应用的appKey，如果没有，可以[前往注册](https://www.jpush.cn/)
-- 运行app
+#### example 使用
+```
+npm install react-native-jchat-demo
+react-native run-android
+```
  
 关于jmessage-sdk的相关接口说明可以参考：
 #####[极光IM Android SDK概述](http://docs.jpush.io/client/im_sdk_android/)
 
 #####[IM Android SDK Java docs](http://docs.jpush.io/client/im_android_api_docs/)
 
-####jmessage-react-plugin Android的项目结构说明
-#####JS部分
-除了入口index.android.js之外，都放在react-native-android文件夹下
-- actions 充当调用jmessage-sdk动作的发起者，action可以再抽象出一个中间件，但本项目中没有这样做
-- containers 所有Component的集合，负责界面的更新与发起actions
-- reducers 根据一个action返回一个新的state，负责state的更新
-- store 绑定actions和reducers
+####jmessage-react-plugin Android 的项目结构说明
+#####JS 部分
+除了入口 index.android.js 之外，都放在 react-native-android 文件夹下
  
 #####Native部分
-- entity 根据需求抽象出的一些实体类，主要是为了使用Gson转换为json字符串传到JS（如果是纯React Native应用，则不需要如此，直接请求服务端即可）
+- entity 根据需求抽象出的一些实体类，主要是为了使用 Gson 转换为 json 字符串传到 JS（如果是纯 React Native 应用，则不需要如此，直接请求服务端即可）
 - tools 主要是一些工具类
-- 其他 包括Native入口类以及NativeModule等
+- 其他 包括 Native 入口类以及 NativeModule 等
 
 ####接口调用
-#####在JS中调用jmessage-sdk的接口
-> actions/conversationActions.js
 
+#####在 JS 中调用 jmessage-sdk 的接口详情
 ```
-export function loadConversations() {
-	return dispatch => {
-		type: types.INITIAL_CONVERSATION_LIST,
-		JMessageHelper.getConvList((result) => {
-			dispatch({
-				type: types.LOAD_CONVERSATIONS,
-				convList: JSON.parse(result),
-			});
-		}, () => {
-			dispatch({
-				type: types.LOAD_ERROR,
-				convList: []
-			})
-		});
-	}
-}
+const JMessageModule = NativeModules.JMessageModule;
 ```
+－ 加载 conversations：
+```
+JMessageModule.getConvList().then((list) => {
+            _convList = JSON.parse(list);
+            this.setState({
+                dataSource: _ds.cloneWithRows(_convList),
+                fetching: false
+            });
+        }).catch((e) => {
+            console.log(e);
+            this.setState({
+                fetching: false
+            });
+        });
+```
+- 接收消息
+```
+const RECEIVE_MSG_EVENT = "receiveMsgEvent";
 
-这个action实际上通过JMessageHelper这个NativeModule调用了getConvList()这个方法：
-> JMessageHelper.java
-
-```
-    /**
-     * JS端调用的获取所有会话的方法
-     * @param successCallback 回调返回一个Map对象
-     */
-    @ReactMethod
-    public void getConvList(Callback successCallback, Callback errorCallback) {
-        mContext = getCurrentActivity();
-        List<Conversation> data = JMessageClient.getConversationList();
-        //对会话列表进行时间排序
-        if (data != null) {
-            if (data.size() > 1) {
-                SortConvList sortList = new SortConvList();
-                Collections.sort(data, sortList);
+componentDidMount() {
+        DeviceEventEmitter.addListener(RECEIVE_MSG_EVENT, (map) => {
+            console.log("收到消息： " + map.message);
+            let conversation = JSON.parse(map.conversation);
+            for (let conv in _convList) {
+                if (conv.username === conversation.username || conv.groupId === conversation.groupId) {
+                    conv = conversation;
+                }
             }
-            //模拟将从服务器端返回的数据解析为JSON字符串传到JS端
-            //如果是纯React应用应该在JS端直接fetch服务端的数据,由于目前使用的是jmessage-sdk,所以采用这种方法
-            ConversationToJSON convToJSON = new ConversationToJSON(mContext, data);
-            String result = convToJSON.getResult();
-            Log.i(TAG,"Result: " + result);
-            successCallback.invoke(result);
-        } else {
-            errorCallback.invoke();
-        }
+            let newData = JSON.parse(JSON.stringify(_convList));
+            newData.sort(this.by("date"));
+            this.setState({
+                dataSource: _ds.cloneWithRows(newData)
+            });
+            _convList = newData;
+        });
     }
 ```
+- 发送消息
+```
+const {username, appKey, groupId} = this.props;
+		JMessageModule.sendTxtMsg(username, appKey, groupId, this.state.inputContent)
+			.then((msg) => {
+				console.log("Sending text message: " + msg);
+				this.msgArr.push(JSON.parse(msg));
+				console.log("msgArr: " + this.msgArr);
+				this.setState({
+					dataSource: this.state.ds.cloneWithRows(this.msgArr),
+					inputContent: ""
+				});
+				if (this.listView !== null) {
+					this.listView.scrollToEnd();
+				}
+			}).catch((e) => {
+				console.log(e);
+				this.setState({
+					inputContent: ""
+				});
+			});
+```
+发送消息后还需要监听发送状态：
 
-在Native里就可以直接调用jmessage-sdk的接口了，然后将得到的数据通过CallBack传递到JS。其他的接口调用也基本上类似。
+```
+const SEND_MSG_RESULT = "sendMsgResult";
+DeviceEventEmitter.addListener(SEND_MSG_RESULT, this.sendMsgResult);
+sendMsgResult = (msg) => {
+		var message = JSON.parse(msg);
+		for (var i = this.msgArr.length - 1; i >= 0; i--) {
+			if (this.msgArr[i].msgId === message.msgId) {
+				this.msgArr[i].sendState = message.sendState;
+			}
+		}
+		let newData = JSON.parse(JSON.stringify(this.msgArr));
+		this.setState({
+			dataSource: this.state.ds.cloneWithRows(newData)
+		});
+		this.msgArr = newData;
+	};
+```
 
+- 分页加载消息
+
+```
+JMessageModule.getMessageFromNewest(username, appKey, groupId, this.START, this.PAGE_MSG_COUNT)
+			.then((result) => {
+				if ("" === result) {
+					console.log("No last page");
+					this.setState({
+						fetching: false
+					});
+					return;
+				}
+				let msgData = JSON.parse(result);
+				msgData.reverse();
+				this.msgArr = this.msgArr.concat(msgData);
+				this.MSG_OFFSET = this.START + msgData.length;
+				this.START = this.MSG_OFFSET;
+				this.setState({
+					fetching: false,
+					dataSource: this.state.ds.cloneWithRows(this.msgArr)
+				});
+			}).catch((e) => {
+				console.log(e);
+				this.setState({
+					fetching: false
+				});
+			});
+```
+
+- 进入会话（进入会话后，通知栏不会展示此会话中收到的消息）
+
+```
+JMessageModule.enterConversation(username, appKey, groupId);
+```
+- 添加好友（无好友模式）
+
+```
+JMessageModule.addFriend(inputTxt).then((result) => {
+            var newDs = JSON.parse(result);
+            _convList = [newDs, ..._convList];
+            this.setState({
+                dataSource: _ds.cloneWithRows(_convList)
+            });
+        }).catch((e) => {
+            console.log(e);
+        });
+```
 ##关于升级React Native
 **进入当前项目的目录**
 - 在命令行中使用：
