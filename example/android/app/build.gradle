@@ -142,9 +142,7 @@ android {
 }
 
 dependencies {
-    compile project(':react-native-message-bubble')
     compile project(':react-native-svg')
-    compile project(':react-native-vector-icons')
     compile project(':react-native-dialog')
     compile project(':jmessage-react-plugin')
     compile fileTree(dir: "libs", include: ["*.jar"])
