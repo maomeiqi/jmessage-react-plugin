@@ -81,11 +81,12 @@ public class ConversationToJSON {
                         lastMsg = context.getString(R.string.type_custom);
                     }
                     break;
-                default:
+                case text:
                     lastMsg = ((TextContent) message.getContent()).getText();
+                    break;
             }
         }
-        myConversation = new MyConversation(title, username, groupId, avatar, unreadMsgCnt,
+        myConversation = new MyConversation(conv.getId(), title, username, groupId, avatar, unreadMsgCnt,
                 date, lastMsg, conv.getTargetAppKey());
         Gson gson = new Gson();
         mResult = gson.toJson(myConversation);
@@ -140,13 +141,15 @@ public class ConversationToJSON {
                             lastMsg = context.getString(R.string.type_custom);
                         }
                         break;
-                    default:
+                    case text:
                         lastMsg = ((TextContent) message.getContent()).getText();
+                        break;
                 }
             }
-            myConversation = new MyConversation(title, username, groupId, avatar, unreadMsgCnt,
+            myConversation = new MyConversation(conv.getId(), title, username, groupId, avatar, unreadMsgCnt,
                     date, lastMsg, conv.getTargetAppKey());
             list.add(myConversation);
+            lastMsg = "";
         }
         Gson gson = new Gson();
         mResult = gson.toJson(list);
