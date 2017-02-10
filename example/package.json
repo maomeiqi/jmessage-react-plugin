@@ -1,0 +1,18 @@
+{
+  "name": "ReactJChatDemo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start"
+  },
+  "dependencies": {
+    "jmessage-react-plugin": "0.0.3",
+    "react": "^15.4.2",
+    "react-native": "^0.41.0",
+    "react-native-dialog": "^1.0.7",
+    "react-native-svg": "^5.1.5"
+  },
+  "devDependencies": {
+    "redux-devtools": "^3.1.1"
+  }
+}
