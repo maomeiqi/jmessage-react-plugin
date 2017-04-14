@@ -1,7 +1,7 @@
 # jmessage-react-plugin （iOS 尚未支持）
-##Android
+## Android
 
-####这是一个使用JMessage-sdk的混合的React Native应用，目前实现了收发文字消息。
+#### 这是一个使用JMessage-sdk的混合的React Native应用，目前实现了收发文字消息。
 
 #### 安装
 ```
@@ -26,22 +26,22 @@ react-native run-android
 ```
  
 关于jmessage-sdk的相关接口说明可以参考：
-#####[极光IM Android SDK概述](http://docs.jpush.io/client/im_sdk_android/)
+##### [极光IM Android SDK概述](http://docs.jpush.io/client/im_sdk_android/)
 
-#####[IM Android SDK Java docs](http://docs.jpush.io/client/im_android_api_docs/)
+##### [IM Android SDK Java docs](http://docs.jpush.io/client/im_android_api_docs/)
 
-####jmessage-react-plugin Android 的项目结构说明
-#####JS 部分
+#### jmessage-react-plugin Android 的项目结构说明
+##### JS 部分
 除了入口 index.android.js 之外，都放在 react-native-android 文件夹下
  
-#####Native部分
+##### Native部分
 - entity 根据需求抽象出的一些实体类，主要是为了使用 Gson 转换为 json 字符串传到 JS（如果是纯 React Native 应用，则不需要如此，直接请求服务端即可）
 - tools 主要是一些工具类
 - 其他 包括 Native 入口类以及 NativeModule 等
 
-####接口调用
+#### 接口调用
 
-#####在 JS 中调用 jmessage-sdk 的接口详情
+##### 在 JS 中调用 jmessage-sdk 的接口详情
 ```
 const JMessageModule = NativeModules.JMessageModule;
 ```
@@ -171,8 +171,10 @@ JMessageModule.addFriend(inputTxt).then((result) => {
             console.log(e);
         });
 ```
-##关于升级React Native
+## 关于升级React Native
+
 **进入当前项目的目录**
+
 - 在命令行中使用：
 
 > react-native --version
