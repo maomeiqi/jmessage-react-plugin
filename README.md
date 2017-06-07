@@ -1,7 +1,7 @@
 # jmessage-react-plugin （iOS 尚未支持）
 ## Android
 
-#### 这是一个使用JMessage-sdk的混合的React Native应用，目前实现了收发文字消息。
+#### 这是一个使用 JMessage-sdk 的 React Native 插件，目前实现了收发文字消息。
 
 #### 安装
 ```
@@ -25,8 +25,8 @@ npm install react-native-jchat-demo
 react-native run-android
 ```
  
-关于jmessage-sdk的相关接口说明可以参考：
-##### [极光IM Android SDK概述](http://docs.jpush.io/client/im_sdk_android/)
+关于 jmessage-sdk 的相关接口说明可以参考：
+##### [极光 IM Android SDK 概述](http://docs.jpush.io/client/im_sdk_android/)
 
 ##### [IM Android SDK Java docs](http://docs.jpush.io/client/im_android_api_docs/)
 
