@@ -12,35 +12,9 @@ const loginStateChanged = "JMessage.LoginStateChanged"; //
 const clickMessageNotificationEvent = "JMessage.ClickMessageNotification"; // 点击推送 Android Only
 const syncOfflineMessage = "JMessage.SyncOfflineMessage" // 同步离线消息事件
 const syncRoamingMessage = "JMessage.SyncRoamingMessage" // 同步漫游消息事件
-const messageRetract =  "JMessage.MessageRetract" // 同步漫游消息事件
-const contactNotify =  "JMessage.ContactNotify" // 同步漫游消息事件
+const messageRetract =  "JMessage.MessageRetract" // 消息撤回事件
+const contactNotify =  "JMessage.ContactNotify" // 收到好友请求消息事件
 
-/**
- * Logs message to console with the [JMessage] prefix
- * @param  {string} message
- */
-const log = (message) => {
-		console.log(`[JMessage] ${message}`);
-	}
-	// is function
-const isFunction = (fn) => typeof fn === 'function';
-/**
- * create a safe fn env
- * @param  {any} fn
- * @param  {any} success
- * @param  {any} error
- */
-const safeCallback = (fn, success, error) => {
-
-	JMessageModule[fn](function(params) {
-		log(params);
-		isFunction(success) && success(params)
-	}, function(error) {
-		log(error)
-		isFunction(error) && error(error)
-	})
-
-}
 
 export default class JMessage {
     
