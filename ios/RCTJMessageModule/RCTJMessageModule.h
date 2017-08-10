@@ -1,0 +1,13 @@
+//
+//  RCTJMessageModule.h
+//  RCTJMessageModule
+//
+//  Created by oshumini on 2017/8/10.
+//  Copyright © 2017年 HXHG. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+
+@interface RCTJMessageModule : NSObject
+
+@end
