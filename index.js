@@ -334,7 +334,7 @@ export default class JMessage {
      * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
      */
     static getFriends(success, error) {
-        JMessageModule.getFriends(params, success, error)
+        JMessageModule.getFriends(success, error)
     }
 
     /**
@@ -358,7 +358,7 @@ export default class JMessage {
      * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
      */
     static getGroupIds(success, error) {
-        JMessageModule.getGroupIds(params, success, error)
+        JMessageModule.getGroupIds(success, error)
     }
 
     /**
@@ -438,7 +438,7 @@ export default class JMessage {
      * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
      */
     static getBlacklist(success, error) {
-        JMessageModule.getBlacklist(params, success, error)
+        JMessageModule.getBlacklist(success, error)
     }
 
     /**
@@ -631,7 +631,7 @@ export default class JMessage {
      * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
      */
     static getConversations(success, error) {
-        JMessageModule.getConversations(params, success, error)
+        JMessageModule.getConversations(success, error)
     }
 
     /**
