@@ -10,6 +10,7 @@
 		6212EB1A1F3C34BB00BDF51A /* RCTJMessageModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 6212EB191F3C34BB00BDF51A /* RCTJMessageModule.m */; };
 		6212EB1B1F3C34BB00BDF51A /* RCTJMessageModule.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6212EB181F3C34BB00BDF51A /* RCTJMessageModule.h */; };
 		6212EB221F3C38D200BDF51A /* JMessage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6212EB211F3C38D200BDF51A /* JMessage.framework */; };
+		62D683E21F4469820083CDF6 /* JMessageHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 62D683E11F4469820083CDF6 /* JMessageHelper.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -30,6 +31,8 @@
 		6212EB181F3C34BB00BDF51A /* RCTJMessageModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RCTJMessageModule.h; sourceTree = "<group>"; };
 		6212EB191F3C34BB00BDF51A /* RCTJMessageModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RCTJMessageModule.m; sourceTree = "<group>"; };
 		6212EB211F3C38D200BDF51A /* JMessage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = JMessage.framework; sourceTree = "<group>"; };
+		62D683E01F4469820083CDF6 /* JMessageHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JMessageHelper.h; sourceTree = "<group>"; };
+		62D683E11F4469820083CDF6 /* JMessageHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JMessageHelper.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,6 +67,8 @@
 			isa = PBXGroup;
 			children = (
 				6212EB211F3C38D200BDF51A /* JMessage.framework */,
+				62D683E01F4469820083CDF6 /* JMessageHelper.h */,
+				62D683E11F4469820083CDF6 /* JMessageHelper.m */,
 				6212EB181F3C34BB00BDF51A /* RCTJMessageModule.h */,
 				6212EB191F3C34BB00BDF51A /* RCTJMessageModule.m */,
 			);
@@ -128,6 +133,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				62D683E21F4469820083CDF6 /* JMessageHelper.m in Sources */,
 				6212EB1A1F3C34BB00BDF51A /* RCTJMessageModule.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
