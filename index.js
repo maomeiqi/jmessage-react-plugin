@@ -84,6 +84,20 @@ export default class JMessage {
     }
 
     /**
+     * 更新当前用户头像。
+     * 
+     * @param {object} params = {
+     *  imgPath: string // 本地图片绝对路径。
+     * }  
+     * 注意 Android 与 iOS 的文件路径是不同的：
+     *   - Android 类似：/storage/emulated/0/DCIM/Camera/IMG_20160526_130223.jpg
+     *   - iOS 类似：/var/mobile/Containers/Data/Application/7DC5CDFF-6581-4AD3-B165-B604EBAB1250/tmp/photo.jpg
+     */
+    static updateMyAvatar(params, success, error) {
+        JMessageModule.updateMyAvatar(params, success, error)
+    }
+
+    /**
      * 更新当前登录用户的信息。
      *
      * @param {object} params = {'field': '需要更新的字段值'}
