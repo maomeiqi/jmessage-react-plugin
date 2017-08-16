@@ -465,7 +465,7 @@ export default class JMessage {
      * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
      */
     static getNoDisturbList(success, error) {
-        JMessageModule.getNoDisturbList(params, success, error)
+        JMessageModule.getNoDisturbList(success, error)
     }
 
     /**
