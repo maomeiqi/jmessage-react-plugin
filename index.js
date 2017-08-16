@@ -486,7 +486,7 @@ export default class JMessage {
      * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
      */
     static isNoDisturbGlobal(success, error) {
-        JMessageModule.isNoDisturbGlobal(params, success, error)
+        JMessageModule.isNoDisturbGlobal(success, error)
     }
 
     /**
