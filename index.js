@@ -84,6 +84,20 @@ export default class JMessage {
     }
 
     /**
+     * 更新当前用户头像。
+     * 
+     * @param {object} params = {
+     *  imgPath: string // 本地图片绝对路径。
+     * }  
+     * 注意 Android 与 iOS 的文件路径是不同的：
+     *   - Android 类似：/storage/emulated/0/DCIM/Camera/IMG_20160526_130223.jpg
+     *   - iOS 类似：/var/mobile/Containers/Data/Application/7DC5CDFF-6581-4AD3-B165-B604EBAB1250/tmp/photo.jpg
+     */
+    static updateMyAvatar(params, success, error) {
+        JMessageModule.updateMyAvatar(params, success, error)
+    }
+
+    /**
      * 更新当前登录用户的信息。
      *
      * @param {object} params = {'field': '需要更新的字段值'}
@@ -320,7 +334,7 @@ export default class JMessage {
      * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
      */
     static getFriends(success, error) {
-        JMessageModule.getFriends(params, success, error)
+        JMessageModule.getFriends(success, error)
     }
 
     /**
@@ -344,7 +358,7 @@ export default class JMessage {
      * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
      */
     static getGroupIds(success, error) {
-        JMessageModule.getGroupIds(params, success, error)
+        JMessageModule.getGroupIds(success, error)
     }
 
     /**
@@ -424,7 +438,7 @@ export default class JMessage {
      * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
      */
     static getBlacklist(success, error) {
-        JMessageModule.getBlacklist(params, success, error)
+        JMessageModule.getBlacklist(success, error)
     }
 
     /**
@@ -451,7 +465,7 @@ export default class JMessage {
      * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
      */
     static getNoDisturbList(success, error) {
-        JMessageModule.getNoDisturbList(params, success, error)
+        JMessageModule.getNoDisturbList(success, error)
     }
 
     /**
@@ -472,7 +486,7 @@ export default class JMessage {
      * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
      */
     static isNoDisturbGlobal(success, error) {
-        JMessageModule.isNoDisturbGlobal(params, success, error)
+        JMessageModule.isNoDisturbGlobal(success, error)
     }
 
     /**
@@ -617,7 +631,7 @@ export default class JMessage {
      * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
      */
     static getConversations(success, error) {
-        JMessageModule.getConversations(params, success, error)
+        JMessageModule.getConversations(success, error)
     }
 
     /**
