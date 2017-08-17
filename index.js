@@ -1,7 +1,7 @@
 import {
-	NativeModules,
-	Platform,
-	DeviceEventEmitter
+    NativeModules,
+    Platform,
+    DeviceEventEmitter
 } from 'react-native';
 
 const JMessageModule = NativeModules.JMessageModule;
@@ -12,29 +12,29 @@ const loginStateChanged = "JMessage.LoginStateChanged"; //
 const clickMessageNotificationEvent = "JMessage.ClickMessageNotification"; // 点击推送 Android Only
 const syncOfflineMessage = "JMessage.SyncOfflineMessage" // 同步离线消息事件
 const syncRoamingMessage = "JMessage.SyncRoamingMessage" // 同步漫游消息事件
-const messageRetract =  "JMessage.MessageRetract" // 消息撤回事件
-const contactNotify =  "JMessage.ContactNotify" // 收到好友请求消息事件
+const messageRetract = "JMessage.MessageRetract" // 消息撤回事件
+const contactNotify = "JMessage.ContactNotify" // 收到好友请求消息事件
 
 
 export default class JMessage {
-    
-   /**
-    * 设置是否开启 debug 模式，开启后 SDK 将会输出更多日志信息。应用对外发布时应关闭。
-    *
-    * @param {object} params = {'enable': Boolean}
-    */
+
+    /**
+     * 设置是否开启 debug 模式，开启后 SDK 将会输出更多日志信息。应用对外发布时应关闭。
+     *
+     * @param {object} params = {'enable': Boolean}
+     */
     static setDebugMode(params) {
         // exec(null, null, PLUGIN_NAME, 'setDebugMode', [params])
         JMessageModule.setDebugMode(params)
     }
 
     /**
-   * @param {object} params = {'username': String, 'password': String}
-   * @param {function} success = function () {}
-   * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
-   */
+     * @param {object} params = {'username': String, 'password': String}
+     * @param {function} success = function () {}
+     * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+     */
     static register(params, success, error) {
-        JMessageModule.userRegister(params,success,error)
+        JMessageModule.userRegister(params, success, error)
     }
 
     /**
@@ -44,7 +44,7 @@ export default class JMessage {
      */
     static login(params, success, error) {
         // exec(success, error, PLUGIN_NAME, 'userLogin', [params])
-        JMessageModule.login(params,success,error)
+        JMessageModule.login(params, success, error)
     }
 
     /**
@@ -52,7 +52,7 @@ export default class JMessage {
      *
      * @param {function} success = function () {}
      */
-    static logout () {
+    static logout() {
         JMessageModule.logout()
     }
 
@@ -62,7 +62,7 @@ export default class JMessage {
      * @param {function} success = function (myInfo) {}
      */
     static getMyInfo(success) {
-        JMessageModule.getMyInfo
+        JMessageModule.getMyInfo(success);
     }
 
     /**
@@ -658,74 +658,74 @@ export default class JMessage {
      */
     static addReceiveMessageListener(listener) {
         listeners[cb] = DeviceEventEmitter.addListener(receiveMsgEvent,
-			(message) => {
-				cb(message);
-			});
+            (message) => {
+                cb(message);
+            });
     }
 
     static removeReceiveMessageListener(listener) {
-		if (!listeners[cb]) {
-			return;
-		}
-		listeners[cb].remove();
-		listeners[cb] = null;
-    }
-    /**
-     * 添加点击通知栏消息通知事件监听。
-     * Note: Android only, (如果想要 iOS 端 实现相同的功能，需要同时集成 jpush-phonegap-plugin)
-     * @param {function} listener = function (message) {}  // 以参数形式返回消息对象。
-     */
+            if (!listeners[cb]) {
+                return;
+            }
+            listeners[cb].remove();
+            listeners[cb] = null;
+        }
+        /**
+         * 添加点击通知栏消息通知事件监听。
+         * Note: Android only, (如果想要 iOS 端 实现相同的功能，需要同时集成 jpush-phonegap-plugin)
+         * @param {function} listener = function (message) {}  // 以参数形式返回消息对象。
+         */
     static addClickMessageNotificationListener(listener) {
         listeners[cb] = DeviceEventEmitter.addListener(clickMessageNotificationEvent,
-			(message) => {
-				cb(message);
-			});
+            (message) => {
+                cb(message);
+            });
     }
 
     static removeClickMessageNotificationListener(listener) {
-		if (!listeners[cb]) {
-			return;
-		}
-		listeners[cb].remove();
-		listeners[cb] = null;
-    }
-    /**
-     * 添加同步离线消息事件监听。
-     *
-     * @param {function} listener = function ({'conversation': {}, 'messageArray': []}) {}  // 以参数形式返回消息对象数组。
-     */
+            if (!listeners[cb]) {
+                return;
+            }
+            listeners[cb].remove();
+            listeners[cb] = null;
+        }
+        /**
+         * 添加同步离线消息事件监听。
+         *
+         * @param {function} listener = function ({'conversation': {}, 'messageArray': []}) {}  // 以参数形式返回消息对象数组。
+         */
     static addSyncOfflineMessageListener(listener) {
         listeners[cb] = DeviceEventEmitter.addListener(syncOfflineMessage,
-			(message) => {
-				cb(message);
-			});
+            (message) => {
+                cb(message);
+            });
     }
 
     static removeSyncOfflineMessageListener(listener) {
-		if (!listeners[cb]) {
-			return;
-		}
-		listeners[cb].remove();
-		listeners[cb] = null;
-    }
-    /**
-     * 添加同步漫游消息事件监听。
-     *
-     * @param {function} listener = function ({'conversation': {}}) {}  // 以参数形式返回消息对象数组。
-     */
+            if (!listeners[cb]) {
+                return;
+            }
+            listeners[cb].remove();
+            listeners[cb] = null;
+        }
+        /**
+         * 添加同步漫游消息事件监听。
+         *
+         * @param {function} listener = function ({'conversation': {}}) {}  // 以参数形式返回消息对象数组。
+         */
     static addSyncRoamingMessageListener(listener) {
         listeners[cb] = DeviceEventEmitter.addListener(syncRoamingMessage,
-			(message) => {
-				cb(message);
-			});
+            (message) => {
+                cb(message);
+            });
     }
-    
+
     static removeSyncRoamingMessageListener(listener) {
-		if (!listeners[cb]) {
-			return;
-		}
-		listeners[cb].remove();
-		listeners[cb] = null;
+        if (!listeners[cb]) {
+            return;
+        }
+        listeners[cb].remove();
+        listeners[cb] = null;
     }
 
     /**
@@ -738,62 +738,62 @@ export default class JMessage {
      */
     static addLoginStateChangedListener(listener) {
         listeners[cb] = DeviceEventEmitter.addListener(loginStateChanged,
-			(message) => {
-				cb(message);
-			});
+            (message) => {
+                cb(message);
+            });
     }
     static removeLoginStateChangedListener(listener) {
-		if (!listeners[cb]) {
-			return;
-		}
-		listeners[cb].remove();
-		listeners[cb] = null;
-    }
-    /**
-     * 好友相关通知事件。
-     *
-     * @param {function} listener = function (event) {}  // 以参数形式返回事件信息。
-     * event = {
-     *  'type': String,            // 'invite_received' / 'invite_accepted' / 'invite_declined' / 'contact_deleted'
-     *  'reason': String,          // 事件发生的理由，该字段由对方发起请求时所填，对方如果未填则返回默认字符串。
-     *  'fromUsername': String,    // 事件发送者的 username。
-     *  'fromUserAppKey': String   // 事件发送者的 AppKey。
-     * }
-     */
+            if (!listeners[cb]) {
+                return;
+            }
+            listeners[cb].remove();
+            listeners[cb] = null;
+        }
+        /**
+         * 好友相关通知事件。
+         *
+         * @param {function} listener = function (event) {}  // 以参数形式返回事件信息。
+         * event = {
+         *  'type': String,            // 'invite_received' / 'invite_accepted' / 'invite_declined' / 'contact_deleted'
+         *  'reason': String,          // 事件发生的理由，该字段由对方发起请求时所填，对方如果未填则返回默认字符串。
+         *  'fromUsername': String,    // 事件发送者的 username。
+         *  'fromUserAppKey': String   // 事件发送者的 AppKey。
+         * }
+         */
     static addContactNotifyListener(listener) {
         listeners[cb] = DeviceEventEmitter.addListener(contactNotify,
-			(message) => {
-				cb(message);
-			});
+            (message) => {
+                cb(message);
+            });
     }
     static removeContactNotifyListener(listener) {
-		if (!listeners[cb]) {
-			return;
-		}
-		listeners[cb].remove();
-		listeners[cb] = null;
-    }
-    /**
-     * 消息撤回事件监听。
-     *
-     * @param {function} listener = function (event) {} // 以参数形式返回事件信息。
-     * event = {
-     *  'conversation': Object      // 会话对象。
-     *  'retractedMessage': Object  // 被撤回的消息对象。
-     * }
-     */
+            if (!listeners[cb]) {
+                return;
+            }
+            listeners[cb].remove();
+            listeners[cb] = null;
+        }
+        /**
+         * 消息撤回事件监听。
+         *
+         * @param {function} listener = function (event) {} // 以参数形式返回事件信息。
+         * event = {
+         *  'conversation': Object      // 会话对象。
+         *  'retractedMessage': Object  // 被撤回的消息对象。
+         * }
+         */
     static addMessageRetractListener(listener) {
         listeners[cb] = DeviceEventEmitter.addListener(messageRetract,
-			(message) => {
-				cb(message);
-			});
+            (message) => {
+                cb(message);
+            });
     }
-    
+
     static removeMessageRetractListener(listener) {
-		if (!listeners[cb]) {
-			return;
-		}
-		listeners[cb].remove();
-		listeners[cb] = null;
+        if (!listeners[cb]) {
+            return;
+        }
+        listeners[cb].remove();
+        listeners[cb] = null;
     }
 }

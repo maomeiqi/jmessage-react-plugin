@@ -18,7 +18,6 @@ public class JMessageReactPackage implements ReactPackage {
         return result;
     }
 
-    @Override
     public List<Class<? extends JavaScriptModule>> createJSModules() {
         return Collections.emptyList();
     }
