@@ -24,10 +24,10 @@
 
 #import "JMessageHelper.h"
 #import <JMessage/JMessage.h>
-
+#import <AVFoundation/AVFoundation.h>
 @interface RCTJMessageModule ()<JMessageDelegate, JMSGEventDelegate, UIApplicationDelegate>
 
-@property(strong,nonatomic)NSMutableDictionary *SendMsgCallbackDic;//{@"msgid": @"", @"RCTJMessageModule": @""}
+@property(strong,nonatomic)NSMutableDictionary *SendMsgCallbackDic;//{@"msgid": @"", @"RCTJMessageModule": @[successCallback, failCallback]}
 @end
 
 @implementation RCTJMessageModule
@@ -58,20 +58,20 @@ RCT_EXPORT_MODULE();
                         name:kJJMessageReceiveMessage
                       object:nil];
   
-  [defaultCenter addObserver:self
-                    selector:@selector(conversationChanged:)
-                        name:kJJMessageConversationChanged
-                      object:nil];
+//  [defaultCenter addObserver:self
+//                    selector:@selector(conversationChanged:)
+//                        name:kJJMessageConversationChanged
+//                      object:nil];
   // have
   [defaultCenter addObserver:self
                     selector:@selector(didSendMessage:)
                         name:kJJMessageSendMessageRespone
                       object:nil];
   
-  [defaultCenter addObserver:self
-                    selector:@selector(unreadChanged:)
-                        name:kJJMessageUnreadChanged
-                      object:nil];
+//  [defaultCenter addObserver:self
+//                    selector:@selector(unreadChanged:)
+//                        name:kJJMessageUnreadChanged
+//                      object:nil];
   // have
   [defaultCenter addObserver:self
                     selector:@selector(loginStateChanged:)
@@ -82,16 +82,17 @@ RCT_EXPORT_MODULE();
                     selector:@selector(onContactNotify:)
                         name:kJJMessageContactNotify
                       object:nil];
+  // have
   [defaultCenter addObserver:self
                     selector:@selector(didReceiveRetractMessage:)
                         name:kJJMessageRetractMessage
                       object:nil];
   
   
-  [defaultCenter addObserver:self
-                    selector:@selector(groupInfoChanged:)
-                        name:kJJMessageGroupInfoChanged
-                      object:nil];
+//  [defaultCenter addObserver:self
+//                    selector:@selector(groupInfoChanged:)
+//                        name:kJJMessageGroupInfoChanged
+//                      object:nil];
   // have
   [defaultCenter addObserver:self
                     selector:@selector(onSyncOfflineMessage:)
@@ -102,13 +103,6 @@ RCT_EXPORT_MODULE();
                     selector:@selector(onSyncRoamingMessage:)
                         name:kJJMessageSyncRoamingMessage
                       object:nil];
-}
-
-RCT_EXPORT_METHOD( setTags:(NSArray *)tags
-                  callback:(RCTResponseSenderBlock)callback) {
-
-  
-//  callback(@[@{@"errorCode": @(iResCode)}]);
 }
 
 - (NSDictionary *)getParamError {
@@ -137,80 +131,76 @@ RCT_EXPORT_METHOD(setDebugMode:(NSDictionary *)param) {
 
 #pragma mark IM - Notifications
 - (void)onSyncOfflineMessage: (NSNotification *) notification {
-  CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"eventName": @"syncOfflineMessage", @"value": notification.object}];
-  [result setKeepCallback:@(true)];
-  [self.commandDelegate sendPluginResult:result callbackId:self.callBack.callbackId];
+  [self.bridge.eventDispatcher sendAppEventWithName:syncOfflineMessageEvent body:notification.object];
 }
 
 - (void)onSyncRoamingMessage: (NSNotification *) notification {
-  CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"eventName": @"syncRoamingMessage", @"value": notification.object}];
-  [result setKeepCallback:@(true)];
-  [self.commandDelegate sendPluginResult:result callbackId:self.callBack.callbackId];
+  [self.bridge.eventDispatcher sendAppEventWithName:syncRoamingMessageEvent body:notification.object];
 }
 
 -(void)didSendMessage:(NSNotification *)notification {
   NSDictionary *response = notification.object;
   
-  CDVPluginResult *result = nil;
-  
+//  CDVPluginResult *result = nil;
+    NSDictionary *msgDic = response[@"message"];
+    NSArray *callBacks = self.SendMsgCallbackDic[msgDic[@"id"]];
   if (response[@"error"] == nil) {
-    CDVCommandStatus status = CDVCommandStatus_OK;
-    result = [CDVPluginResult resultWithStatus:status messageAsDictionary:response[@"message"]];
+    RCTResponseSenderBlock successCallback = callBacks[0];
+    successCallback(@[msgDic]);
   } else {
     NSError *error = response[@"error"];
-    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:@{@"code": @(error.code), @"description": [error description]}];
+    RCTResponseSenderBlock failCallback = callBacks[1];
+    failCallback(@[@{@"code": @(error.code), @"description": [error description]}]);
   }
-  
-  NSDictionary *msgDic = response[@"message"];
-  NSString *callBackID = self.SendMsgCallbackDic[msgDic[@"id"]];
-  if (callBackID) {
-    [self.commandDelegate sendPluginResult:result callbackId:callBackID];
-    [self.SendMsgCallbackDic removeObjectForKey:msgDic[@"id"]];
-  } else {
-    return;
-  }
+  [self.SendMsgCallbackDic removeObjectForKey:msgDic[@"id"]];
 }
 // TODO: fix ==================>
 // - MARK: JMessage Event
-- (void)conversationChanged:(NSNotification *)notification {
-  [JMessagePlugin evalFuntionName:@"onConversationChanged" jsonParm:[notification.object toJsonString]];
-}
-
-- (void)unreadChanged:(NSNotification *)notification{
-  [JMessagePlugin evalFuntionName:@"onUnreadChanged" jsonParm:[notification.object toJsonString]];
-}
-
-- (void)groupInfoChanged:(NSNotification *)notification{
-  [JMessagePlugin evalFuntionName:@"onGroupInfoChanged" jsonParm:[notification.object toJsonString]];
-}
+//- (void)conversationChanged:(NSNotification *)notification {
+////  [JMessagePlugin evalFuntionName:@"onConversationChanged" jsonParm:[notification.object toJsonString]];
+//}
+//
+//- (void)unreadChanged:(NSNotification *)notification{
+//  [JMessagePlugin evalFuntionName:@"onUnreadChanged" jsonParm:[notification.object toJsonString]];
+//}
+//
+//- (void)groupInfoChanged:(NSNotification *)notification{
+//  [JMessagePlugin evalFuntionName:@"onGroupInfoChanged" jsonParm:[notification.object toJsonString]];
+//}
 
 - (void)loginStateChanged:(NSNotification *)notification{
-  CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"eventName": @"loginStateChanged", @"value": notification.object}];
+//  CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"eventName": @"loginStateChanged", @"value": notification.object}];
+//  
+//  [result setKeepCallback:@(true)];
+//  [self.commandDelegate sendPluginResult:result callbackId:self.callBack.callbackId];
   
-  [result setKeepCallback:@(true)];
-  [self.commandDelegate sendPluginResult:result callbackId:self.callBack.callbackId];
+  [self.bridge.eventDispatcher sendAppEventWithName:loginStateChangedEvent body:notification.object];
 }
 
 - (void)onContactNotify:(NSNotification *)notification{
-  CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"eventName": @"contactNotify", @"value": notification.object}];
-  
-  [result setKeepCallback:@(true)];
-  [self.commandDelegate sendPluginResult:result callbackId:self.callBack.callbackId];
+//  CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"eventName": @"contactNotify", @"value": notification.object}];
+//  
+//  [result setKeepCallback:@(true)];
+//  [self.commandDelegate sendPluginResult:result callbackId:self.callBack.callbackId];
+    
+  [self.bridge.eventDispatcher sendAppEventWithName:contactNotifyEvent body:notification.object];
 }
 
 - (void)didReceiveRetractMessage:(NSNotification *)notification{
-  CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"eventName": @"retractMessage", @"value": notification.object}];
-  
-  [result setKeepCallback:@(true)];
-  [self.commandDelegate sendPluginResult:result callbackId:self.callBack.callbackId];
+//  CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"eventName": @"retractMessage", @"value": notification.object}];
+//  
+//  [result setKeepCallback:@(true)];
+//  [self.commandDelegate sendPluginResult:result callbackId:self.callBack.callbackId];
+  [self.bridge.eventDispatcher sendAppEventWithName:messageRetractEvent body:notification.object];
 }
 
 //didReceiveJMessageMessage change name
 - (void)didReceiveJMessageMessage:(NSNotification *)notification {
-  CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"eventName": @"receiveMessage", @"value": notification.object}];
-  [result setKeepCallback:@(true)];
-  
-  [self.commandDelegate sendPluginResult:result callbackId:self.callBack.callbackId];
+//  CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"eventName": @"receiveMessage", @"value": notification.object}];
+//  [result setKeepCallback:@(true)];
+//  
+//  [self.commandDelegate sendPluginResult:result callbackId:self.callBack.callbackId];
+  [self.bridge.eventDispatcher sendAppEventWithName:receiveMsgEvent body:notification.object];
 }
 
 // TODO: fix <================
@@ -234,7 +224,7 @@ RCT_EXPORT_METHOD(setDebugMode:(NSDictionary *)param) {
 RCT_EXPORT_METHOD(userRegister:(NSDictionary *)user
                   successCallback:(RCTResponseSenderBlock)successCallback
                   failCallback:(RCTResponseSenderBlock)failCallback) {
-  NSDictionary * user = [command argumentAtIndex:0];
+//  NSDictionary * user = [command argumentAtIndex:0];
   NSLog(@"username %@",user);
 
   [JMSGUser registerWithUsername: user[@"username"] password: user[@"password"] completionHandler:^(id resultObject, NSError *error) {
@@ -301,7 +291,7 @@ RCT_EXPORT_METHOD(getUserInfo:(NSDictionary *)param
 RCT_EXPORT_METHOD(updateMyPassword:(NSDictionary *)param
                   successCallback:(RCTResponseSenderBlock)successCallback
                   failCallback:(RCTResponseSenderBlock)failCallback) {
-  NSDictionary * param = [command argumentAtIndex:0];
+//  NSDictionary * param = [command argumentAtIndex:0];
   
   if (param[@"oldPwd"] && param[@"newPwd"]) {
     [JMSGUser updateMyPasswordWithNewPassword:param[@"newPwd"] oldPassword:param[@"oldPwd"] completionHandler:^(id resultObject, NSError *error) {
@@ -320,7 +310,7 @@ RCT_EXPORT_METHOD(updateMyPassword:(NSDictionary *)param
 RCT_EXPORT_METHOD(updateMyAvatar:(NSDictionary *)param
                   successCallback:(RCTResponseSenderBlock)successCallback
                   failCallback:(RCTResponseSenderBlock)failCallback) {
-  NSDictionary * param = [command argumentAtIndex:0];
+//  NSDictionary * param = [command argumentAtIndex:0];
   
   if (!param[@"imgPath"]) {
     failCallback(@[[self getParamError]]);
@@ -431,14 +421,15 @@ RCT_EXPORT_METHOD(updateMyInfo:(NSDictionary *)param
 RCT_EXPORT_METHOD(sendTextMessage:(NSDictionary *)param
                   successCallback:(RCTResponseSenderBlock)successCallback
                   failCallback:(RCTResponseSenderBlock)failCallback) {
-  NSDictionary * param = [command argumentAtIndex:0];
+//  NSDictionary * param = [command argumentAtIndex:0];
   
   if (param[@"type"] == nil) {
-    [self returnParamError:command];
+
+    failCallback(@[[self getParamError]]);
     return;}
   
   if (param[@"text"] == nil) {
-    [self returnParamError:command];
+    failCallback(@[[self getParamError]]);
     return;
   }
   
@@ -499,14 +490,14 @@ RCT_EXPORT_METHOD(sendTextMessage:(NSDictionary *)param
     }
     
   } else {
-    failCallback(@[[self getParamError]])
+    failCallback(@[[self getParamError]]);
   }
 }
 
 RCT_EXPORT_METHOD(sendImageMessage:(NSDictionary *)param
                   successCallback:(RCTResponseSenderBlock)successCallback
                   failCallback:(RCTResponseSenderBlock)failCallback) {
-  NSDictionary * param = [command argumentAtIndex:0];
+//  NSDictionary * param = [command argumentAtIndex:0];
   
   if (param[@"type"] == nil) {
     failCallback(@[[self getParamError]]);
@@ -710,7 +701,7 @@ RCT_EXPORT_METHOD(sendCustomMessage:(NSDictionary *)param
       }
       
       JMSGConversation *conversation = resultObject;
-      self.SendMsgCallbackDic[message.msgId] = @[successCallback, failCallback)];
+      self.SendMsgCallbackDic[message.msgId] = @[successCallback, failCallback];
       if (messageSendingOptions) {
         [conversation sendMessage:message optionalContent:messageSendingOptions];
       } else {
@@ -723,7 +714,7 @@ RCT_EXPORT_METHOD(sendCustomMessage:(NSDictionary *)param
       JMSGCustomContent *content = [[JMSGCustomContent alloc] initWithCustomDictionary: param[@"customObject"]];
       JMSGMessage *message = [JMSGMessage createGroupMessageWithContent: content groupId: param[@"groupId"]];
       
-      self.SendMsgCallbackDic[message.msgId] = command.callbackId;
+      self.SendMsgCallbackDic[message.msgId] = @[successCallback, failCallback];
       if (messageSendingOptions) {
         [JMSGMessage sendMessage:message optionalContent:messageSendingOptions];
       } else {
@@ -738,14 +729,14 @@ RCT_EXPORT_METHOD(sendCustomMessage:(NSDictionary *)param
 RCT_EXPORT_METHOD(sendLocationMessage:(NSDictionary *)param
                   successCallback:(RCTResponseSenderBlock)successCallback
                   failCallback:(RCTResponseSenderBlock)failCallback) {
-  NSDictionary * param = [command argumentAtIndex:0];
+//  NSDictionary * param = [command argumentAtIndex:0];
   
   if (param[@"type"] == nil ||
       param[@"latitude"] == nil ||
       param[@"longitude"] == nil ||
       param[@"scale"] == nil ||
       param[@"address"] == nil) {
-    failCallback(@[])
+    failCallback(@[]);
     return;
   }
   
@@ -806,7 +797,6 @@ RCT_EXPORT_METHOD(sendLocationMessage:(NSDictionary *)param
       }
     } else {
       failCallback(@[[self getParamError]]);
-      [self ]
     }
   }
 }
@@ -894,7 +884,7 @@ RCT_EXPORT_METHOD(sendFileMessage:(NSDictionary *)param
 RCT_EXPORT_METHOD(getHistoryMessages:(NSDictionary *)param
                   successCallback:(RCTResponseSenderBlock)successCallback
                   failCallback:(RCTResponseSenderBlock)failCallback) {
-  NSDictionary * param = [command argumentAtIndex:0];
+//  NSDictionary * param = [command argumentAtIndex:0];
   if (param[@"type"] == nil ||
       param[@"from"] == nil ||
       param[@"limit"] == nil) {
@@ -981,7 +971,7 @@ RCT_EXPORT_METHOD(sendInvitationRequest:(NSDictionary *)param
 RCT_EXPORT_METHOD(acceptInvitation:(NSDictionary *)param
                   successCallback:(RCTResponseSenderBlock)successCallback
                   failCallback:(RCTResponseSenderBlock)failCallback) {
-  NSDictionary * param = [command argumentAtIndex:0];
+//  NSDictionary * param = [command argumentAtIndex:0];
   if (param[@"username"] == nil) {
     failCallback(@[[self getParamError]]);
     return;
@@ -1081,7 +1071,7 @@ RCT_EXPORT_METHOD(updateFriendNoteName:(NSDictionary *)param
     
     NSArray *userArr = resultObject;
     if (userArr.count < 1) {
-      [self returnErrorWithLog:@"cann't find user by usernaem" command:command];
+      failCallback(@[[self getErrorWithLog:@"cann't find user by usernaem"]]);
     } else {
       JMSGUser *user = resultObject[0];
       [user updateNoteName:param[@"noteName"] completionHandler:^(id resultObject, NSError *error) {
@@ -1089,7 +1079,7 @@ RCT_EXPORT_METHOD(updateFriendNoteName:(NSDictionary *)param
           failCallback(@[[error errorToDictionary]]);
           return ;
         }
-        successCallback(@[])
+        successCallback(@[]);
       }];
     }
   }];
@@ -1118,7 +1108,7 @@ RCT_EXPORT_METHOD(updateFriendNoteText:(NSDictionary *)param
     
     NSArray *userArr = resultObject;
     if (userArr.count < 1) {
-      [self returnErrorWithLog:@"cann't find user by usernaem" command:command];
+      failCallback(@[[self getErrorWithLog:@"cann't find user by usernaem"]]);
     } else {
       JMSGUser *user = resultObject[0];
       
@@ -1253,7 +1243,7 @@ RCT_EXPORT_METHOD(addGroupMembers:(NSDictionary *)param
                   failCallback:(RCTResponseSenderBlock)failCallback) {
   if (param[@"id"] == nil ||
       param[@"usernameArray"] == nil) {
-    [self returnParamError:command];
+    failCallback(@[[self getParamError]]);
   }
   
   NSString *appKey = nil;
@@ -1285,7 +1275,7 @@ RCT_EXPORT_METHOD(removeGroupMembers:(NSDictionary *)param
                   successCallback:(RCTResponseSenderBlock)successCallback
                   failCallback:(RCTResponseSenderBlock)failCallback) {
 
-  NSDictionary * param = [command argumentAtIndex:0];
+//  NSDictionary * param = [command argumentAtIndex:0];
   if (param[@"id"] == nil ||
       param[@"usernameArray"] == nil) {
     failCallback(@[[self getParamError]]);
@@ -1324,14 +1314,14 @@ RCT_EXPORT_METHOD(exitGroup:(NSDictionary *)param
   
   [JMSGGroup groupInfoWithGroupId:param[@"id"] completionHandler:^(id resultObject, NSError *error) {
     if (error) {
-      failCallback(@[error errorToDictionary]);
+      failCallback(@[[error errorToDictionary]]);
       return ;
     }
     
     JMSGGroup *group = resultObject;
     [group exit:^(id resultObject, NSError *error) {
       if (error) {
-        failCallback(@[error errorToDictionary]);
+        failCallback(@[[error errorToDictionary]]);
         return ;
       }
       successCallback(@[]);
@@ -1349,7 +1339,7 @@ RCT_EXPORT_METHOD(getGroupMembers:(NSDictionary *)param
   
   [JMSGGroup groupInfoWithGroupId:param[@"id"] completionHandler:^(id resultObject, NSError *error) {
     if (error) {
-      failCallback(@[error errorToDictionary]);
+      failCallback(@[[error errorToDictionary]]);
       return ;
     }
     
@@ -1357,7 +1347,7 @@ RCT_EXPORT_METHOD(getGroupMembers:(NSDictionary *)param
     
     [group memberArrayWithCompletionHandler:^(id resultObject, NSError *error) {
       if (error) {
-        failCallback(@[error errorToDictionary]);
+        failCallback(@[[error errorToDictionary]]);
         return ;
       }
       NSArray *userList = resultObject;
@@ -1480,7 +1470,7 @@ RCT_EXPORT_METHOD(setNoDisturb:(NSDictionary *)param
       
       NSArray *userList = resultObject;
       if (userList.count < 1) {
-        successCallback(@[])
+        successCallback(@[]);
         return;
       }
       
@@ -1508,7 +1498,7 @@ RCT_EXPORT_METHOD(setNoDisturb:(NSDictionary *)param
           failCallback(@[[error errorToDictionary]]);
         }
         
-        successCallback(@[])
+        successCallback(@[]);
       }];
     }];
   }
@@ -1552,14 +1542,14 @@ RCT_EXPORT_METHOD(setNoDisturbGlobal:(NSDictionary *)param
       failCallback(@[[error errorToDictionary]]);
       return;
     }
-    successCallback(@[])
+    successCallback(@[]);
   }];
 }
 
 RCT_EXPORT_METHOD(isNoDisturbGlobal:(RCTResponseSenderBlock)successCallback
                        failCallback:(RCTResponseSenderBlock)failCallback) {
   BOOL isNodisturb = [JMessage isSetGlobalNoDisturb];
-  successCallback(@[@{@"isNoDisturb": @(isNodisturb)}])
+  successCallback(@[@{@"isNoDisturb": @(isNodisturb)}]);
 }
 
 RCT_EXPORT_METHOD(downloadOriginalUserAvatar:(NSDictionary *)param
@@ -1585,7 +1575,7 @@ RCT_EXPORT_METHOD(downloadOriginalUserAvatar:(NSDictionary *)param
     
     NSArray *userList = resultObject;
     if (userList.count < 1) {
-      successCallback(@[])
+      successCallback(@[]);
       return;
     }
     
@@ -1598,7 +1588,7 @@ RCT_EXPORT_METHOD(downloadOriginalUserAvatar:(NSDictionary *)param
 
       successCallback(@[@{@"username": user.username,
                           @"appKey": user.appKey,
-                          @"filePath": [user largeAvatarLocalPath]}])
+                          @"filePath": [user largeAvatarLocalPath]}]);
     }];
   }];
   
@@ -1658,7 +1648,7 @@ RCT_EXPORT_METHOD(downloadOriginalImage:(NSDictionary *)param
           
           JMSGMediaAbstractContent *mediaContent = (JMSGMediaAbstractContent *) message.content;
           successCallback(@[@{@"messageId": message.msgId,
-                              @"filePath": [mediaContent originMediaLocalPath]}])
+                              @"filePath": [mediaContent originMediaLocalPath]}]);
         }];
       }
     }];
@@ -1693,7 +1683,7 @@ RCT_EXPORT_METHOD(downloadOriginalImage:(NSDictionary *)param
             }
             JMSGMediaAbstractContent *mediaContent = (JMSGMediaAbstractContent *) message.content;
             successCallback(@[@{@"messageId": message.msgId,
-                                @"filePath": [mediaContent originMediaLocalPath]}])
+                                @"filePath": [mediaContent originMediaLocalPath]}]);
           }];
         }
       }];
@@ -1740,12 +1730,12 @@ RCT_EXPORT_METHOD(downloadVoiceFile:(NSDictionary *)param
                                            JMSGMessage *message = [conversation messageWithMessageId:param[@"messageId"]];
                                            
                                            if (message == nil) {
-                                             failCallback(@[[self getErrorWithLog:@"cann't find this message"]])
+                                             failCallback(@[[self getErrorWithLog:@"cann't find this message"]]);
                                              return;
                                            }
                                            
                                            if (message.contentType != kJMSGContentTypeVoice) {
-                                             failCallback(@[[self getErrorWithLog:@"It is not image message"]])
+                                             failCallback(@[[self getErrorWithLog:@"It is not image message"]]);
                                              return;
                                            } else {
                                              JMSGVoiceContent *content = (JMSGVoiceContent *) message.content;
@@ -1774,12 +1764,12 @@ RCT_EXPORT_METHOD(downloadVoiceFile:(NSDictionary *)param
         JMSGMessage *message = [conversation messageWithMessageId:param[@"messageId"]];
         
         if (message == nil) {
-          failCallback(@[[self getErrorWithLog:@"cann't find this message"]])
+          failCallback(@[[self getErrorWithLog:@"cann't find this message"]]);
           return;
         }
         
         if (message.contentType != kJMSGContentTypeVoice) {
-          failCallback(@[[self getErrorWithLog:@"It is not voice message"]])
+          failCallback(@[[self getErrorWithLog:@"It is not voice message"]]);
           return;
         } else {
           JMSGVoiceContent *content = (JMSGVoiceContent *) message.content;
@@ -1874,7 +1864,7 @@ RCT_EXPORT_METHOD(downloadFile:(NSDictionary *)param
         }
         
         if (message.contentType != kJMSGContentTypeFile) {
-          failCallback(@[[self getErrorWithLog:@"It is not a file message"]])
+          failCallback(@[[self getErrorWithLog:@"It is not a file message"]]);
           return;
           
         } else {
@@ -2017,7 +2007,7 @@ RCT_EXPORT_METHOD(getConversation:(NSDictionary *)param
                                              return;
                                            }
                                            JMSGConversation *conversation = resultObject;
-                                           successCallback(@[[conversation conversationToDictionary]])
+                                           successCallback(@[[conversation conversationToDictionary]]);
                                          }];
   } else {
     [JMSGConversation createGroupConversationWithGroupId:param[@"groupId"]
@@ -2027,7 +2017,7 @@ RCT_EXPORT_METHOD(getConversation:(NSDictionary *)param
                                            return;
                                          }
                                          JMSGConversation *conversation = resultObject;
-                                         successCallback(@[[conversation conversationToDictionary]])
+                                         successCallback(@[[conversation conversationToDictionary]]);
                                        }];
   }
 }
@@ -2085,24 +2075,24 @@ RCT_EXPORT_METHOD(resetUnreadMessageCount:(NSDictionary *)param
                                                     appKey:appKey
                                          completionHandler:^(id resultObject, NSError *error) {
                                            if (error) {
-                                             failCallback(@[error errorToDictionary]);
+                                             failCallback(@[[error errorToDictionary]]);
                                              return;
                                            }
                                            JMSGConversation *conversation = resultObject;
                                            [conversation clearUnreadCount];
-                                           successCallback(@[])
+                                           successCallback(@[]);
                                          }];
     
   } else {
     [JMSGConversation createGroupConversationWithGroupId:param[@"groupId"]
                                        completionHandler:^(id resultObject, NSError *error) {
                                          if (error) {
-                                           failCallback(@[error errorToDictionary]);
+                                           failCallback(@[[error errorToDictionary]]);
                                            return;
                                          }
                                          JMSGConversation *conversation = resultObject;
                                          [conversation clearUnreadCount];
-                                         successCallback(@[])
+                                         successCallback(@[]);
                                        }];
   }
 }
@@ -2112,7 +2102,6 @@ RCT_EXPORT_METHOD(retractMessage:(NSDictionary *)param
                   failCallback:(RCTResponseSenderBlock)failCallback) {
   
   if (param[@"type"] == nil) {
-    [self returnParamError:command];
     failCallback(@[[self getParamError]]);
     return;}
   
@@ -2152,7 +2141,7 @@ RCT_EXPORT_METHOD(retractMessage:(NSDictionary *)param
                                                return;
                                              }
                                              
-                                             successCallback(@[])
+                                             successCallback(@[]);
                                            }];
                                          }];
     
@@ -2180,7 +2169,7 @@ RCT_EXPORT_METHOD(retractMessage:(NSDictionary *)param
                                                return;
                                              }
                                              
-                                             successCallback(@[])
+                                             successCallback(@[]);
                                            }];
                                          }];
     } else {
