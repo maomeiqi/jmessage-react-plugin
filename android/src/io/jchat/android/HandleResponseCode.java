@@ -14,7 +14,10 @@ import io.jchat.android.R;
  * Created by Ken on 2015/3/25.
  */
 public class HandleResponseCode {
-    public static void onHandle(Context context, int status, boolean isCenter){
+    public static void onHandle(Context context, int status, boolean isCenter, boolean shutdownToast){
+        if (shutdownToast) {
+            return;
+        }
         Toast toast = new Toast(context);
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.jmui_default_toast, null);
