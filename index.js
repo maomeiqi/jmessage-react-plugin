@@ -19,10 +19,24 @@ const contactNotify = "JMessage.ContactNotify" // 收到好友请求消息事件
 export default class JMessage {
 
     /**
-     * 设置是否开启 debug 模式，开启后 SDK 将会输出更多日志信息。应用对外发布时应关闭。
+     * @param {object} params = {
+     *  'appkey': String， // 极光官网注册的应用 AppKey
+     *  'isOpenMessageRoaming': boolean,  // 是否开启消息漫游，不传默认关闭。
+     *  'isProduction': Boolean, // 是否为生产模式
+     *  'channel': String // (选填)应用的渠道名称
+     * }
      *
-     * @param {object} params = {'enable': Boolean}
+     * 打开消息漫游之后，用户多个设备之间登录时，SDK 会自动将当前登录用户的历史消息同步到本地。
      */
+    static init(params) {
+        JMessageModule.setup(params)
+    }
+
+   /**
+    * 设置是否开启 debug 模式，开启后 SDK 将会输出更多日志信息。应用对外发布时应关闭。
+    *
+    * @param {object} params = {'enable': Boolean}
+    */
     static setDebugMode(params) {
         // exec(null, null, PLUGIN_NAME, 'setDebugMode', [params])
         JMessageModule.setDebugMode(params)
