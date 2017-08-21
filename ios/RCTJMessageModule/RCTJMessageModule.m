@@ -49,6 +49,11 @@ RCT_EXPORT_MODULE();
   return self;
 }
 
+- (void)setBridge:(RCTBridge *)bridge {
+  _bridge = bridge;
+  JMessageHelper.shareInstance.launchOptions = _bridge.launchOptions;
+}
+
 -(void)initNotifications {
   
   NSNotificationCenter *defaultCenter = [NSNotificationCenter defaultCenter];

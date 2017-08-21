@@ -26,5 +26,5 @@
 #define contactNotifyEvent  @"JMessage.ContactNotify" // 收到好友请求消息事件
 
 @interface RCTJMessageModule : NSObject<RCTBridgeModule>
-
+@property(strong, nonatomic)NSDictionary *launchOptions;
 @end

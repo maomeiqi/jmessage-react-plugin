@@ -29,14 +29,38 @@
 -(void)initJMessage:(NSDictionary*)options{
   //TODO: add init jmessage
   // init third-party SDK
-//  [JMessage addDelegate:self withConversation:nil];
-//  
-//  [JMessage setupJMessage:_launchOptions
-//                   appKey:appkey
-//                  channel:channel
-//         apsForProduction:[isProduction boolValue]
-//                 category:nil
-//           messageRoaming:[isOpenMessageRoaming boolValue]];
+  
+  NSString *appkey = @"";
+  NSString *channel = @"";
+  BOOL isProduction = true;
+  BOOL isOpenMessageRoaming = false;
+  
+  if (options[@"appkey"]) {
+    appkey = options[@"appkey"];
+  }
+  
+  if (options[@"channel"]) {
+    channel = options[@"channel"];
+  }
+  
+  if (options[@"isOpenMessageRoaming"]) {
+    NSNumber *isOpenMessageRoamingNum = options[@"isOpenMessageRoaming"];
+    isOpenMessageRoaming = [isOpenMessageRoamingNum boolValue];
+  }
+  
+  if (options[@"isProduction"]) {
+    NSNumber *isProductionNum = options[@"isProduction"];
+    isProduction = [isProductionNum boolValue];
+  }
+  
+  [JMessage addDelegate:self withConversation:nil];
+  
+  [JMessage setupJMessage:_launchOptions
+                   appKey:appkey
+                  channel:@""
+         apsForProduction:isProduction
+                 category:nil
+           messageRoaming:isOpenMessageRoaming];
 }
 
 - (void)onReceiveMessageRetractEvent:(JMSGMessageRetractEvent *)retractEvent {
