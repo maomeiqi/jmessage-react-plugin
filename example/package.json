@@ -5,8 +5,9 @@
     "start": "node node_modules/react-native/local-cli/cli.js start"
   },
   "dependencies": {
-    "jmessage-react-plugin": "1.0.2",
+    "aurora-imui-react-native": "^0.4.12",
     "jcore-react-native": "^1.1.8",
+    "jmessage-react-plugin": "file:///Users/HuminiOS/Desktop/workproject/jmessage-react-plugin",
     "react": "16.0.0-alpha.12",
     "react-native": "^0.47.1",
     "react-native-dialog": "^1.0.7",
