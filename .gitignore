@@ -91,4 +91,5 @@ build-res/
 .qshell
 *.qshell
 example/node_modules/*
+example/npm-debug*
 
