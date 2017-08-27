@@ -686,18 +686,18 @@ export default class JMessage {
      * }
      */
     static addReceiveMessageListener(listener) {
-        listeners[cb] = DeviceEventEmitter.addListener(receiveMsgEvent,
+        listeners[listener] = DeviceEventEmitter.addListener(receiveMsgEvent,
             (message) => {
-                cb(message);
+                listener(message);
             });
     }
 
     static removeReceiveMessageListener(listener) {
-            if (!listeners[cb]) {
+            if (!listeners[listener]) {
                 return;
             }
-            listeners[cb].remove();
-            listeners[cb] = null;
+            listeners[listener].remove();
+            listeners[listener] = null;
         }
         /**
          * 添加点击通知栏消息通知事件监听。
@@ -705,18 +705,18 @@ export default class JMessage {
          * @param {function} listener = function (message) {}  // 以参数形式返回消息对象。
          */
     static addClickMessageNotificationListener(listener) {
-        listeners[cb] = DeviceEventEmitter.addListener(clickMessageNotificationEvent,
+        listeners[listener] = DeviceEventEmitter.addListener(clickMessageNotificationEvent,
             (message) => {
-                cb(message);
+                listener(message);
             });
     }
 
     static removeClickMessageNotificationListener(listener) {
-            if (!listeners[cb]) {
+            if (!listeners[listener]) {
                 return;
             }
-            listeners[cb].remove();
-            listeners[cb] = null;
+            listeners[listener].remove();
+            listeners[listener] = null;
         }
         /**
          * 添加同步离线消息事件监听。
@@ -724,18 +724,18 @@ export default class JMessage {
          * @param {function} listener = function ({'conversation': {}, 'messageArray': []}) {}  // 以参数形式返回消息对象数组。
          */
     static addSyncOfflineMessageListener(listener) {
-        listeners[cb] = DeviceEventEmitter.addListener(syncOfflineMessage,
+        listeners[listener] = DeviceEventEmitter.addListener(syncOfflineMessage,
             (message) => {
-                cb(message);
+                listener(message);
             });
     }
 
     static removeSyncOfflineMessageListener(listener) {
-            if (!listeners[cb]) {
+            if (!listeners[listener]) {
                 return;
             }
-            listeners[cb].remove();
-            listeners[cb] = null;
+            listeners[listener].remove();
+            listeners[listener] = null;
         }
         /**
          * 添加同步漫游消息事件监听。
@@ -743,18 +743,18 @@ export default class JMessage {
          * @param {function} listener = function ({'conversation': {}}) {}  // 以参数形式返回消息对象数组。
          */
     static addSyncRoamingMessageListener(listener) {
-        listeners[cb] = DeviceEventEmitter.addListener(syncRoamingMessage,
+        listeners[listener] = DeviceEventEmitter.addListener(syncRoamingMessage,
             (message) => {
-                cb(message);
+                listener(message);
             });
     }
 
     static removeSyncRoamingMessageListener(listener) {
-        if (!listeners[cb]) {
+        if (!listeners[listener]) {
             return;
         }
-        listeners[cb].remove();
-        listeners[cb] = null;
+        listeners[listener].remove();
+        listeners[listener] = null;
     }
 
     /**
@@ -766,17 +766,17 @@ export default class JMessage {
      * }
      */
     static addLoginStateChangedListener(listener) {
-        listeners[cb] = DeviceEventEmitter.addListener(loginStateChanged,
+        listeners[listener] = DeviceEventEmitter.addListener(loginStateChanged,
             (message) => {
-                cb(message);
+                listener(message);
             });
     }
     static removeLoginStateChangedListener(listener) {
-            if (!listeners[cb]) {
+            if (!listeners[listener]) {
                 return;
             }
-            listeners[cb].remove();
-            listeners[cb] = null;
+            listeners[listener].remove();
+            listeners[listener] = null;
         }
         /**
          * 好友相关通知事件。
@@ -790,17 +790,17 @@ export default class JMessage {
          * }
          */
     static addContactNotifyListener(listener) {
-        listeners[cb] = DeviceEventEmitter.addListener(contactNotify,
+        listeners[listener] = DeviceEventEmitter.addListener(contactNotify,
             (message) => {
-                cb(message);
+                listener(message);
             });
     }
     static removeContactNotifyListener(listener) {
-            if (!listeners[cb]) {
+            if (!listeners[listener]) {
                 return;
             }
-            listeners[cb].remove();
-            listeners[cb] = null;
+            listeners[listener].remove();
+            listeners[listener] = null;
         }
         /**
          * 消息撤回事件监听。
@@ -812,17 +812,17 @@ export default class JMessage {
          * }
          */
     static addMessageRetractListener(listener) {
-        listeners[cb] = DeviceEventEmitter.addListener(messageRetract,
+        listeners[listener] = DeviceEventEmitter.addListener(messageRetract,
             (message) => {
-                cb(message);
+                listener(message);
             });
     }
 
     static removeMessageRetractListener(listener) {
-        if (!listeners[cb]) {
+        if (!listeners[listener]) {
             return;
         }
-        listeners[cb].remove();
-        listeners[cb] = null;
+        listeners[listener].remove();
+        listeners[listener] = null;
     }
 }
