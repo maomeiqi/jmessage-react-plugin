@@ -26,27 +26,12 @@ var MessageListView = IMUI.MessageList;
 const AuroraIController = IMUI.AuroraIMUIController;
 const window = Dimensions.get('window');
 
+import JMessage from 'jmessage-react-plugin';
+
 import Translations from '../../resource/Translations'
 
 var themsgid = 1
 
-function constructNormalMessage() {
-
-    var message = {}
-    message.msgId = themsgid.toString()
-    themsgid += 1
-    message.status = "send_going"
-    message.isOutgoing = true
-    message.timeString = ""
-    var user = {
-          userId: "",
-          displayName: "",
-          avatarPath: ""
-    }
-    message.fromUser = user
-    
-    return  message
-}
 
 export default class Chat extends Component {
   constructor(props) {
@@ -54,20 +39,128 @@ export default class Chat extends Component {
     this.state = { inputViewLayout: {width:window.width, height:86,}};
     
     this.updateLayout = this.updateLayout.bind(this);
+    this.conversation = this.props.navigation.state.params.conversation
+
+    JMessage.getMyInfo((myInfo) => {
+      this.myInfo = myInfo
+    })
+  }
+
+  convertJMessageToAuroraMsg(jmessage) {
+    var auroraMsg = {}
+    auroraMsg.msgType = jmessage.type
+    auroraMsg.msgId = jmessage.id
+    
+    if (jmessage.type === 'text') {    
+      auroraMsg.text = jmessage.text
+      // auroraMsg.text = "jmessage.text"
+    }
+  
+    if (jmessage.type === 'image') {    
+      auroraMsg.mediaPath = jmessage.thumbPath
+    }
+  
+    if (jmessage.type === 'voice') {    
+      auroraMsg.mediaPath = jmessage.path
+      auroraMsg.duration = jmessage.duration
+    }
+  
+    var user = {
+        userId: "",
+        displayName: "",
+        avatarPath: ""
+    }
+    user.userId = jmessage.from.username
+    user.displayName = jmessage.from.nickname
+    user.avatarPath = jmessage.from.avatarThumbPath
+    auroraMsg.fromUser = user
+    auroraMsg.status = "send_going"
+
+    auroraMsg.isOutgoing = true
+
+    if (this.myInfo.username === jmessage.from.username) {
+      auroraMsg.isOutgoing = true
+    } else {
+      auroraMsg.isOutgoing = false
+    }
+
+    auroraMsg.timeString = ""
+    
+    return auroraMsg
+  }
+
+  getNormalMessage () {
+    var message = {}
+    
+    if (this.conversation.conversationType === 'single') {
+      message.type = 'single'
+      message.username = this.conversation.key
+    } else {
+    message.type = 'group'
+    message.groupId = this.conversation.key
+    }
+    return message
   }
 
   componentDidMount() {  
-    AuroraIController.addMessageListDidLoadListener(() => {
+    // Alert.alert(this.props.navigation.state.params.key)
 
-      var messages = []
-      for(var i=0; i<14; i++){
-        var message = constructNormalMessage()
-        message.msgType = "text"
-        message.text = "" + i
-        AuroraIController.insertMessagesToTop([message])      
-    }
-    AuroraIController.insertMessagesToTop(messages)
-    });
+    var parames = {
+
+      'from': 0,            // 开始的消息下标。
+      'limit': 10            // 要获取的消息数。比如当 from = 0, limit = 10 时，是获取第 0 - 9 条历史消息。
+     }
+    //  Alert.alert('conversation', this.conversation)
+     if (this.conversation.conversationType === 'single') {
+      parames.type = 'single'
+      parames.username = this.conversation.key
+     } else {
+      parames.type = 'group'
+      parames.groupId = this.conversation.key
+     }
+     this.messageListDidLoadCallback = () => {
+
+        JMessage.getHistoryMessages(parames, (messages) => {
+          
+          var auroraMessages = messages.map((message) => {
+            var normalMessage = this.convertJMessageToAuroraMsg(message)
+            return normalMessage
+          })
+          AuroraIController.insertMessagesToTop(auroraMessages)
+        }, (error) => {
+          Alert.alert('error!', JSON.stringify(error))
+        })
+
+        this.receiveMessageCallBack = (message) => {
+          
+          if (this.conversation.conversationType === 'single') {
+            if (message.target.type === 'user' ) {
+              if (message.from.username === this.conversation.key) {
+                var msg = this.convertJMessageToAuroraMsg(message)
+                AuroraIController.appendMessages([msg])
+              }
+              Alert.alert('message.target.username', message.target.username)
+              Alert.alert('this.conversation.key', this.conversation.key)
+              // Alert.alert("1111:", JSON.stringify(message)) 
+            }
+          } else {
+            if (message.target.type === 'group') {
+              if (message.from.id === this.conversation.key) {
+                var msg = this.convertJMessageToAuroraMsg(message)
+                AuroraIController.appendMessages([msg])
+              }
+            }
+          }
+        }
+        JMessage.addReceiveMessageListener(this.receiveMessageCallBack)
+      }
+     AuroraIController.addMessageListDidLoadListener(this.messageListDidLoadCallback)
+  }
+
+  componentWillUnmount() {
+    Alert.alert("Component", "will unmount")
+    JMessage.removeReceiveMessageListener(this.receiveMessageCallBack)
+    AuroraIController.removeMessageListDidLoadListener(this.messageListDidLoadCallback)
   }
 
   updateLayout(layout) {
@@ -100,24 +193,28 @@ export default class Chat extends Component {
 
   onSendText = (text) => {
 
-    var message = constructNormalMessage()
-    
-    message.msgType = "text"
+    var message = this.getNormalMessage()
     message.text = text
-    message.timeString = 'fsdafafaf'
-    
-    AuroraIController.appendMessages([message])
-    AuroraIController.scrollToBottom(true)
+    JMessage.sendTextMessage(message, (message) => {
+      var auroraMsg = this.convertJMessageToAuroraMsg(message)
+      AuroraIController.appendMessages([auroraMsg])
+      AuroraIController.scrollToBottom(true)
+    }, (error) => {
+      Alert.alert(JSON.stringify(error))
+    })
   }
 
   onTakePicture = (mediaPath) => {
+    var message = this.getNormalMessage()
+    message.path = mediaPath
+    JMessage.sendImageMessage(message, (message) => {
+      var auroraMsg = this.convertJMessageToAuroraMsg(message)
+      AuroraIController.appendMessages([auroraMsg])
+      AuroraIController.scrollToBottom(true)
+    }, (error) => {
+      Alert.alert(JSON.stringify(error))
+    })
 
-    var message = constructNormalMessage()
-    message.msgType = "image"
-    message.mediaPath = mediaPath
-
-    AuroraIController.appendMessages([message])
-    AuroraIController.scrollToBottom(true)
   }
 
   onStartRecordVoice = (e) => {
@@ -125,11 +222,16 @@ export default class Chat extends Component {
   }
 
   onFinishRecordVoice = (mediaPath, duration) => {
-    var message = constructNormalMessage()
-    message.msgType = "voice"
-    message.mediaPath = mediaPath
-    message.duration = duration
-    AuroraIController.appendMessages([message])
+
+    var message = this.getNormalMessage()
+    message.path = mediaPath
+    JMessage.sendVoiceMessage(message, (message) => {
+      var auroraMsg = this.convertJMessageToAuroraMsg(message)
+      AuroraIController.appendMessages([auroraMsg])
+      AuroraIController.scrollToBottom(true)
+    }, (error) => {
+      Alert.alert(JSON.stringify(error))
+    }) 
   }
 
   onCancelRecordVoice = () => {
@@ -141,12 +243,18 @@ export default class Chat extends Component {
   }
 
   onFinishRecordVideo = (mediaPath) => {
-    var message = constructNormalMessage()
 
-    message.msgType = "video"
-    message.mediaPath = mediaPath
-
-    AuroraIController.appendMessages([message])
+    var message = this.getNormalMessage()
+    message.path = mediaPath
+    message.extras = {type: "video"}
+    message.fileName = "video"
+    JMessage.sendFileMessage(message, (message) => {
+      var auroraMsg = this.convertJMessageToAuroraMsg(message)
+      AuroraIController.appendMessages([auroraMsg])
+      AuroraIController.scrollToBottom(true)
+    }, (error) => {
+      Alert.alert(JSON.stringify(error))
+    })
   }
     
   onSendGalleryFiles = (mediaFiles) => {
@@ -160,11 +268,15 @@ export default class Chat extends Component {
      * 代码用例不做裁剪操作。
      */ 
     for(index in mediaFiles) {
-      var message = constructNormalMessage()
-      message.msgType = "image"
-      message.mediaPath = mediaFiles[index].mediaPath
-      AuroraIController.appendMessages([message])
-      AuroraIController.scrollToBottom(true)
+      var message = this.getNormalMessage()
+      message.path = mediaFiles[index].mediaPath
+      JMessage.sendImageMessage(message, (message) => {
+        var auroraMsg = this.convertJMessageToAuroraMsg(message)
+        AuroraIController.appendMessages([auroraMsg])
+        AuroraIController.scrollToBottom(true)
+      }, (error) => {
+        Alert.alert(JSON.stringify(error))
+      })
     }
   }
 
