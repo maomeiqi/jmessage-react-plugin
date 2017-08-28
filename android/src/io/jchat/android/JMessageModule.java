@@ -137,6 +137,16 @@ public class JMessageModule extends ReactContextBaseJavaModule {
 
     }
 
+    @ReactMethod
+    public void setDebugMode(ReadableMap map) {
+        try {
+            boolean enable = map.getBoolean(Constant.ENABLE);
+            JMessageClient.setDebugMode(enable);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * 启动应用时判断登录状态
      *

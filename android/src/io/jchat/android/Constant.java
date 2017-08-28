@@ -1,7 +1,7 @@
 package io.jchat.android;
 
 public class Constant {
-
+    static final String ENABLE = "enable";
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
     public static final String OLD_PWD = "oldPwd";
