@@ -45,7 +45,8 @@ RCT_EXPORT_MODULE();
 
 - (id)init {
   self = [super init];
-  
+  [self initNotifications];
+  self.SendMsgCallbackDic = @{}.mutableCopy;
   return self;
 }
 
@@ -55,6 +56,7 @@ RCT_EXPORT_MODULE();
 }
 
 -(void)initNotifications {
+  [[NSNotificationCenter defaultCenter] removeObserver:self]; 
   
   NSNotificationCenter *defaultCenter = [NSNotificationCenter defaultCenter];
   // have
