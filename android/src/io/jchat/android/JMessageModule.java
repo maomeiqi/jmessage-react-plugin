@@ -40,10 +40,12 @@ import cn.jpush.im.android.api.callback.GetNoDisurbListCallback;
 import cn.jpush.im.android.api.callback.GetUserInfoCallback;
 import cn.jpush.im.android.api.callback.GetUserInfoListCallback;
 import cn.jpush.im.android.api.callback.IntegerCallback;
+import cn.jpush.im.android.api.callback.ProgressUpdateCallback;
 import cn.jpush.im.android.api.content.CustomContent;
 import cn.jpush.im.android.api.content.FileContent;
 import cn.jpush.im.android.api.content.ImageContent;
 import cn.jpush.im.android.api.content.LocationContent;
+import cn.jpush.im.android.api.content.MessageContent;
 import cn.jpush.im.android.api.content.TextContent;
 import cn.jpush.im.android.api.content.VoiceContent;
 import cn.jpush.im.android.api.enums.ContentType;
@@ -58,6 +60,7 @@ import cn.jpush.im.android.api.model.Conversation;
 import cn.jpush.im.android.api.model.GroupInfo;
 import cn.jpush.im.android.api.model.Message;
 import cn.jpush.im.android.api.model.UserInfo;
+import cn.jpush.im.android.api.options.MessageSendingOptions;
 import cn.jpush.im.api.BasicCallback;
 import io.jchat.android.utils.JMessageUtils;
 import io.jchat.android.utils.ResultUtils;
@@ -282,6 +285,95 @@ public class JMessageModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void createSendMessage(ReadableMap map, Callback callback) {
+        try {
+            MessageContent content;
+            Conversation conversation = mJMessageUtils.getConversation(map);
+            String type = map.getString(Constant.TYPE);
+            if (type.equals(Constant.TEXT)) {
+                content = new TextContent(map.getString(Constant.TEXT));
+            } else if (type.equals(Constant.IMAGE)) {
+                String path = map.getString(Constant.PATH);
+                content = new ImageContent(new File(path));
+            } else if (type.equals(Constant.VOICE)) {
+                String path = map.getString(Constant.PATH);
+                File file = new File(map.getString(path));
+                MediaPlayer mediaPlayer = MediaPlayer.create(mContext, Uri.parse(path));
+                int duration = mediaPlayer.getDuration() / 1000;    // Millisecond to second.
+                content = new VoiceContent(file, duration);
+                mediaPlayer.release();
+            } else if (type.equals(Constant.LOCATION)) {
+                double latitude = map.getDouble(Constant.LATITUDE);
+                double longitude = map.getDouble(Constant.LONGITUDE);
+                int scale = map.getInt(Constant.SCALE);
+                String address = map.getString(Constant.ADDRESS);
+                content = new LocationContent(latitude, longitude, scale, address);
+            } else {
+                content = new CustomContent();
+            }
+            if (type.equals(Constant.CUSTOM)) {
+                CustomContent customContent = new CustomContent();
+                customContent.setAllValues(ResultUtils.fromMap(map.getMap(Constant.CUSTOM_OBJECT)));
+                Message message = conversation.createSendMessage(customContent);
+                callback.invoke(ResultUtils.toJSObject(message));
+            } else {
+                Message message = conversation.createSendMessage(content);
+                callback.invoke(ResultUtils.toJSObject(message));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            mJMessageUtils.handleError(callback, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);
+        }
+    }
+
+    @ReactMethod
+    public void sendMessage(ReadableMap map, final Callback success, final Callback fail,
+                            final Callback progress) {
+        try {
+            Conversation conversation = mJMessageUtils.getConversation(map);
+            final Message message = conversation.getMessage(map.getInt(Constant.ID));
+            if (map.hasKey(Constant.SENDING_OPTIONS)) {
+                MessageSendingOptions options = new MessageSendingOptions();
+                ReadableMap optionMap = map.getMap(Constant.SENDING_OPTIONS);
+                options.setShowNotification(optionMap.getBoolean("isShowNotification"));
+                options.setRetainOffline(optionMap.getBoolean("isRetainOffline"));
+
+                if (optionMap.hasKey("isCustomNotificationEnabled")) {
+                    options.setCustomNotificationEnabled(
+                            optionMap.getBoolean("isCustomNotificationEnabled"));
+                }
+                if (optionMap.hasKey("notificationTitle")) {
+                    options.setNotificationText(optionMap.getString("notificationTitle"));
+                }
+                if (optionMap.hasKey("notificationText")) {
+                    options.setNotificationText(optionMap.getString("notificationText"));
+                }
+                JMessageClient.sendMessage(message, options);
+            } else {
+                JMessageClient.sendMessage(message);
+            }
+            if (message.getContentType() == ContentType.image) {
+                message.setOnContentUploadProgressCallback(new ProgressUpdateCallback() {
+                    @Override
+                    public void onProgressUpdate(double v) {
+                        progress.invoke(v);
+                    }
+                });
+            }
+            message.setOnSendCompleteCallback(new BasicCallback() {
+                @Override
+                public void gotResult(int status, String desc) {
+                    mJMessageUtils.handleCallbackWithObject(status, desc, success, fail,
+                            ResultUtils.toJSObject(message));
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            mJMessageUtils.handleError(fail, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);
+        }
+    }
+
+    @ReactMethod
     public void sendTextMessage(ReadableMap map, final Callback success, final Callback fail) {
         TextContent content = new TextContent(map.getString(Constant.TEXT));
         mJMessageUtils.sendMessage(map, content, success, fail);
@@ -318,7 +410,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void sendCustomMessage(ReadableMap map, Callback success, Callback fail) {
         CustomContent content = new CustomContent();
-        content.setAllValues(ResultUtils.fromMap(map.getMap("customObject")));
+        content.setAllValues(ResultUtils.fromMap(map.getMap(Constant.CUSTOM_OBJECT)));
         mJMessageUtils.sendMessage(map, content, success, fail);
     }
 

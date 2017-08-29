@@ -6,7 +6,7 @@
   },
   "dependencies": {
     "aurora-imui-react-native": "^0.4.12",
-    "jcore-react-native": "^1.1.8",
+    "jcore-react-native": "^1.1.8-beta",
     "jmessage-react-plugin": "file:///Users/HuminiOS/Desktop/workproject/jmessage-react-plugin",
     "react": "16.0.0-alpha.12",
     "react-native": "^0.47.1",

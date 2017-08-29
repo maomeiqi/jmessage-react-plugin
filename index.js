@@ -32,11 +32,11 @@ export default class JMessage {
         JMessageModule.setup(params)
     }
 
-   /**
-    * 设置是否开启 debug 模式，开启后 SDK 将会输出更多日志信息。应用对外发布时应关闭。
-    *
-    * @param {object} params = {'enable': Boolean}
-    */
+    /**
+     * 设置是否开启 debug 模式，开启后 SDK 将会输出更多日志信息。应用对外发布时应关闭。
+     *
+     * @param {object} params = {'enable': Boolean}
+     */
     static setDebugMode(params) {
         // exec(null, null, PLUGIN_NAME, 'setDebugMode', [params])
         JMessageModule.setDebugMode(params)
@@ -127,6 +127,47 @@ export default class JMessage {
      */
     static updateMyInfo(params, success, error) {
         JMessageModule.updateMyInfo(params, success, error)
+    }
+
+    /**
+     * @param {object} params = {
+     *  'type': String,                                // 'single' / 'group'
+     *  'messageType': String,                         // 'text', 'image', 'voice', 'location', 'file', 'custom'
+     *  'groupId': String,                             // 当 type = group 时，groupId 不能为空
+     *  'username': String,                            // 当 type = single 时，username 不能为空
+     *  'appKey': String,                              // 当 type = single 时，用于指定对象所属应用的 appKey。如果为空，默认为当前应用。
+     *  'text': String,                                // Optional 消息内容
+     *  'path': String                                 // Optional 资源路径
+     *  'fileName': String,                            // Optional 文件名
+     *  'latitude': Number,                            // Optional 纬度信息
+     *  'longitude': Number,                           // Optional 经度信息
+     *  'scale': Number,                               // Optional 地图缩放比例
+     *  'address': String,                             // Optional 详细地址信息
+     *  'customObject': {'key1': 'value1'}  // Optional. Optional 自定义键值对
+     *  'extras': Object,                              // Optional. 自定义键值对 = {'key1': 'value1'}
+     * }
+     * @param {function} success = function (msg) {}   // 以参数形式返回消息对象。
+     * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+     */
+    static createSendMessage(params, callback) {
+        JMessageModule.createSendMessage(params, callback);
+    }
+
+    /**
+     * @param {object} params = {
+     *  'id': Number,                                  // message id
+     *  'type': String,                                // 'single' / 'group'
+     *  'groupId': String,                             // 当 type = group 时，groupId 不能为空
+     *  'username': String,                            // 当 type = single 时，username 不能为空
+     *  'appKey': String,                              // 当 type = single 时，用于指定对象所属应用的 appKey。如果为空，默认为当前应用。
+     *  'messageSendingOptions': MessageSendingOptions // Optional. MessageSendingOptions 对象
+     * } 
+     * @param {function} success = function (msg) {}   // 以参数形式返回消息对象。
+     * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+     * @param {function} progress = function (progress) {} // 上传进度回调，回调数值从 0 到 1, 会多次回调
+     */
+    static sendMessage(params, success, error, progress) {
+        JMessageModule.sendMessage(params, success, error, progress);
     }
 
     /**

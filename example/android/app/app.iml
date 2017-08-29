@@ -110,6 +110,7 @@
     <orderEntry type="library" name="support-v4-25.3.1" level="project" />
     <orderEntry type="library" name="support-media-compat-25.3.1" level="project" />
     <orderEntry type="library" name="okhttp-3.4.1" level="project" />
+    <orderEntry type="library" name="jcore-android-1.1.6" level="project" />
     <orderEntry type="library" name="imagepipeline-okhttp3-0.11.0" level="project" />
     <orderEntry type="library" name="react-native-0.41.0" level="project" />
     <orderEntry type="library" name="support-annotations-25.3.1" level="project" />
@@ -117,6 +118,7 @@
     <orderEntry type="library" name="support-vector-drawable-25.3.1" level="project" />
     <orderEntry type="library" name="animated-vector-drawable-25.3.1" level="project" />
     <orderEntry type="library" name="support-compat-25.3.1" level="project" />
+    <orderEntry type="module" module-name="jcore-react-native" />
     <orderEntry type="module" module-name="react-native-dialog" />
     <orderEntry type="module" module-name="react-native-svg" />
     <orderEntry type="module" module-name="jmessage-react-plugin" />

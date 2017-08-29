@@ -42,6 +42,11 @@ public class Constant {
     public static final String LIMIT = "limit";
     public static final String CREATE_TIME = "createTime";
     public static final String TEXT = "text";
+    static final String IMAGE = "image";
+    static final String VOICE = "voice";
+    static final String LOCATION = "location";
+    static final String FILE = "file";
+    static final String CUSTOM = "custom";
     public static final String EXTRAS = "extras";
     public static final String THUMB_PATH = "thumbPath";
     public static final String PATH = "path";
@@ -69,4 +74,5 @@ public class Constant {
     static final String MESSAGE = "message";
     static final String RETRACT_MESSAGE = "retractedMessage";
     static final String MESSAGE_ARRAY = "messageArray";
+    static final String PROGRESS = "progress";
 }
