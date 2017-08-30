@@ -37,6 +37,7 @@
   
   if (options[@"appkey"]) {
     appkey = options[@"appkey"];
+    self.JMessageAppKey = appkey;
   }
   
   if (options[@"channel"]) {

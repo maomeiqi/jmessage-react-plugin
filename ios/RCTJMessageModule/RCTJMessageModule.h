@@ -24,6 +24,7 @@
 #define syncRoamingMessageEvent @"JMessage.SyncRoamingMessage" // 同步漫游消息事件
 #define messageRetractEvent  @"JMessage.MessageRetract" // 消息撤回事件
 #define contactNotifyEvent  @"JMessage.ContactNotify" // 收到好友请求消息事件
+#define uploadProgressEvent @"JMessage.UploadProgress" // 上传进度
 
 @interface RCTJMessageModule : NSObject<RCTBridgeModule>
 @property(strong, nonatomic)NSDictionary *launchOptions;
