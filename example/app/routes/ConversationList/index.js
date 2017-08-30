@@ -47,7 +47,7 @@ var count = 0
 
     componentWillMount() {
         JMessage.getConversations((result) => {   
-
+            
             var data  = result.map((conversaion) => 
                             {
                                 var item

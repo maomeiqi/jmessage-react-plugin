@@ -27,7 +27,6 @@ const {
     }
 
     onPress() {
-        // Alert.alert('onpress','username: ' + this.state.username + 'password :' + this.state.password)
         JMessage.login({username: this.state.username, password: this.state.password}, () => {
             Alert.alert('login success')
         }, (error) => {
@@ -53,4 +52,4 @@ const {
             </FormButton> 
         </View>)
     }
-  }
+}

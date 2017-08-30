@@ -51,9 +51,9 @@
 		6258B0811F4E763A00990134 /* defoult_header@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6258B07E1F4E763A00990134 /* defoult_header@3x.png */; };
 		644B751444DE4B449A676320 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1AE87CC42B0D4EBDBE6247F3 /* CoreFoundation.framework */; };
 		64C3FDC1A79F4BF3AD9EAA99 /* libAuroraIMUI.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B3D3338066F545108CE6489C /* libAuroraIMUI.a */; };
+		6683A32737904214BD076312 /* libRCTJCoreModule.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C597C5BCCDA4718A237069C /* libRCTJCoreModule.a */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
 		95B2BF2485864532802CD38F /* libRNSVG.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E53DEE966F3C4EF59620DD03 /* libRNSVG.a */; };
-		C35CED31F46948F2971796B6 /* libRCTJCoreModule.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ED02A3F004274BBB8685B0A3 /* libRCTJCoreModule.a */; };
 		D6E3BB68828140DFAB77E5BC /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9468FF705FDF464DB351AC60 /* UIKit.framework */; };
 		EBD4EB335B5A4E73981DA11B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 03AFB386B3AE4B6DBB93C124 /* Foundation.framework */; };
 /* End PBXBuildFile section */
@@ -248,6 +248,13 @@
 			remoteGlobalIDString = 623EA9981EE55D0800EC43AE;
 			remoteInfo = RCTAuroraIMUI;
 		};
+		625AE5B11F5664830008C40A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4C54343FC0D74C6180E8B4CC /* RCTJCoreModule.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 6212E9B41F3990DC00BDF51A;
+			remoteInfo = RCTJCoreModule;
+		};
 		62D683901F43E8890083CDF6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 146833FF1AC3E56700842450 /* React.xcodeproj */;
@@ -296,13 +303,6 @@
 			proxyType = 2;
 			remoteGlobalIDString = 6212EB151F3C34BB00BDF51A;
 			remoteInfo = RCTJMessageModule;
-		};
-		62D683FA1F4486300083CDF6 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 7F0F814AF6184BD6AF643105 /* RCTJCoreModule.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 6212E9B41F3990DC00BDF51A;
-			remoteInfo = RCTJCoreModule;
 		};
 		78C398B81ACF4ADC00677621 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -356,7 +356,9 @@
 		146833FF1AC3E56700842450 /* React.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = React.xcodeproj; path = "../node_modules/react-native/React/React.xcodeproj"; sourceTree = "<group>"; };
 		1AE87CC42B0D4EBDBE6247F3 /* CoreFoundation.framework */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		278EF46CCB2D4E47B8ECCF30 /* RCTAuroraIMUI.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RCTAuroraIMUI.xcodeproj; path = "../node_modules/aurora-imui-react-native/ReactNative/ios/RCTAuroraIMUI.xcodeproj"; sourceTree = "<group>"; };
+		2C597C5BCCDA4718A237069C /* libRCTJCoreModule.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRCTJCoreModule.a; sourceTree = "<group>"; };
 		2D02E47B1E0B4A5D006451C7 /* JMessageDemo-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "JMessageDemo-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4C54343FC0D74C6180E8B4CC /* RCTJCoreModule.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RCTJCoreModule.xcodeproj; path = "../node_modules/jcore-react-native/ios/RCTJCoreModule.xcodeproj"; sourceTree = "<group>"; };
 		53E405AEFA73434487A5D4CD /* RCTJMessageModule.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RCTJMessageModule.xcodeproj; path = "../node_modules/jmessage-react-plugin/ios/RCTJMessageModule.xcodeproj"; sourceTree = "<group>"; };
 		5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTAnimation.xcodeproj; path = "../node_modules/react-native/Libraries/NativeAnimation/RCTAnimation.xcodeproj"; sourceTree = "<group>"; };
 		621730121F4DAA24001ADED4 /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = System/Library/Frameworks/CoreTelephony.framework; sourceTree = SDKROOT; };
@@ -375,13 +377,11 @@
 		6258B07E1F4E763A00990134 /* defoult_header@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "defoult_header@3x.png"; sourceTree = "<group>"; };
 		6BF8C24637104E46893AB7C2 /* RNSVG.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNSVG.xcodeproj; path = "../node_modules/react-native-svg/ios/RNSVG.xcodeproj"; sourceTree = "<group>"; };
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
-		7F0F814AF6184BD6AF643105 /* RCTJCoreModule.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RCTJCoreModule.xcodeproj; path = "../node_modules/jcore-react-native/ios/RCTJCoreModule.xcodeproj"; sourceTree = "<group>"; };
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
 		9468FF705FDF464DB351AC60 /* UIKit.framework */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		B3D3338066F545108CE6489C /* libAuroraIMUI.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libAuroraIMUI.a; sourceTree = "<group>"; };
 		B68903A680EE48DAA80CB4A8 /* libRCTJMessageModule.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRCTJMessageModule.a; sourceTree = "<group>"; };
 		E53DEE966F3C4EF59620DD03 /* libRNSVG.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNSVG.a; sourceTree = "<group>"; };
-		ED02A3F004274BBB8685B0A3 /* libRCTJCoreModule.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRCTJCoreModule.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -414,11 +414,11 @@
 				95B2BF2485864532802CD38F /* libRNSVG.a in Frameworks */,
 				0282F6A6B8844CFEB5FAEAD3 /* libRCTJMessageModule.a in Frameworks */,
 				6258B0771F4E756000990134 /* RCTAuroraIMUI.framework in Frameworks */,
-				C35CED31F46948F2971796B6 /* libRCTJCoreModule.a in Frameworks */,
 				64C3FDC1A79F4BF3AD9EAA99 /* libAuroraIMUI.a in Frameworks */,
 				644B751444DE4B449A676320 /* CoreFoundation.framework in Frameworks */,
 				EBD4EB335B5A4E73981DA11B /* Foundation.framework in Frameworks */,
 				D6E3BB68828140DFAB77E5BC /* UIKit.framework in Frameworks */,
+				6683A32737904214BD076312 /* libRCTJCoreModule.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -593,6 +593,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		625AE5A61F5664830008C40A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				625AE5B21F5664830008C40A /* libRCTJCoreModule.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		62D683711F43E8890083CDF6 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -606,14 +614,6 @@
 			isa = PBXGroup;
 			children = (
 				62D683B51F43F1A40083CDF6 /* libRCTJMessageModule.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		62D683F11F4486300083CDF6 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				62D683FB1F4486300083CDF6 /* libRCTJCoreModule.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -643,8 +643,8 @@
 				139FDEE61B06529A00C62182 /* RCTWebSocket.xcodeproj */,
 				6BF8C24637104E46893AB7C2 /* RNSVG.xcodeproj */,
 				53E405AEFA73434487A5D4CD /* RCTJMessageModule.xcodeproj */,
-				7F0F814AF6184BD6AF643105 /* RCTJCoreModule.xcodeproj */,
 				278EF46CCB2D4E47B8ECCF30 /* RCTAuroraIMUI.xcodeproj */,
+				4C54343FC0D74C6180E8B4CC /* RCTJCoreModule.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -772,8 +772,8 @@
 					ProjectRef = 00C302BB1ABCB91800DB3ED1 /* RCTImage.xcodeproj */;
 				},
 				{
-					ProductGroup = 62D683F11F4486300083CDF6 /* Products */;
-					ProjectRef = 7F0F814AF6184BD6AF643105 /* RCTJCoreModule.xcodeproj */;
+					ProductGroup = 625AE5A61F5664830008C40A /* Products */;
+					ProjectRef = 4C54343FC0D74C6180E8B4CC /* RCTJCoreModule.xcodeproj */;
 				},
 				{
 					ProductGroup = 62D683AB1F43F1A40083CDF6 /* Products */;
@@ -1003,6 +1003,13 @@
 			remoteRef = 6258B0571F4E733700990134 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		625AE5B21F5664830008C40A /* libRCTJCoreModule.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRCTJCoreModule.a;
+			remoteRef = 625AE5B11F5664830008C40A /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		62D683911F43E8890083CDF6 /* libthird-party.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -1050,13 +1057,6 @@
 			fileType = archive.ar;
 			path = libRCTJMessageModule.a;
 			remoteRef = 62D683B41F43F1A40083CDF6 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		62D683FB1F4486300083CDF6 /* libRCTJCoreModule.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libRCTJCoreModule.a;
-			remoteRef = 62D683FA1F4486300083CDF6 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		78C398B91ACF4ADC00677621 /* libRCTLinking.a */ = {
@@ -1184,16 +1184,13 @@
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 					"$(SRCROOT)/../node_modules/jmessage-react-plugin/ios/RCTJMessageModule/**",
-					"$(SRCROOT)/../node_modules/jcore-react-native/ios/RCTJCoreModule",
 					"$(SRCROOT)/../node_modules/aurora-imui-react-native/iOS/IMUIMessageCollectionView/**",
+					"$(SRCROOT)/../node_modules/jcore-react-native/ios/RCTJCoreModule",
 				);
 				INFOPLIST_FILE = JMessageDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/JMessageDemo\"",
-					"\"$(SRCROOT)/JMessageDemo\"",
-					"\"$(SRCROOT)/JMessageDemo\"",
 					"\"$(SRCROOT)/JMessageDemo\"",
 				);
 				OTHER_LDFLAGS = (
@@ -1220,16 +1217,13 @@
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 					"$(SRCROOT)/../node_modules/jmessage-react-plugin/ios/RCTJMessageModule/**",
-					"$(SRCROOT)/../node_modules/jcore-react-native/ios/RCTJCoreModule",
 					"$(SRCROOT)/../node_modules/aurora-imui-react-native/iOS/IMUIMessageCollectionView/**",
+					"$(SRCROOT)/../node_modules/jcore-react-native/ios/RCTJCoreModule",
 				);
 				INFOPLIST_FILE = JMessageDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/JMessageDemo\"",
-					"\"$(SRCROOT)/JMessageDemo\"",
-					"\"$(SRCROOT)/JMessageDemo\"",
 					"\"$(SRCROOT)/JMessageDemo\"",
 				);
 				OTHER_LDFLAGS = (
@@ -1260,8 +1254,8 @@
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 					"$(SRCROOT)/../node_modules/jmessage-react-plugin/ios/RCTJMessageModule/**",
-					"$(SRCROOT)/../node_modules/jcore-react-native/ios/RCTJCoreModule",
 					"$(SRCROOT)/../node_modules/aurora-imui-react-native/iOS/IMUIMessageCollectionView/**",
+					"$(SRCROOT)/../node_modules/jcore-react-native/ios/RCTJCoreModule",
 				);
 				INFOPLIST_FILE = "JMessageDemo-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -1293,8 +1287,8 @@
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 					"$(SRCROOT)/../node_modules/jmessage-react-plugin/ios/RCTJMessageModule/**",
-					"$(SRCROOT)/../node_modules/jcore-react-native/ios/RCTJCoreModule",
 					"$(SRCROOT)/../node_modules/aurora-imui-react-native/iOS/IMUIMessageCollectionView/**",
+					"$(SRCROOT)/../node_modules/jcore-react-native/ios/RCTJCoreModule",
 				);
 				INFOPLIST_FILE = "JMessageDemo-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

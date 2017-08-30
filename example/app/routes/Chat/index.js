@@ -124,6 +124,9 @@ export default class Chat extends Component {
           
           var auroraMessages = messages.map((message) => {
             var normalMessage = this.convertJMessageToAuroraMsg(message)
+            if (normalMessage.msgType === "unknow") {
+              return
+            }
             return normalMessage
           })
           AuroraIController.insertMessagesToTop(auroraMessages)
@@ -207,13 +210,44 @@ export default class Chat extends Component {
   onTakePicture = (mediaPath) => {
     var message = this.getNormalMessage()
     message.path = mediaPath
-    JMessage.sendImageMessage(message, (message) => {
-      var auroraMsg = this.convertJMessageToAuroraMsg(message)
-      AuroraIController.appendMessages([auroraMsg])
-      AuroraIController.scrollToBottom(true)
-    }, (error) => {
-      Alert.alert(JSON.stringify(error))
+    message.messageType = "image"
+    JMessage.createSendMessage(message, (message) => {
+      Alert.alert("the message:", JSON.stringify(message))
+      // {
+      //   *  'id': Number,                                  // message id
+      //   *  'type': String,                                // 'single' / 'group'
+      //   *  'groupId': String,                             // 当 type = group 时，groupId 不能为空
+      //   *  'username': String,                            // 当 type = single 时，username 不能为空
+      //   *  'appKey': String,                              // 当 type = single 时，用于指定对象所属应用的 appKey。如果为空，默认为当前应用。
+      //   *  'messageSendingOptions': MessageSendingOptions // Optional. MessageSendingOptions 对象
+      //   * }
+      var msg = {}
+      msg.id = message.id
+      console.log(JSON.stringify(message))
+      // msg.type = message.target.type
+      if (message.target.type === 'user') {
+        msg.username = message.target.username
+        msg.type = 'single'
+      } else {
+        msg.groupId = message.target.id
+        msg.type = 'group'
+      }
+
+      JMessage.sendMessage(msg,(message) => {
+
+      },(error) => {
+
+      },(progress) => {
+        // console.log("" + progress)
+      })
     })
+    // JMessage.sendImageMessage(message, (message) => {
+    //   var auroraMsg = this.convertJMessageToAuroraMsg(message)
+    //   AuroraIController.appendMessages([auroraMsg])
+    //   AuroraIController.scrollToBottom(true)
+    // }, (error) => {
+    //   Alert.alert(JSON.stringify(error))
+    // })
 
   }
 
