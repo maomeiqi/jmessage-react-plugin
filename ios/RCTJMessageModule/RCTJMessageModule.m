@@ -176,54 +176,29 @@ RCT_EXPORT_METHOD(setDebugMode:(NSDictionary *)param) {
 //}
 
 - (void)loginStateChanged:(NSNotification *)notification{
-//  CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"eventName": @"loginStateChanged", @"value": notification.object}];
-//  
-//  [result setKeepCallback:@(true)];
-//  [self.commandDelegate sendPluginResult:result callbackId:self.callBack.callbackId];
-  
+
   [self.bridge.eventDispatcher sendAppEventWithName:loginStateChangedEvent body:notification.object];
 }
 
 - (void)onContactNotify:(NSNotification *)notification{
-//  CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"eventName": @"contactNotify", @"value": notification.object}];
-//  
-//  [result setKeepCallback:@(true)];
-//  [self.commandDelegate sendPluginResult:result callbackId:self.callBack.callbackId];
-    
+
   [self.bridge.eventDispatcher sendAppEventWithName:contactNotifyEvent body:notification.object];
 }
 
 - (void)didReceiveRetractMessage:(NSNotification *)notification{
-//  CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"eventName": @"retractMessage", @"value": notification.object}];
-//  
-//  [result setKeepCallback:@(true)];
-//  [self.commandDelegate sendPluginResult:result callbackId:self.callBack.callbackId];
+
   [self.bridge.eventDispatcher sendAppEventWithName:messageRetractEvent body:notification.object];
 }
 
 //didReceiveJMessageMessage change name
 - (void)didReceiveJMessageMessage:(NSNotification *)notification {
-//  CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"eventName": @"receiveMessage", @"value": notification.object}];
-//  [result setKeepCallback:@(true)];
-//  
-//  [self.commandDelegate sendPluginResult:result callbackId:self.callBack.callbackId];
+
   [self.bridge.eventDispatcher sendAppEventWithName:receiveMsgEvent body:notification.object];
 }
 
 // TODO: fix <================
 
 
-//+(void)evalFuntionName:(NSString*)functionName jsonParm:(NSString*)jsonString{
-//  dispatch_async(dispatch_get_main_queue(), ^{
-//    [SharedJMessagePlugin.commandDelegate evalJs:[NSString stringWithFormat:@"%@.%@('%@')",JMessagePluginName,functionName,jsonString]];
-//  });
-//}
-//
-//+(void)fireDocumentEvent:(NSString*)eventName jsString:(NSString*)jsString{
-//  dispatch_async(dispatch_get_main_queue(), ^{
-//    [SharedJMessagePlugin.commandDelegate evalJs:[NSString stringWithFormat:@"cordova.fireDocumentEvent('jmessage.%@',%@)", eventName, jsString]];
-//  });
-//}
 
 //#pragma mark IM - User
 
@@ -298,7 +273,6 @@ RCT_EXPORT_METHOD(getUserInfo:(NSDictionary *)param
 RCT_EXPORT_METHOD(updateMyPassword:(NSDictionary *)param
                   successCallback:(RCTResponseSenderBlock)successCallback
                   failCallback:(RCTResponseSenderBlock)failCallback) {
-//  NSDictionary * param = [command argumentAtIndex:0];
   
   if (param[@"oldPwd"] && param[@"newPwd"]) {
     [JMSGUser updateMyPasswordWithNewPassword:param[@"newPwd"] oldPassword:param[@"oldPwd"] completionHandler:^(id resultObject, NSError *error) {
@@ -317,7 +291,6 @@ RCT_EXPORT_METHOD(updateMyPassword:(NSDictionary *)param
 RCT_EXPORT_METHOD(updateMyAvatar:(NSDictionary *)param
                   successCallback:(RCTResponseSenderBlock)successCallback
                   failCallback:(RCTResponseSenderBlock)failCallback) {
-//  NSDictionary * param = [command argumentAtIndex:0];
   
   if (!param[@"imgPath"]) {
     failCallback(@[[self getParamError]]);
@@ -428,7 +401,6 @@ RCT_EXPORT_METHOD(updateMyInfo:(NSDictionary *)param
 RCT_EXPORT_METHOD(sendTextMessage:(NSDictionary *)param
                   successCallback:(RCTResponseSenderBlock)successCallback
                   failCallback:(RCTResponseSenderBlock)failCallback) {
-//  NSDictionary * param = [command argumentAtIndex:0];
   
   if (param[@"type"] == nil) {
 
@@ -504,7 +476,6 @@ RCT_EXPORT_METHOD(sendTextMessage:(NSDictionary *)param
 RCT_EXPORT_METHOD(sendImageMessage:(NSDictionary *)param
                   successCallback:(RCTResponseSenderBlock)successCallback
                   failCallback:(RCTResponseSenderBlock)failCallback) {
-//  NSDictionary * param = [command argumentAtIndex:0];
   
   if (param[@"type"] == nil) {
     failCallback(@[[self getParamError]]);
@@ -891,7 +862,7 @@ RCT_EXPORT_METHOD(sendFileMessage:(NSDictionary *)param
 RCT_EXPORT_METHOD(getHistoryMessages:(NSDictionary *)param
                   successCallback:(RCTResponseSenderBlock)successCallback
                   failCallback:(RCTResponseSenderBlock)failCallback) {
-//  NSDictionary * param = [command argumentAtIndex:0];
+
   if (param[@"type"] == nil ||
       param[@"from"] == nil ||
       param[@"limit"] == nil) {
@@ -978,7 +949,7 @@ RCT_EXPORT_METHOD(sendInvitationRequest:(NSDictionary *)param
 RCT_EXPORT_METHOD(acceptInvitation:(NSDictionary *)param
                   successCallback:(RCTResponseSenderBlock)successCallback
                   failCallback:(RCTResponseSenderBlock)failCallback) {
-//  NSDictionary * param = [command argumentAtIndex:0];
+
   if (param[@"username"] == nil) {
     failCallback(@[[self getParamError]]);
     return;
@@ -2185,5 +2156,27 @@ RCT_EXPORT_METHOD(retractMessage:(NSDictionary *)param
   }
 }
 
+RCT_EXPORT_METHOD(createSendMessage:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback) {
+  /**
+   * @param {object} params = {
+   *  'type': String,                                // 'single' / 'group'
+   *  'messageType': String,                         // 'text', 'image', 'voice', 'location', 'file', 'custom'
+   *  'groupId': String,                             // 当 type = group 时，groupId 不能为空
+   *  'username': String,                            // 当 type = single 时，username 不能为空
+   *  'appKey': String,                              // 当 type = single 时，用于指定对象所属应用的 appKey。如果为空，默认为当前应用。
+   *  'text': String,                                // Optional 消息内容
+   *  'path': String                                 // Optional 资源路径
+   *  'fileName': String,                            // Optional 文件名
+   *  'latitude': Number,                            // Optional 纬度信息
+   *  'longitude': Number,                           // Optional 经度信息
+   *  'scale': Number,                               // Optional 地图缩放比例
+   *  'address': String,                             // Optional 详细地址信息
+   *  'customObject': {'key1': 'value1'}  // Optional. Optional 自定义键值对
+   *  'extras': Object,                              // Optional. 自定义键值对 = {'key1': 'value1'}
+   * }
+   */
+  JMSGMessage
 
+}
 @end

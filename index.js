@@ -14,7 +14,7 @@ const syncOfflineMessage = "JMessage.SyncOfflineMessage" // 同步离线消息�
 const syncRoamingMessage = "JMessage.SyncRoamingMessage" // 同步漫游消息事件
 const messageRetract = "JMessage.MessageRetract" // 消息撤回事件
 const contactNotify = "JMessage.ContactNotify" // 收到好友请求消息事件
-
+const uploadProgress = "JMessage.UploadProgress" // 收到好友请求消息事件
 
 export default class JMessage {
 
@@ -146,8 +146,7 @@ export default class JMessage {
      *  'customObject': {'key1': 'value1'}  // Optional. Optional 自定义键值对
      *  'extras': Object,                              // Optional. 自定义键值对 = {'key1': 'value1'}
      * }
-     * @param {function} success = function (msg) {}   // 以参数形式返回消息对象。
-     * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+     * @param {function} callback = function (msg) {}   // 以参数形式返回消息对象。
      */
     static createSendMessage(params, callback) {
         JMessageModule.createSendMessage(params, callback);
@@ -164,10 +163,9 @@ export default class JMessage {
      * } 
      * @param {function} success = function (msg) {}   // 以参数形式返回消息对象。
      * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
-     * @param {function} progress = function (progress) {} // 上传进度回调，回调数值从 0 到 1, 会多次回调
      */
-    static sendMessage(params, success, error, progress) {
-        JMessageModule.sendMessage(params, success, error, progress);
+    static sendMessage(params, success, error) {
+        JMessageModule.sendMessage(params, success, error);
     }
 
     /**
@@ -866,4 +864,27 @@ export default class JMessage {
         listeners[listener].remove();
         listeners[listener] = null;
     }
+    /**
+     * 
+     * @param {function} listener  = function (result) {}
+     * result = {
+     *  messageId = String, // 消息 Id
+     *  progress = Float // 消息文件上传的进度
+     * }
+     */
+    static addUploadProgressListener(listener) {
+        listeners[listener] = DeviceEventEmitter.addListener(uploadProgress,
+            (message) => {
+                listener(message);
+            });
+    }
+
+    static removeUploadProgressListener(listener) {
+        if (!listeners[listener]) {
+            return;
+        }
+        listeners[listener].remove();
+        listeners[listener] = null;
+    }
+    
 }
