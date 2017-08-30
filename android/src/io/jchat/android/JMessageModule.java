@@ -75,7 +75,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
     private static final String SYNC_ROAMING_EVENT = "JMessage.SyncRoamingMessage"; // 同步漫游消息事件
     private static final String RETRACT_MESSAGE_EVENT = "JMessage.MessageRetract"; // 消息撤回事件
     private static final String CONTACT_NOTIFY_EVENT = "JMessage.ContactNotify"; // 收到好友请求消息事件
-
+    private static final String UPLOAD_PROGRESS_EVENT = "JMessage.UploadProgress"; // 上传（图片，文件等）进度事件
     private static final int ERR_CODE_PARAMETER = 1;
     private static final int ERR_CODE_CONVERSATION = 2;
     private static final int ERR_CODE_MESSAGE = 3;
@@ -327,8 +327,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void sendMessage(ReadableMap map, final Callback success, final Callback fail,
-                            final Callback progress) {
+    public void sendMessage(ReadableMap map, final Callback success, final Callback fail) {
         try {
             Conversation conversation = mJMessageUtils.getConversation(map);
             final Message message = conversation.getMessage(map.getInt(Constant.ID));
@@ -356,7 +355,11 @@ public class JMessageModule extends ReactContextBaseJavaModule {
                 message.setOnContentUploadProgressCallback(new ProgressUpdateCallback() {
                     @Override
                     public void onProgressUpdate(double v) {
-                        progress.invoke(v);
+                        WritableMap result = Arguments.createMap();
+                        result.putInt(Constant.MESSAGE_ID, message.getId());
+                        result.putDouble(Constant.PROGRESS, v);
+                        getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                                .emit(UPLOAD_PROGRESS_EVENT, result);
                     }
                 });
             }
