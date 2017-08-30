@@ -59,18 +59,47 @@ export default class Conv extends React.Component {
         this._panResponder = PanResponder.create({
             onStartShouldSetPanResponder: this.handleStartShouldSetPanResponder,
         });
-        JMessageModule.getConvList().then((list) => {
-            _convList = JSON.parse(list);
-            this.setState({
-                dataSource: _ds.cloneWithRows(_convList),
-                fetching: false
-            });
-        }).catch((e) => {
-            console.log(e);
-            this.setState({
-                fetching: false
-            });
+
+        var message = {
+            type: 'single',
+            messageType: 'image',
+            username: '0002',
+            path: "/storage/emulated/0/DCIM/Camera/IMG20161223160904.jpg",
+        }
+        JMessageModule.createSendMessage(message, (msg) => {
+            var output = "";
+            for (var i in msg) {
+                var property = msg[i];
+                output += i + " = " + property + "\n";
+            }
+            console.log(output);
+            var jmsg = {
+                id: msg.id,
+                username: '0002',
+                type: 'single'
+            }
+            console.log("message id: " + msg.id);
+            JMessageModule.sendMessage(jmsg, (message) => {
+
+            }, (error) => {
+                console.log("error code: " + error.code);
+            }, (progress) => {
+                console.log("now progress: " + progress);
+            })
         });
+
+        // JMessageModule.getConvList().then((list) => {
+        //     _convList = JSON.parse(list);
+        //     this.setState({
+        //         dataSource: _ds.cloneWithRows(_convList),
+        //         fetching: false
+        //     });
+        // }).catch((e) => {
+        //     console.log(e);
+        //     this.setState({
+        //         fetching: false
+        //     });
+        // });
 
     }
 
@@ -96,7 +125,7 @@ export default class Conv extends React.Component {
         DeviceEventEmitter.addListener(RECEIVE_MSG_EVENT, (map) => {
             console.log("收到消息： " + map.message);
             let conversation = JSON.parse(map.conversation);
-            for (let i=0; i < _convList.length; i++) {
+            for (let i = 0; i < _convList.length; i++) {
                 if (_convList[i].id === conversation.id) {
                     _convList[i] = conversation;
                     console.log("update conversation");
@@ -117,9 +146,9 @@ export default class Conv extends React.Component {
     }
 
     by = (date) => {
-        return function (o, p) {
+        return function(o, p) {
             var a, b;
-            if (typeof  o === "object" && typeof p === "object" && o && p) {
+            if (typeof o === "object" && typeof p === "object" && o && p) {
                 a = o[date];
                 b = p[date];
                 if (a === b) {
@@ -128,7 +157,7 @@ export default class Conv extends React.Component {
                 if (typeof a === typeof b) {
                     return a > b ? -1 : 1;
                 }
-                return typeof a > typeof b ? -1: 1;
+                return typeof a > typeof b ? -1 : 1;
             } else {
                 throw ("error");
             }

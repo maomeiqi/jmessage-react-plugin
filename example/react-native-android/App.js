@@ -45,7 +45,15 @@ class JChatDemo extends React.Component {
             }
             console.log(output);
         });
-
+        var user = {
+            username: '0001',
+            password: '1111'
+        }
+        JMessageModule.login(user, () => {
+            console.log("Login succeed");
+        }, (error) => {
+            console.log("Login failed, code: " + error.code + " description: " + error.description);
+        });
     }
 
     componentDidMount() {}

@@ -289,7 +289,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
         try {
             MessageContent content;
             Conversation conversation = mJMessageUtils.getConversation(map);
-            String type = map.getString(Constant.TYPE);
+            String type = map.getString(Constant.MESSAGE_TYPE);
             if (type.equals(Constant.TEXT)) {
                 content = new TextContent(map.getString(Constant.TEXT));
             } else if (type.equals(Constant.IMAGE)) {
@@ -642,15 +642,6 @@ public class JMessageModule extends ReactContextBaseJavaModule {
         } catch (Exception e) {
             e.printStackTrace();
             mJMessageUtils.handleError(fail, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);
-        }
-    }
-
-    @ReactMethod
-    public void enterConversation(String targetId, String appKey, String groupId) {
-        if (null != targetId && !TextUtils.isEmpty(targetId)) {
-            JMessageClient.enterSingleConversation(targetId, appKey);
-        } else {
-            JMessageClient.enterGroupConversation(Long.parseLong(groupId));
         }
     }
 

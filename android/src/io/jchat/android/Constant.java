@@ -38,6 +38,7 @@ public class Constant {
     public static final String CONVERSATION_TYPE = "conversationType";
     public static final String TARGET = "target";
     public static final String TYPE = "type";
+    static final String MESSAGE_TYPE = "messageType";
     public static final String FROM = "from";
     public static final String LIMIT = "limit";
     public static final String CREATE_TIME = "createTime";

@@ -34,8 +34,7 @@ public class MainApplication extends Application implements ReactApplication {
                     new MainReactPackage(),
                     new JMessageReactPackage(SHUTDOWN_TOAST),
                     new MyDialogPackage(),
-                    new SvgPackage(),
-                    new ReactIMUIPackage()
+                    new SvgPackage()
             );
         }
     };
