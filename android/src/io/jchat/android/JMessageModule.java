@@ -326,7 +326,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
             } else {
                 JMessageClient.sendMessage(message);
             }
-            if (message.getContentType() == ContentType.image) {
+            if (message.getContentType() == ContentType.image || message.getContentType() == ContentType.file) {
                 message.setOnContentUploadProgressCallback(new ProgressUpdateCallback() {
                     @Override
                     public void onProgressUpdate(double v) {
