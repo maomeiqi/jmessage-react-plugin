@@ -1,6 +1,6 @@
 {
   "name": "jmessage-react-plugin",
-  "version": "1.0.2",
+  "version": "2.0.0-beta",
   "description": "a jmessage plugin for react native application",
   "main": "index.js",
   "repository": {
@@ -16,6 +16,30 @@
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/jpush/jmessage-react-plugin/issues"
+  },
+  "peerDependencies": {
+    "jcore-react-native": ">= 1.1.8"
+  },
+  "rnpm": {
+    "ios": {
+      "sharedLibraries": [
+        "libz",
+        "UserNotifications",
+        "CoreTelephony",
+        "Security",
+        "CFNetwork",
+        "CoreFoundation",
+        "SystemConfiguration",
+        "Foundation",
+        "UIKit",
+        "libresolv",
+        "CoreGraphics",
+        "CoreAudio",
+        "AudioToolbox",
+        "MobileCoreServices",
+        "libsqlite3.0"
+      ]
+    }
   },
   "homepage": "https://github.com/jpush/jmessage-react-plugin#readme"
 }
