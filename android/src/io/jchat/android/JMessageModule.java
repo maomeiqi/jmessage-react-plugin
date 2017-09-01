@@ -1,6 +1,5 @@
 package io.jchat.android;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -85,21 +84,13 @@ public class JMessageModule extends ReactContextBaseJavaModule {
     private static final String ERR_MSG_CONVERSATION = "Can't get the conversation";
     private static final String ERR_MSG_MESSAGE = "No such message";
 
-    private boolean mShutdownToast;
-    private ProgressDialog mDialog;
     private Context mContext;
-    private String mPath;
-    private Uri mUri;
-    private Callback mCallback;
-    private String mUsername;
     private JMessageUtils mJMessageUtils;
 
     public JMessageModule(ReactApplicationContext reactContext, boolean shutdownToast) {
         super(reactContext);
-        JMessageClient.registerEventReceiver(this);
         mJMessageUtils = new JMessageUtils(reactContext, shutdownToast);
         mContext = reactContext;
-        mShutdownToast = shutdownToast;
     }
 
     @Override
@@ -113,31 +104,15 @@ public class JMessageModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void init(int mode) {
-        if (mode >= 0 && mode <= 4) {
-            JMessageClient.setNotificationMode(mode);
-            String modeStr;
-            switch (mode) {
-                case 0:
-                    modeStr = "NOTI_MODE_NO_NOTIFICATION";
-                    break;
-                case 2:
-                    modeStr = "NOTI_MODE_NO_SOUND";
-                    break;
-                case 3:
-                    modeStr = "NOTI_MODE_NO_VIBRATE";
-                    break;
-                case 4:
-                    modeStr = "NOTI_MODE_SILENCE";
-                    break;
-                default:
-                    modeStr = "NOTI_MODE_DEFAULT";
-                    break;
-            }
-            Log.i(TAG, "Set NotificationMode: " + modeStr);
+    public void init(ReadableMap map) {
+        try {
+            boolean isOpenMessageRoaming = map.getBoolean(Constant.IS_OPEN_MESSAGE_ROAMING);
+            JMessageClient.init(getReactApplicationContext(), isOpenMessageRoaming);
+            JMessageClient.registerEventReceiver(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.d(TAG, "Parameter invalid, please check again");
         }
-        new NotificationClickEventReceiver(getReactApplicationContext());
-
     }
 
     @ReactMethod
