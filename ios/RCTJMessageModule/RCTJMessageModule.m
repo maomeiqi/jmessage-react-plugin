@@ -488,6 +488,12 @@ RCT_EXPORT_METHOD(sendImageMessage:(NSDictionary *)param
   
   if ([param[@"type"] isEqual: @"single"] && param[@"username"] != nil) {
     JMSGImageContent *content = [[JMSGImageContent alloc] initWithImageData: [NSData dataWithContentsOfFile: mediaPath]];
+    
+    content.uploadHandler = ^(float percent, NSString *msgID) {
+      [self.bridge.eventDispatcher sendAppEventWithName:uploadProgressEvent body:@{@"messageId": msgID,
+                                                                                   @"progress": @(percent)}];
+    };
+    
     JMSGMessage *message = [JMSGMessage createSingleMessageWithContent:content username: param[@"username"]];
     if (param[@"extras"] && [param[@"extras"] isKindOfClass: [NSDictionary class]]) {
       NSDictionary *extras = param[@"extras"];
@@ -513,6 +519,13 @@ RCT_EXPORT_METHOD(sendImageMessage:(NSDictionary *)param
     
   } else if ([param[@"type"] isEqual: @"group"] && param[@"groupId"] != nil) {
     JMSGImageContent *content = [[JMSGImageContent alloc] initWithImageData: [NSData dataWithContentsOfFile: mediaPath]];
+    
+    content.uploadHandler = ^(float percent, NSString *msgID) {
+      
+      [self.bridge.eventDispatcher sendAppEventWithName:uploadProgressEvent body:@{@"messageId": msgID,
+                                                                                   @"progress": @(percent)}];
+    };
+    
     JMSGMessage *message = [JMSGMessage createGroupMessageWithContent: content groupId: param[@"groupId"]];
     if (param[@"extras"] && [param[@"extras"] isKindOfClass: [NSDictionary class]]) {
       NSDictionary *extras = param[@"extras"];
@@ -794,6 +807,12 @@ RCT_EXPORT_METHOD(sendFileMessage:(NSDictionary *)param
   if ([param[@"type"] isEqual: @"single"] && param[@"username"] != nil) {
     // send single text message
     JMSGFileContent *content = [[JMSGFileContent alloc] initWithFileData:[NSData dataWithContentsOfFile: mediaPath] fileName: fileName];
+    
+    content.uploadHandler = ^(float percent, NSString *msgID) {
+      [self.bridge.eventDispatcher sendAppEventWithName:uploadProgressEvent body:@{@"messageId": msgID,
+                                                                                   @"progress": @(percent)}];
+    };
+    
     JMSGMessage *message = [JMSGMessage createSingleMessageWithContent:content username: param[@"username"]];
     if (param[@"extras"] && [param[@"extras"] isKindOfClass: [NSDictionary class]]) {
       NSDictionary *extras = param[@"extras"];
@@ -818,6 +837,12 @@ RCT_EXPORT_METHOD(sendFileMessage:(NSDictionary *)param
     if ([param[@"type"] isEqual: @"group"] && param[@"groupId"] != nil) {
       // send group text message
       JMSGFileContent *content = [[JMSGFileContent alloc] initWithFileData:[NSData dataWithContentsOfFile: mediaPath] fileName: fileName];
+      
+      content.uploadHandler = ^(float percent, NSString *msgID) {
+        [self.bridge.eventDispatcher sendAppEventWithName:uploadProgressEvent body:@{@"messageId": msgID,
+                                                                                     @"progress": @(percent)}];
+      };
+      
       JMSGMessage *message = [JMSGMessage createGroupMessageWithContent: content groupId: param[@"groupId"]];
       if (param[@"extras"] && [param[@"extras"] isKindOfClass: [NSDictionary class]]) {
         NSDictionary *extras = param[@"extras"];
