@@ -1196,3 +1196,21 @@ JMessage.removeMessageRetractListener(listener) // 移除监听(一般在 compon
   - type:  'user_password_change' / 'user_logout' / 'user_deleted' / 'user_login_status_unexpected'
 
 
+#### addUploadProgressListener
+
+发送文件（图片、文件）进度回调，该回调会回调多次。
+
+##### 示例
+
+```javascript
+var listener = (result) => { }
+
+JMessage.addUploadProgressListener(listener) // 添加监听
+JMessage.removeUploadProgressListener(listener) // 移除监听(一般在 componentWillUnmount 中调用)
+```
+
+##### 回调参数说明
+
+- result
+  - messageId：消息 id。
+  - progress：上传进度，从 0-1 float 类型。
