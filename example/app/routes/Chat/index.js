@@ -197,7 +197,7 @@ export default class Chat extends Component {
   onSendText = (text) => {
 
     var message = this.getNormalMessage()
-    message.username='fasddsaf'
+    
     message.text = text
     JMessage.sendTextMessage(message, (message) => {
       var auroraMsg = this.convertJMessageToAuroraMsg(message)
