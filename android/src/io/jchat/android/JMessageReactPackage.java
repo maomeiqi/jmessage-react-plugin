@@ -11,14 +11,20 @@ import java.util.Collections;
 import java.util.List;
 
 public class JMessageReactPackage implements ReactPackage {
-    @Override
-    public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
-        List<NativeModule> result = new ArrayList<>();
-        result.add(new JMessageModule(reactContext));
-        return result;
+
+    private boolean mShutdownToast;
+
+    public JMessageReactPackage(boolean shutdownToast) {
+        mShutdownToast = shutdownToast;
     }
 
     @Override
+    public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
+        List<NativeModule> result = new ArrayList<>();
+        result.add(new JMessageModule(reactContext, mShutdownToast));
+        return result;
+    }
+
     public List<Class<? extends JavaScriptModule>> createJSModules() {
         return Collections.emptyList();
     }

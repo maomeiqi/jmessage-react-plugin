@@ -37,40 +37,23 @@ class JChatDemo extends React.Component {
 
     componentWillMount() {
         JMessageModule.init(1);
-        JMessageModule.isLogin((map) => {
-            switch (map.result) {
-        case 're-login':
-            _navigator.replace({
-                name: 'reloginActivity',
-                component: ReloginActivity,
-                params: {
-                    username: map.username
-                }
-            });
-            console.log('user has not logged in but cached userInfo');
-            break;
-        case 'login':
-            _navigator.replace({
-                name: 'loginActivity',
-                component: LoginActivity,
-                params: {
-                    showBackBtn: false
-                }
-            });
-            console.log('user has not logged in');
-            break;
-        case 'fillInfo':
-            _navigator.replace({
-                name: 'fillInfoActivity',
-                component: FillInfoActivity,
-            });
-            break;
-        default:
-            console.log('user has logged in');
-            break;
+        JMessageModule.getMyInfo((userInfo) => {
+            var output = "";
+            for (var i in userInfo) {
+                var property = userInfo[i];
+                output += i + " = " + property + "\n";
+            }
+            console.log(output);
+        });
+        var user = {
+            username: '0001',
+            password: '1111'
         }
-    });
-
+        JMessageModule.login(user, () => {
+            console.log("Login succeed");
+        }, (error) => {
+            console.log("Login failed, code: " + error.code + " description: " + error.description);
+        });
     }
 
     componentDidMount() {}
@@ -100,7 +83,7 @@ class JChatDemo extends React.Component {
         renderScene = { this.renderScene }
     />
 
-    );
+        );
     }
 }
 

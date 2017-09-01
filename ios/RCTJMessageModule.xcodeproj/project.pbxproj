@@ -1,0 +1,286 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		6212EB1A1F3C34BB00BDF51A /* RCTJMessageModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 6212EB191F3C34BB00BDF51A /* RCTJMessageModule.m */; };
+		6212EB1B1F3C34BB00BDF51A /* RCTJMessageModule.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6212EB181F3C34BB00BDF51A /* RCTJMessageModule.h */; };
+		6212EB221F3C38D200BDF51A /* JMessage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6212EB211F3C38D200BDF51A /* JMessage.framework */; };
+		62D683E21F4469820083CDF6 /* JMessageHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 62D683E11F4469820083CDF6 /* JMessageHelper.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		6212EB131F3C34BB00BDF51A /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+				6212EB1B1F3C34BB00BDF51A /* RCTJMessageModule.h in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		6212EB151F3C34BB00BDF51A /* libRCTJMessageModule.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRCTJMessageModule.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		6212EB181F3C34BB00BDF51A /* RCTJMessageModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RCTJMessageModule.h; sourceTree = "<group>"; };
+		6212EB191F3C34BB00BDF51A /* RCTJMessageModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RCTJMessageModule.m; sourceTree = "<group>"; };
+		6212EB211F3C38D200BDF51A /* JMessage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = JMessage.framework; sourceTree = "<group>"; };
+		62D683E01F4469820083CDF6 /* JMessageHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JMessageHelper.h; sourceTree = "<group>"; };
+		62D683E11F4469820083CDF6 /* JMessageHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JMessageHelper.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		6212EB121F3C34BB00BDF51A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6212EB221F3C38D200BDF51A /* JMessage.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		6212EB0C1F3C34BB00BDF51A = {
+			isa = PBXGroup;
+			children = (
+				6212EB171F3C34BB00BDF51A /* RCTJMessageModule */,
+				6212EB161F3C34BB00BDF51A /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		6212EB161F3C34BB00BDF51A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6212EB151F3C34BB00BDF51A /* libRCTJMessageModule.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		6212EB171F3C34BB00BDF51A /* RCTJMessageModule */ = {
+			isa = PBXGroup;
+			children = (
+				6212EB211F3C38D200BDF51A /* JMessage.framework */,
+				62D683E01F4469820083CDF6 /* JMessageHelper.h */,
+				62D683E11F4469820083CDF6 /* JMessageHelper.m */,
+				6212EB181F3C34BB00BDF51A /* RCTJMessageModule.h */,
+				6212EB191F3C34BB00BDF51A /* RCTJMessageModule.m */,
+			);
+			path = RCTJMessageModule;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6212EB141F3C34BB00BDF51A /* RCTJMessageModule */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6212EB1E1F3C34BB00BDF51A /* Build configuration list for PBXNativeTarget "RCTJMessageModule" */;
+			buildPhases = (
+				6212EB111F3C34BB00BDF51A /* Sources */,
+				6212EB121F3C34BB00BDF51A /* Frameworks */,
+				6212EB131F3C34BB00BDF51A /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = RCTJMessageModule;
+			productName = RCTJMessageModule;
+			productReference = 6212EB151F3C34BB00BDF51A /* libRCTJMessageModule.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		6212EB0D1F3C34BB00BDF51A /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0830;
+				ORGANIZATIONNAME = HXHG;
+				TargetAttributes = {
+					6212EB141F3C34BB00BDF51A = {
+						CreatedOnToolsVersion = 8.3.3;
+						DevelopmentTeam = RL64Y54S9V;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 6212EB101F3C34BB00BDF51A /* Build configuration list for PBXProject "RCTJMessageModule" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 6212EB0C1F3C34BB00BDF51A;
+			productRefGroup = 6212EB161F3C34BB00BDF51A /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				6212EB141F3C34BB00BDF51A /* RCTJMessageModule */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6212EB111F3C34BB00BDF51A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				62D683E21F4469820083CDF6 /* JMessageHelper.m in Sources */,
+				6212EB1A1F3C34BB00BDF51A /* RCTJMessageModule.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		6212EB1C1F3C34BB00BDF51A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		6212EB1D1F3C34BB00BDF51A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		6212EB1F1F3C34BB00BDF51A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEVELOPMENT_TEAM = RL64Y54S9V;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/RCTJMessageModule",
+				);
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		6212EB201F3C34BB00BDF51A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEVELOPMENT_TEAM = RL64Y54S9V;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/RCTJMessageModule",
+				);
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		6212EB101F3C34BB00BDF51A /* Build configuration list for PBXProject "RCTJMessageModule" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6212EB1C1F3C34BB00BDF51A /* Debug */,
+				6212EB1D1F3C34BB00BDF51A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6212EB1E1F3C34BB00BDF51A /* Build configuration list for PBXNativeTarget "RCTJMessageModule" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6212EB1F1F3C34BB00BDF51A /* Debug */,
+				6212EB201F3C34BB00BDF51A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 6212EB0D1F3C34BB00BDF51A /* Project object */;
+}

@@ -66,7 +66,7 @@ import com.android.build.OutputFile
  * ]
  */
 
-apply from: "react.gradle"
+apply from: "../../node_modules/react-native/react.gradle"
 
 /**
  * Set this to true to create two separate APKs instead of one:
@@ -84,8 +84,8 @@ def enableSeparateBuildPerCPUArchitecture = false
 def enableProguardInReleaseBuilds = false
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
 
     defaultConfig {
         applicationId "com.sample.applicaiton"
@@ -145,8 +145,9 @@ dependencies {
     compile project(':react-native-svg')
     compile project(':react-native-dialog')
     compile project(':jmessage-react-plugin')
+    compile project(':jcore-react-native')
     compile fileTree(dir: "libs", include: ["*.jar"])
-    compile "com.android.support:appcompat-v7:23.0.1"
+    compile "com.android.support:appcompat-v7:25.3.1"
     compile "com.facebook.react:react-native:+"  // From node_modules
 }
 

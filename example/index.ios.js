@@ -3,50 +3,38 @@
  * https://github.com/facebook/react-native
  */
 'use strict';
-import React, {
-  AppRegistry,
-  Component,
-  StyleSheet,
-  Text,
-  View
+import React from 'react';
+import {
+	AppRegistry,
 } from 'react-native';
+import {
+	StackNavigator
+} from 'react-navigation';
 
-class ReactJChat extends Component {
-  render() {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit index.ios.js
-        </Text>
-        <Text style={styles.instructions}>
-          Press Cmd+R to reload,{'\n'}
-          Cmd+D or shake for dev menu
-        </Text>
-      </View>
-    );
-  }
-}
+import LaunchPage from './app/routes/Launch/index.js';
+import HomePage from './app/routes/Home/index.js';
+import LoginPage from './app/routes/Login/index.js';
+import ChatPage from './app/routes/Chat/index.js';
+import ConversationListPage from './app/routes/ConversationList/index.js';
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+import CardStackStyleInterpolator from 'react-navigation/src/views/CardStackStyleInterpolator';
+
+const ReactJChat = StackNavigator({
+	Launch: { screen: LaunchPage },
+	Home: { screen: HomePage },
+  Login: {screen: LoginPage},
+  Chat: {
+    type: 'Reset',
+    screen: ChatPage,
+    path: 'people/:conversation'
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
+  ConversationList: {screen: ConversationListPage}
+},{
+    // mode:'modal',
+    headerMode: 'screen',
+    transitionConfig:()=>({
+      screenInterpolator:CardStackStyleInterpolator.forInitial,
+    })
 });
 
 AppRegistry.registerComponent('ReactJChat', () => ReactJChat);
