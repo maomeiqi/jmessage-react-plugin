@@ -148,7 +148,10 @@ RCT_EXPORT_METHOD(setDebugMode:(NSDictionary *)param) {
 -(void)didSendMessage:(NSNotification *)notification {
   NSDictionary *response = notification.object;
   
-//  CDVPluginResult *result = nil;
+  if (!response[@"message"]) {
+    return;
+  }
+  
     NSDictionary *msgDic = response[@"message"];
     NSArray *callBacks = self.SendMsgCallbackDic[msgDic[@"id"]];
   if (response[@"error"] == nil) {

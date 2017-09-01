@@ -27,8 +27,11 @@ const {
     }
 
     onPress() {
+        const { navigate } = this.props.navigation
+
         JMessage.login({username: this.state.username, password: this.state.password}, () => {
             Alert.alert('login success')
+            navigate('ConversationList')
         }, (error) => {
             Alert.alert('login success', JSON.stringify(error))
         })
@@ -46,7 +49,7 @@ const {
                 onChangeText = { (e) => { this.setState({password: e}) } }>
             </TextInput>
             <FormButton 
-                title="lala"
+                title="登录"
                 onPress={this.onPress}
                 >
             </FormButton> 

@@ -53,9 +53,16 @@ var count = 0
                                 var item
                                 if (conversaion.conversationType === 'single') {
                                      item = {key: conversaion.target.username}
+                                     item.conversationType = 'single'
                                 } else {
                                     item = {key: conversaion.target.id}
+                                    item.conversationType = 'group'
                                     Alert.alert('conversaion', JSON.stringify(conversaion))
+                                }
+
+                                if (conversaion.latestMessage === undefined) {
+                                    item.latestMessageString = ""
+                                    return item
                                 }
 
                                 item.conversationType = conversaion.conversationType
@@ -84,6 +91,21 @@ var count = 0
     }
 
     _onPress() {
+        Alert.alert("click","fasdf")
+        JMessage.createConversation({type: 'single', username: '0002'}, (conv) => {
+            var item
+            if (conv.conversationType === 'single') {
+                 item = {key: conv.target.username}
+                 item.conversationType = 'single'
+            } else {
+                item = {key: conv.target.id}
+                item.conversationType = 'group'
+                Alert.alert('conversaion', JSON.stringify(conv))
+            }
+            this.props.navigation.navigate('Chat', {conversation: item})
+        }, (error) => {
+            Alert.alert('error', JSON.stringify(error))
+        })
     }
 
     render() {

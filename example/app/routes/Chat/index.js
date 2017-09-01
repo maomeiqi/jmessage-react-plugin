@@ -40,7 +40,7 @@ export default class Chat extends Component {
     
     this.updateLayout = this.updateLayout.bind(this);
     this.conversation = this.props.navigation.state.params.conversation
-
+    Alert.alert("the conversation ",JSON.stringify(this.conversation))
     JMessage.getMyInfo((myInfo) => {
       this.myInfo = myInfo
     })
@@ -197,6 +197,7 @@ export default class Chat extends Component {
   onSendText = (text) => {
 
     var message = this.getNormalMessage()
+    message.username='fasddsaf'
     message.text = text
     JMessage.sendTextMessage(message, (message) => {
       var auroraMsg = this.convertJMessageToAuroraMsg(message)
