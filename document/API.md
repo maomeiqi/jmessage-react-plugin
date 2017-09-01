@@ -81,6 +81,13 @@ JMessage.init({
   isProduction: true, // 是否为生产模式
 })	
 ```
+#### 参数说明
+
+- appkey：极光官网注册的应用 AppKey。
+- isOpenMessageRoaming：是否开启消息漫游，不传默认关闭。
+- isProduction：是否为生产模式。
+- channel：(选填)应用的渠道名称。
+
 ### setDebugMode
 
 设置是否开启 debug 模式，开启后 SDK 将会输出更多日志信息，推荐在应用对外发布时关闭。
@@ -90,7 +97,9 @@ JMessage.init({
 ```js
 JMessage.setDebugMode({ enable: true })
 ```
+#### 参数说明
 
+- enable：为 true 打开 Debug 模式，false 关闭 Debug 模式。
 
 ## 用户登录、注册及属性维护
 
@@ -125,8 +134,6 @@ JMessage.login({
 
 #### 参数说明
 
-#### 参数说明
-
 - username: 用户名。
 - password: 用户密码。
 
@@ -144,13 +151,13 @@ JMessage.logout()
 
 获取当前登录用户信息。如果未登录会返回空对象。可以用于判断用户登录状态
 
-关于 UserInfo 的构成，可以查看[文档](./Models.md)。
+关于 UserInfo 的构成，可以查看 [Models 文档](./Models.md)。
 
 #### 示例
 
 ```js
-JMessage.getMyInfo((result) => {
-	if (result.username === undefine) {
+JMessage.getMyInfo((UserInf) => {
+	if (UserInf.username === undefine) {
       // 未登录
 	} else {
       // 已登录
@@ -184,7 +191,7 @@ JMessage.updateMyPassword({ oldPwd: 'old_password', newPwd: 'new_password' },
 ```js
 JMessage.updateMyAvatar({ imgPath: 'img_local_path' },
   () => {
-    // do something.
+    // success do something.
 
   }, (error) => {
     var code = error.code
@@ -197,7 +204,7 @@ JMessage.updateMyAvatar({ imgPath: 'img_local_path' },
 - imgPath: 本地图片文件的绝对路径地址。注意在 Android 6.0 及以上版本系统中，需要动态请求 `WRITE_EXTERNAL_STORAGE` 权限。
   两个系统中的图片路径分别类似于：
   - Android：`/storage/emulated/0/DCIM/Camera/IMG_20160526_130223.jpg`
-  - iOS：`/var/mobile/Containers/Data/Application/7DC5CDFF-6581-4AD3-B165-B604EBAB1250/tmp/photo.jpg
+  - iOS：`/var/mobile/Containers/Data/Application/7DC5CDFF-6581-4AD3-B165-B604EBAB1250/tmp/photo.jpg`
 
 ### updateMyInfo
 
@@ -219,7 +226,7 @@ JMessage.updateMyInfo({ nickname: 'nickname' },
 #### 参数说明
 
 - nickname: 昵称。不支持字符 "\n" 和 "\r"；长度限制：Byte (0~64)。
-- birthday: 生日日期的毫秒数。
+- birthday: (Number)生日日期的毫秒数。
 - gender: 必须为 'male', 'female' 和 'unknown' 中的一种。
 - 其余都为 `string` 类型，支持全部字符串；长度限制为 Byte (0~250)。
 
@@ -251,7 +258,7 @@ JMessage.createGroup({ name: 'group_name', desc: 'group_desc' },
 
 ### createSendMessage
 
-创建消息
+创建消息，创建好消息后需要调用 [sendMessage](#sendmessage) 来发送消息。如果需要状态更新（发送中到发送完成）推荐这种方式。
 
 #### 示例
 
@@ -275,18 +282,18 @@ JMessage.createSendMessage({type: 'group', groupId: 'group id', appKey: 'appkey'
   - messageType = file 时 `path` 为必填。
   - messageType = location 时 `latitude`   `longitude`  和 `scale` 为必填，`address` 选填。
   - messageType = custom 时 `customObject` 为必填。
-- text: 消息内容。
-- path: 资源文件路径。
-- latitude：纬度。
-- longitude：进度。
-- scale：地图缩放比例。
-- address：详细地址信息。
-- customObject：自定义消息键值对。
-- extras: 自定义键值对，value 必须为字符串类型。
+- text: 消息内容（文字消息需要该字段）。
+- path: 资源文件路径（图片、语言、文件消息需要该字段）。
+- latitude：纬度（位置消息需要该字段）。
+- longitude：进度（位置消息需要该字段）。
+- scale：地图缩放比例（位置消息需要该字段）。
+- address：详细地址信息（位置消息需要该字段）。
+- customObject：自定义消息键值对（自定义消息需要该字段）。
+- extras: 自定义键值对，value 必须为字符串类型，可在所有类型的消息中附加键值对（非必须）。
 
 ### sendMessage
 
-于 [createSendMessage](#createsendmessage) 配合使用，用于发送创建好的消息。
+与 [createSendMessage](#createsendmessage) 配合使用，用于发送创建好的消息。
 
 #### 示例
 
@@ -730,7 +737,7 @@ JMessage.downloadFile({ type: 'single', username: 'username',
 
 ### createConversation
 
-创建[聊天会话](./Models.md)。
+创建 [会话](./Models.md)。
 
 #### 示例
 
@@ -1111,9 +1118,7 @@ JMessage.removeSyncRoamingMessageListener(listener) // 移除监听(一般在 co
 ##### 示例
 
 ```javascript
-var listener = (event) => {
-    }
-}
+var listener = (event) => { }
 
 JMessage.addMessageRetractListener(listener) // 添加监听
 JMessage.removeMessageRetractListener(listener) // 移除监听(一般在 componentWillUnmount 中调用)
@@ -1134,9 +1139,7 @@ JMessage.removeMessageRetractListener(listener) // 移除监听(一般在 compon
 ##### 示例
 
 ```javascript
-var listener = (message) => {
-    }
-}
+var listener = (message) => { }
 
 JMessage.addClickMessageNotificationListener(listener) // 添加监听
 JMessage.removeClickMessageNotificationListener(listener) // 移除监听(一般在 componentWillUnmount 中调用)
@@ -1144,7 +1147,7 @@ JMessage.removeClickMessageNotificationListener(listener) // 移除监听(一般
 
 ##### 回调参数
 
-- message：直接返回消息对象
+- [message](./Models.md)：直接返回消息对象
 
 ### 好友事件
 
@@ -1157,7 +1160,6 @@ JMessage.removeClickMessageNotificationListener(listener) // 移除监听(一般
 ```javascript
 var listener = (event) => {
   // 回调参数 event 为好友事件
-    }
 }
 
 JMessage.addContactNotifyListener(listener) // 添加监听
@@ -1182,9 +1184,7 @@ JMessage.removeContactNotifyListener(listener) // 移除监听(一般在 compone
 ##### 示例
 
 ```javascript
-var listener = (event) => {
-    }
-}
+var listener = (event) => { }
 
 JMessage.addLoginStateChangedListener(listener) // 添加监听
 JMessage.removeMessageRetractListener(listener) // 移除监听(一般在 componentWillUnmount 中调用)
