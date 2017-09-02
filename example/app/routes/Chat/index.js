@@ -34,6 +34,11 @@ var themsgid = 1
 
 
 export default class Chat extends Component {
+
+  static navigationOptions = {
+    title: "Chat",
+  };
+
   constructor(props) {
     super(props);
     this.state = { inputViewLayout: {width:window.width, height:86,}};

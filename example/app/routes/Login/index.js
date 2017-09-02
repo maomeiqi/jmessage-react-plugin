@@ -17,6 +17,10 @@ const {
   } = ReactNative;
 
   export default class Login extends React.Component {
+    static navigationOptions = {
+        title: "登录"
+    };
+
     constructor(props) {
         super(props);
         this.state = {
@@ -31,7 +35,7 @@ const {
 
         JMessage.login({username: this.state.username, password: this.state.password}, () => {
             Alert.alert('login success')
-            navigate('ConversationList')
+            navigate('Home')
         }, (error) => {
             Alert.alert('login success', JSON.stringify(error))
         })

@@ -29,10 +29,12 @@ const {
         JMessage.init(params)
         JMessage.getMyInfo((myInfo) => {
             if (myInfo.username) {
-                // navigate('Home')
-                navigate('ConversationList')
+                navigate('Home')
+                // navigate('MainPage')
+                // navigate('ConversationList')
             } else {
                 navigate('Login')
+
                 // navigate('Chat')
             }
         })

@@ -17,6 +17,11 @@ const {
   } = ReactNative;
 
   export default class Register extends React.Component {
+
+    static navigationOptions = {
+        title: "注册"
+    }
+
     constructor(props) {
         super(props);
         this.state = {
@@ -47,7 +52,7 @@ const {
                 onChangeText = { (e) => { this.setState({password: e}) } }>
             </TextInput>
             <FormButton 
-                title="lala"
+                title="注册"
                 onPress={this.onPress}
                 >
             </FormButton> 

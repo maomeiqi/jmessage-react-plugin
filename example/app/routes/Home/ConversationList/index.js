@@ -4,7 +4,7 @@ import React from 'react';
 import ReactNative from 'react-native';
 import JMessage from 'jmessage-react-plugin';
 
-import FormButton from '../../views/FormButton'
+import FormButton from '../../../views/FormButton'
 
 const {
     View,
@@ -15,9 +15,11 @@ const {
     Alert,
     TextInput,
     FlatList,
+    Image,
   } = ReactNative;
 
   class MyListItem extends React.PureComponent {
+
     _onPress = () => {
       this.props.onPressItem(this.props.id);
     };
@@ -34,9 +36,26 @@ const {
   }
 
   
-var count = 0
+const styles = StyleSheet.create({
+    icon: {
+        width: 26,
+        height: 26,
+    },
+});
+
+  var count = 0
   export default class ConversationList extends React.Component {
-    
+    static navigationOptions = {
+        title: "会话",
+        tabBarLabel: '会话',
+        tabBarIcon: ({ tintColor }) => (
+          <Image
+            source={require('../../../resource/chat-icon.png')}
+            style={[styles.icon, {tintColor: tintColor}]}
+          />
+        ),
+      };
+
     constructor(props) {
         super(props);
         this.state = {
