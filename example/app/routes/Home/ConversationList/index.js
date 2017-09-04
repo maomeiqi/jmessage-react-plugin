@@ -15,7 +15,7 @@ const {
     Alert,
     TextInput,
     FlatList,
-    Image,
+    Image
   } = ReactNative;
 
   class MyListItem extends React.PureComponent {
@@ -40,6 +40,21 @@ const styles = StyleSheet.create({
     icon: {
         width: 26,
         height: 26,
+    },
+    conversationContent: {
+        borderBottomWidth: 1,
+        borderColor: "#cccccc",
+        height: 60,
+    },
+    conversationItem: {
+        flexDirection:'row',
+        margin: 10,
+        alignItems: 'center',
+    },
+    conversationAvatar: {
+        width: 45,
+        height: 45,
+        marginRight: 10,
     },
 });
 
@@ -67,37 +82,40 @@ const styles = StyleSheet.create({
     componentWillMount() {
         JMessage.getConversations((result) => {   
             
-            var data  = result.map((conversaion) => 
+            var data  = result.map((conversation, index) => 
                             {
-                                var item
-                                if (conversaion.conversationType === 'single') {
-                                     item = {key: conversaion.target.username}
+                                var item = {}
+                                item.key = index
+                                item.conversation = conversation
+                                if (conversation.conversationType === 'single') {
+                                     item = {key: conversation.target.username}
                                      item.conversationType = 'single'
+                                     item.displayName = conversation.target.nickname
                                 } else {
-                                    item = {key: conversaion.target.id}
+                                    item = {key: conversation.target.id}
                                     item.conversationType = 'group'
-                                    Alert.alert('conversaion', JSON.stringify(conversaion))
+                                    item.displayName = conversation.target.name
                                 }
 
-                                if (conversaion.latestMessage === undefined) {
+                                if (conversation.latestMessage === undefined) {
                                     item.latestMessageString = ""
                                     return item
                                 }
 
-                                item.conversationType = conversaion.conversationType
-                                if (conversaion.latestMessage.type === 'text') {    
-                                    item.latestMessageString = conversaion.latestMessage.text 
+                                item.conversationType = conversation.conversationType
+                                if (conversation.latestMessage.type === 'text') {    
+                                    item.latestMessageString = conversation.latestMessage.text 
                                 }
 
-                                if (conversaion.latestMessage.type === 'image') {    
+                                if (conversation.latestMessage.type === 'image') {    
                                     item.latestMessageString = '[图片]' 
                                 }
 
-                                if (conversaion.latestMessage.type === 'voice') {    
+                                if (conversation.latestMessage.type === 'voice') {    
                                     item.latestMessageString = '[语言]' 
                                 }
 
-                                if (conversaion.latestMessage.type === 'file') {    
+                                if (conversation.latestMessage.type === 'file') {    
                                     item.latestMessageString = '[文件]' 
                                 }
 
@@ -133,10 +151,22 @@ const styles = StyleSheet.create({
         renderItem = { ({item}) => (
             <View>
                 <TouchableHighlight
+                    style={[styles.conversationContent]}
+                    underlayColor = '#dddddd'
                     onPress={ () => {
                             this.props.navigation.navigate('Chat', {conversation: item})
                         }}>
-                    <Text>{item.key}</Text>
+                    <View style={ [styles.conversationItem]}>
+                        <Image 
+                            source={require('../../../resource/group-icon.png')}
+                            style={[styles.conversationAvatar]}>
+                        </Image>
+                        <View>
+                            <Text>{ item.displayName }</Text>
+                            <Text>{ item.latestMessageString }</Text>
+                        </View>
+                    </View>
+                    
                     
                 </TouchableHighlight>
                 </View>

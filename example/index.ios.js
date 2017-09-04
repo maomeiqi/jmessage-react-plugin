@@ -43,7 +43,7 @@ const ReactJChat = StackNavigator({
 },{
     // mode:'modal',
     headerMode: 'screen',
-    transitionConfig:()=>({
+    transitionConfig:() => ({
       screenInterpolator:CardStackStyleInterpolator.forInitial,
     })
 });

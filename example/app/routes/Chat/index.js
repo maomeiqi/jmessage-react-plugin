@@ -166,7 +166,6 @@ export default class Chat extends Component {
   }
 
   componentWillUnmount() {
-    Alert.alert("Component", "will unmount")
     JMessage.removeReceiveMessageListener(this.receiveMessageCallBack)
     AuroraIController.removeMessageListDidLoadListener(this.messageListDidLoadCallback)
   }
