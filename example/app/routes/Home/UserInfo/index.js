@@ -15,7 +15,7 @@ const {
     Button,
     Alert,
     TextInput,
-    Image
+    Image,
   } = ReactNative;
 
   const styles = StyleSheet.create({
@@ -25,6 +25,10 @@ const {
       marginTop: 20,
       borderBottomWidth: 1,
       borderColor: "#cccccc",
+    },
+    avatar: {
+      width: 60,
+      height: 60,
     },
     icon: {
         width: 26,
@@ -75,17 +79,30 @@ export default class MyNotificationsScreen extends React.Component {
       JMessage.getMyInfo((user) => {
         // this.sta = myInfo
         this.setState({myInfo: user})
+        // JMessage.downloadOriginalUserAvatar()
       })
+      
     }
     render() {
+      // Alert.alert("my info ", JSON.stringify(this.state.myInfo))
+      // Alert.alert("my info ", this.state.myInfo.avatarThumbPath)
+      // console.log('file://' + this.state.myInfo.avatarThumbPath)
+      if (this.state.myInfo.avatarThumbPath === "") {
+        this.avatar = <Image
+          source={require('../../../resource/group-icon.png')}
+          style={styles.avatar}>
+        </Image>
+      } else {
+        this.avatar = <Image
+        source={{isStatic:true,uri:this.state.myInfo.avatarThumbPath, scale:1}}
+        style={styles.avatar}>
+      </Image>
+      }
       return (
         <View>
           <View
             style={[styles.header]}>
-            <Image
-              source={require('../../../resource/group-icon.png')}
-              style={[styles.header]}>
-            </Image>
+            { this.avatar }
             <Text
               style={[styles.username]}>
               { this.state.myInfo.nickname}

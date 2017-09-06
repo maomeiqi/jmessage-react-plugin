@@ -15,7 +15,8 @@ const {
     Alert,
     TextInput,
     FlatList,
-    Image
+    Image,
+    Modal,
   } = ReactNative;
 
   class MyListItem extends React.PureComponent {
@@ -56,11 +57,37 @@ const styles = StyleSheet.create({
         height: 45,
         marginRight: 10,
     },
+
+    modalView: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContent: {
+        width: 200,
+        height: 150,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#ffffff',
+    },
+    modalButton: {
+
+    }
 });
 
   var count = 0
+
   export default class ConversationList extends React.Component {
     static navigationOptions = {
+        headerRight: <Button 
+        title="创建会话" 
+        onPress={
+            ({state}) => {
+                Alert.alert('state', JSON.stringify(state.params))
+
+            }}
+        />,
         title: "会话",
         tabBarLabel: '会话',
         tabBarIcon: ({ tintColor }) => (
@@ -71,14 +98,26 @@ const styles = StyleSheet.create({
         ),
       };
 
+    onCreateConversation() {
+        // this.setState({isShowModal: true})
+        Alert.alert("click","success")
+    }
+
     constructor(props) {
         super(props);
         this.state = {
-            data: [{key:'a'}, {key:'b'}]
+            data: [{key:'a'}, {key:'b'}],
+            modalText: "",
+            isShowModal: false,
         }
-        this._onPress = this._onPress.bind(this)
+        // this.onCreateConversation = this.onCreateConversation.bind(this)
+        // this.props.navigation.setParams({ createConversastion: this.onCreateConversation });
     }
 
+    componentDidMount() {
+        this.props.navigation.setParams({ createConversastion: this.onCreateConversation });
+        this.props.navigation.setParams({ test: 'test' });
+      }
     componentWillMount() {
         JMessage.getConversations((result) => {   
             
@@ -175,12 +214,77 @@ const styles = StyleSheet.create({
         
     </FlatList>
         return (
-        <View>
-            <Button
-            title = "Add"
-            onPress={this._onPress}>
 
-            </Button>
+        <View>
+            <Modal
+                transparent={true}
+                visible={ this.state.isShowModal }>
+                <View
+                    style={ styles.modalView }>
+                    <View
+                        style={ styles.modalContent}>
+                        <TextInput
+                            placeholder = "用户名或群聊名称"
+                            onChangeText = { (e) => { this.setState({modalText: e}) } }>
+                        </TextInput>
+                        <Button
+                            onPress={() => {
+                                var params = {}
+                                params.type = 'single'
+                                params.username = this.state.modalText
+                                JMessage.createConversation(params, (conv) => {
+                                        var item = {}
+
+                                        if (conv.conversationType === 'single') {
+                                            item = {key: conv.target.username}
+                                            item.conversationType = 'single'
+                                        } else {
+                                            item = {key: conv.target.id}
+                                            item.conversationType = 'group'
+                                            Alert.alert('conversaion', JSON.stringify(conv))
+                                        }
+                                        this.props.navigation.navigate('Chat', {conversation: item})
+                                    }, (error) => {
+                                        Alert.alert('error !', JSON.stringify(error))    
+                                    })
+                            } }
+                            style={styles.modalButton}
+                            title='创建单聊'>
+                        </Button>
+                        <Button
+                            onPress={ () => {
+
+                                JMessage.createGroup({name: this.state.modalText,desc: ""}, (group) => {
+                                    var params = {}
+                                    params.type = 'single'
+                                    params.groupId = group.id
+                                    JMessage.createConversation(params, (conv) => {
+                                        var item = {}
+
+                                        if (conv.conversationType === 'single') {
+                                            item = {key: conv.target.username}
+                                            item.conversationType = 'single'
+                                        } else {
+                                            item = {key: conv.target.id}
+                                            item.conversationType = 'group'
+                                            Alert.alert('conversaion', JSON.stringify(conv))
+                                        }
+                                    }, (error) => {
+                                        Alert.alert('error !', JSON.stringify(error))    
+                                    })
+                                }, (error) => {
+                                    Alert.alert('error !', JSON.stringify(error))
+                                })
+                                
+                            } }
+                            style={styles.modalButton}
+                            title='创建群聊'>
+                            
+                        </Button>
+                    </View>
+                    
+                </View>
+            </Modal>
             { this.listView }
         </View>)
   }

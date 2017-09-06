@@ -33,19 +33,24 @@ const ReactJChat = StackNavigator({
     },
   },
   Login: {
-    screen: LoginPage
+    screen: LoginPage,
+    navigationOptions: {
+      headerLeft: null,
+      gesturesEnabled: false,
+    },
   },
   Chat: {
     type: 'Reset',
     screen: ChatPage,
     path: 'people/:conversation'
   }
-},{
-    // mode:'modal',
-    headerMode: 'screen',
-    transitionConfig:() => ({
-      screenInterpolator:CardStackStyleInterpolator.forInitial,
-    })
 });
+
+// ,{
+//   headerMode: 'screen',
+//   transitionConfig:() => ({
+//     screenInterpolator:CardStackStyleInterpolator.forInitial,
+//   })
+// }
 
 AppRegistry.registerComponent('ReactJChat', () => ReactJChat);

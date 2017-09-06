@@ -35,6 +35,7 @@ class FormButton extends Component {
     constructor(props) {
         super(props);
         this.title = props.title
+        this.style = props.style 
         this.onPress = this.onPress.bind(this);
     }
 
@@ -42,12 +43,13 @@ class FormButton extends Component {
         if (!this.props.onPress) {
             return;
           }
-          this.props.onPress();
+        this.props.onPress();
     }
 
     render () {
         return (
             <Button
+            style={this.style}
             color="#FF3366"
             title={this.title}
             onPress = {this.onPress}

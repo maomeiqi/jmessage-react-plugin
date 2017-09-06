@@ -14,9 +14,23 @@ const {
     Button,
     Alert,
     TextInput
-  } = ReactNative;
+} = ReactNative;
 
-  export default class Login extends React.Component {
+// justifyContent: 'center',
+// alignItems: 'center',
+const styles = StyleSheet.create({
+    inputView: {
+        margin: 10,
+    },
+    loginBtn: {
+        color: "#ffffff",
+        height: 30,
+        backgroundColor: "#cccccc",
+    }
+
+})
+
+export default class Login extends React.Component {
     static navigationOptions = {
         title: "登录"
     };
@@ -45,14 +59,17 @@ const {
         return (
         <View>
             <TextInput
+                style={styles.inputView}
                 placeholder = "用户名"
                 onChangeText = { (e) => { this.setState({username: e}) } }>
             </TextInput>
             <TextInput
+                style={styles.inputView}
                 placeholder = "密码"
                 onChangeText = { (e) => { this.setState({password: e}) } }>
             </TextInput>
             <FormButton 
+                style={styles.loginBtn}
                 title="登录"
                 onPress={this.onPress}
                 >
