@@ -37,7 +37,7 @@
         "CoreAudio",
         "AudioToolbox",
         "MobileCoreServices",
-        "libsqlite3.0"
+        "libsqlite3"
       ]
     }
   },
