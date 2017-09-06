@@ -212,7 +212,7 @@ RCT_EXPORT_METHOD(login:(NSDictionary *)user
   }];
 }
 
-RCT_EXPORT_METHOD(logout:(NSDictionary *)param) {
+RCT_EXPORT_METHOD(logout) {
   [JMSGUser logout:^(id resultObject, NSError *error) {}];
 }
 

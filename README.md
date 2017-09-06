@@ -14,8 +14,6 @@ react-native link
 
 #### Android
 
-#### 这是一个使用 JMessage-sdk 的 React Native 插件，支持文字、图片、语言、文件消息。
-
 
 安装完毕后，在 MainApplication 中加上 JMessagePackage 即可。
 ```
@@ -27,6 +25,21 @@ protected List<ReactPackage> getPackages() {
     );
 }
 ```
+
+#### iOS
+
+- 打开工程，进入 Build Settings -> Framework search paths 添加 framework 搜索路径
+
+  ```
+  $(SRCROOT)/../node_modules/jmessage-react-plugin/ios/RCTJMessageModule
+  ```
+
+- 打开工程，进入 Build Settings -> Other Link Flag 添加一行编译选项
+
+  ```
+  -framework "JMessage"
+  ```
+
 
 ## API
 
