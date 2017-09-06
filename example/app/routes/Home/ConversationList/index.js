@@ -78,29 +78,34 @@ const styles = StyleSheet.create({
 
   var count = 0
 
+//   headerRight: <Button 
+//   title="创建会话" 
+//   onPress={
+//       ({state}) => {
+//           Alert.alert('state', JSON.stringify(state.params))
+
+//       }}
+//   />,
+
   export default class ConversationList extends React.Component {
-    static navigationOptions = {
-        headerRight: <Button 
-        title="创建会话" 
-        onPress={
-            ({state}) => {
-                Alert.alert('state', JSON.stringify(state.params))
+    static navigationOptions = ( {navigation} ) => {
+        const { params = {} } = navigation.state;
+        return {
+            headerRight:
+                <Button title="创建会话" onPress={() => { params.createConversation() }} />,
+            title: "会话",
+            tabBarLabel: '会话',
+            tabBarIcon: ({ tintColor }) => (
+              <Image
+                source={require('../../../resource/chat-icon.png')}
+                style={[styles.icon, {tintColor: tintColor}]}
+              />
+            ),
+          }
+    };
 
-            }}
-        />,
-        title: "会话",
-        tabBarLabel: '会话',
-        tabBarIcon: ({ tintColor }) => (
-          <Image
-            source={require('../../../resource/chat-icon.png')}
-            style={[styles.icon, {tintColor: tintColor}]}
-          />
-        ),
-      };
-
-    onCreateConversation() {
-        // this.setState({isShowModal: true})
-        Alert.alert("click","success")
+    _onCreateConversation() {
+        this.setState({isShowModal: true})
     }
 
     constructor(props) {
@@ -110,13 +115,11 @@ const styles = StyleSheet.create({
             modalText: "",
             isShowModal: false,
         }
-        // this.onCreateConversation = this.onCreateConversation.bind(this)
-        // this.props.navigation.setParams({ createConversastion: this.onCreateConversation });
+        this._onCreateConversation = this._onCreateConversation.bind(this)
     }
 
     componentDidMount() {
-        this.props.navigation.setParams({ createConversastion: this.onCreateConversation });
-        this.props.navigation.setParams({ test: 'test' });
+        this.props.navigation.setParams({ createConversation: this._onCreateConversation });
       }
     componentWillMount() {
         JMessage.getConversations((result) => {   
@@ -178,6 +181,7 @@ const styles = StyleSheet.create({
                 item.conversationType = 'group'
                 Alert.alert('conversaion', JSON.stringify(conv))
             }
+            this.setState({})
             this.props.navigation.navigate('Chat', {conversation: item})
         }, (error) => {
             Alert.alert('error', JSON.stringify(error))
@@ -232,6 +236,7 @@ const styles = StyleSheet.create({
                                 var params = {}
                                 params.type = 'single'
                                 params.username = this.state.modalText
+                                this.setState({isShowModal: false})
                                 JMessage.createConversation(params, (conv) => {
                                         var item = {}
 
@@ -243,6 +248,7 @@ const styles = StyleSheet.create({
                                             item.conversationType = 'group'
                                             Alert.alert('conversaion', JSON.stringify(conv))
                                         }
+                                        
                                         this.props.navigation.navigate('Chat', {conversation: item})
                                     }, (error) => {
                                         Alert.alert('error !', JSON.stringify(error))    
@@ -258,6 +264,7 @@ const styles = StyleSheet.create({
                                     var params = {}
                                     params.type = 'single'
                                     params.groupId = group.id
+                                    this.setState({isShowModal: false})
                                     JMessage.createConversation(params, (conv) => {
                                         var item = {}
 
@@ -269,6 +276,7 @@ const styles = StyleSheet.create({
                                             item.conversationType = 'group'
                                             Alert.alert('conversaion', JSON.stringify(conv))
                                         }
+                                        this.props.navigation.navigate('Chat', {conversation: item})
                                     }, (error) => {
                                         Alert.alert('error !', JSON.stringify(error))    
                                     })

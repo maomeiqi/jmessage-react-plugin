@@ -6,7 +6,7 @@
 
 ```
 npm install jmessage-react-plugin --save
-npm install jcore-react-native --save（目前 jmessage-react-plugin 2.0.0-beta 版本需要指定安装 jcore-react-native 1.1.8-beta 版本）
+npm install jcore-react-native --save（目前 jmessage-react-plugin 2.0.0-beta 版本需要指定安装 jcore-react-native 1.1.8-beta2 版本）
 react-native link
 ```
 
