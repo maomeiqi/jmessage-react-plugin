@@ -112,6 +112,7 @@ export default class MyNotificationsScreen extends React.Component {
             underlayColor = '#dddddd'
             style={[styles.listContent]}
             onPress={ () => {
+              this.props.navigation.navigate('UpdataMyInfo')
             }}
             >
             <View

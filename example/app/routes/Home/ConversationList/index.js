@@ -120,8 +120,12 @@ const styles = StyleSheet.create({
 
     componentDidMount() {
         this.props.navigation.setParams({ createConversation: this._onCreateConversation });
-      }
+    }
     componentWillMount() {
+        this.reloadConversationList()
+    }
+
+    reloadConversationList() {
         JMessage.getConversations((result) => {   
             
             var data  = result.map((conversation, index) => 
@@ -166,7 +170,7 @@ const styles = StyleSheet.create({
             this.setState({data: data})
         }, (error) => {
             Alert.alert(JSON.stringify(error))
-        })    
+        })  
     }
 
     _onPress() {
@@ -185,6 +189,25 @@ const styles = StyleSheet.create({
             this.props.navigation.navigate('Chat', {conversation: item})
         }, (error) => {
             Alert.alert('error', JSON.stringify(error))
+        })
+    }
+
+    enterConversation(params) {
+        JMessage.createConversation(params, (conv) => {
+            var item = {}
+
+            if (conv.conversationType === 'single') {
+                item = {key: conv.target.username}
+                item.conversationType = 'single'
+            } else {
+                item = {key: conv.target.id}
+                item.conversationType = 'group'
+                Alert.alert('conversaion', JSON.stringify(conv))
+            }
+            this.reloadConversationList()
+            this.props.navigation.navigate('Chat', {conversation: item})
+        }, (error) => {
+            Alert.alert('create conversation error !', JSON.stringify(error))    
         })
     }
 
@@ -237,58 +260,31 @@ const styles = StyleSheet.create({
                                 params.type = 'single'
                                 params.username = this.state.modalText
                                 this.setState({isShowModal: false})
-                                JMessage.createConversation(params, (conv) => {
-                                        var item = {}
-
-                                        if (conv.conversationType === 'single') {
-                                            item = {key: conv.target.username}
-                                            item.conversationType = 'single'
-                                        } else {
-                                            item = {key: conv.target.id}
-                                            item.conversationType = 'group'
-                                            Alert.alert('conversaion', JSON.stringify(conv))
-                                        }
-                                        
-                                        this.props.navigation.navigate('Chat', {conversation: item})
-                                    }, (error) => {
-                                        Alert.alert('error !', JSON.stringify(error))    
-                                    })
+                                this.enterConversation(params)
                             } }
                             style={styles.modalButton}
-                            title='创建单聊'>
-                        </Button>
+                            title='创建单聊'/>
                         <Button
                             onPress={ () => {
 
                                 JMessage.createGroup({name: this.state.modalText,desc: ""}, (group) => {
                                     var params = {}
-                                    params.type = 'single'
+                                    params.type = 'group'
                                     params.groupId = group.id
                                     this.setState({isShowModal: false})
-                                    JMessage.createConversation(params, (conv) => {
-                                        var item = {}
-
-                                        if (conv.conversationType === 'single') {
-                                            item = {key: conv.target.username}
-                                            item.conversationType = 'single'
-                                        } else {
-                                            item = {key: conv.target.id}
-                                            item.conversationType = 'group'
-                                            Alert.alert('conversaion', JSON.stringify(conv))
-                                        }
-                                        this.props.navigation.navigate('Chat', {conversation: item})
-                                    }, (error) => {
-                                        Alert.alert('error !', JSON.stringify(error))    
-                                    })
+                                    this.enterConversation(params)
                                 }, (error) => {
-                                    Alert.alert('error !', JSON.stringify(error))
+                                    Alert.alert('create group error !', JSON.stringify(error))
                                 })
                                 
                             } }
                             style={styles.modalButton}
-                            title='创建群聊'>
+                            title='创建群聊'/>
                             
-                        </Button>
+                        <Button
+                            onPress = { () => { this.setState({isShowModal: false}) }}
+                            style={styles.modalButton}
+                            title='离开'/>
                     </View>
                     
                 </View>
