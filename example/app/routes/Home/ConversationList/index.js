@@ -232,8 +232,6 @@ const styles = StyleSheet.create({
                             <Text>{ item.latestMessageString }</Text>
                         </View>
                     </View>
-                    
-                    
                 </TouchableHighlight>
                 </View>
             ) }

@@ -8,7 +8,8 @@ import {
 } from 'react-navigation';
 
 import ConversationList from './ConversationList/index.js'
-import UserInfo from './UserInfo/index.js'
+import MyInfo from './MyInfo/index.js'
+import FriendList from './Friends/index.js'
 
 const {
     View,
@@ -25,8 +26,11 @@ const {
     Conversation: {
       screen: ConversationList,
     },
-    UserInfo: {
-      screen: UserInfo,
+    Friend: {
+      screen: FriendList,
+    },
+    MyInfo: {
+      screen: MyInfo,
     },
   }, {
     tabBarOptions: {

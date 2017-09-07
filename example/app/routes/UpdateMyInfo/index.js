@@ -9,6 +9,7 @@ var {
 
 import ReactNative from 'react-native';
 import JMessage from 'jmessage-react-plugin';
+import ListItem from '../../views/ListItem'
 import {
 	TabNavigator
 } from 'react-navigation';
@@ -51,26 +52,7 @@ const {
       alignItems: 'center',
       textAlign: 'center',
     },
-    listContent: {
-      borderBottomWidth: 1,
-      borderColor: "#cccccc",
-    },
-    listItem: {
-      flexDirection:'row',
-      alignItems: 'center',
-      margin: 10,
-    },
-    itemIcon: {
-      width: 26,
-      height: 26,
-      marginRight: 10,
-    },
-    itemTitle: {
-        flex: 1,
-    },
-    itemContent: {
-        marginRight: 10
-    },
+
     modalView: {
         flex: 1,
         justifyContent: 'center',
@@ -244,91 +226,48 @@ export default class UpdataMyInfoScreen extends Component {
             </View>
 
 
-            <InfoListItem
+            <ListItem
             title="昵称"
             content={ this.state.myInfo.nickname }
             onPress={ () => {
                 this.field = "nickname"
                 this.setState({isShowModal: true})
             } }>
-            </InfoListItem>
+            </ListItem>
 
-            <InfoListItem
+            <ListItem
             title="性别"
             content={ this.state.myInfo.gender }
             onPress= { () => {
                 this.setState({isShowPickModal: true})
             } }>
-            </InfoListItem>
-            <InfoListItem
+            </ListItem>
+            <ListItem
             title="地区"
             content={ this.state.myInfo.region }
             onPress= { () => {
                 this.field = "region"
                 this.setState({isShowModal: true})
             } }>
-            </InfoListItem>
-            <InfoListItem
+            </ListItem>
+            <ListItem
             title="个性签名"
             content={ this.state.myInfo.signature }
             onPress= { () => {
                 this.field = "signature"
                 this.setState({isShowModal: true})
             }} >
-            </InfoListItem>
-            <InfoListItem
+            </ListItem>
+            <ListItem
             title="生日"
             content={ this.state.myInfo.birthday }
+            source={require('../../resource/myinfo-icon.png')}
             onPress= { () => {
                 this.field = "birthday"
                 this.setState({isShowPickModal: true})
             }} >
-            </InfoListItem>
+            </ListItem>
         </ScrollView>
       );
-    }
-}
-
-
-
-class InfoListItem extends Component {
-    
-    
-    static propTypes = {
-        title: PropTypes.string,
-        content: PropTypes.string,
-        onPress: PropTypes.func
-    }
-
-    constructor(props) {
-        super(props);
-    }
-
-    onPress() {
-        if (!this.props.onPress) {
-            return;
-          }
-        this.props.onPress();
-    }
-
-    render () {
-        
-        return (
-            <TouchableHighlight
-            style={[styles.listContent]}
-            underlayColor = '#dddddd'
-            title={this.title}
-            onPress = {this.props.onPress}>
-                <View
-                style={[styles.listItem]}>
-                <Image
-                    source={require('../../resource/myinfo-icon.png')}
-                    style={[styles.itemIcon]}>
-                </Image>              
-                <Text style={styles.itemTitle} >{ this.props.title }</Text>
-                <Text style={styles.itemContent} >{ this.props.content }</Text>
-                </View>
-            </TouchableHighlight>
-        )
     }
 }

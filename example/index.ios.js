@@ -13,7 +13,8 @@ import HomePage from './app/routes/Home/index.js';
 import LoginPage from './app/routes/Login/index.js';
 import ChatPage from './app/routes/Chat/index.js';
 import UpdateMyInfoPage from './app/routes/UpdateMyInfo/index.js';
-
+import GroupsPage from './app/routes/Groups/index.js';
+import FriendInfoPage from './app/routes/FriendInfo/index.js';
 
 import CardStackStyleInterpolator from 'react-navigation/src/views/CardStackStyleInterpolator';
 
@@ -41,7 +42,15 @@ const ReactJChat = StackNavigator({
   UpdataMyInfo: {
     type: 'Reset',
     screen: UpdateMyInfoPage,
-
+  },
+  Groups: {
+    type: 'Reset',
+    screen: GroupsPage,
+  },
+  FriendInfo: {
+    type: 'Reset',
+    screen: FriendInfoPage,
+    path: 'people/:user'
   }
 });
 
