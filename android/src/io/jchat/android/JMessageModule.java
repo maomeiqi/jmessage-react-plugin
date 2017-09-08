@@ -1167,6 +1167,34 @@ public class JMessageModule extends ReactContextBaseJavaModule {
         }
     }
 
+    @ReactMethod
+    public void downloadThumbUserAvatar(ReadableMap map, final Callback success, final Callback fail) {
+        try {
+            final String username = map.getString(Constant.USERNAME);
+            final String appKey = map.hasKey(Constant.APP_KEY) ? map.getString(Constant.APP_KEY) : "";
+            JMessageClient.getUserInfo(username, appKey, new GetUserInfoCallback() {
+                @Override
+                public void gotResult(int status, String desc, UserInfo userInfo) {
+                    if (status == 0) {
+                        if (userInfo.getAvatar() != null) {
+                            File file = userInfo.getAvatarFile();
+                            WritableMap result = Arguments.createMap();
+                            result.putString(Constant.USERNAME, username);
+                            result.putString(Constant.APP_KEY, appKey);
+                            result.putString(Constant.FILE_PATH, file.getAbsolutePath());
+                            mJMessageUtils.handleCallbackWithObject(status, desc, success, fail, result);
+                        }
+                    } else {
+                        mJMessageUtils.handleError(fail, status, desc);
+                    }
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            mJMessageUtils.handleError(fail, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);
+        }
+    }
+
     public void onEvent(LoginStateChangeEvent event) {
         Log.d(TAG, "登录状态改变事件：event = " + event.toString());
         WritableMap map = Arguments.createMap();
