@@ -544,6 +544,17 @@ export default class JMessage {
     }
 
     /**
+     * 下载用户头像缩略图，如果已经下载，不会重复下载。
+     *
+     * @param {object} params = {'username': String, 'appKey': String}
+     * @param {function} success = function ({'username': String, 'appKey': String, 'filePath': String}) {}
+     * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+     */
+    static downloadThumbUserAvatar(params, success, error) {
+        JMessageModule.downloadThumbUserAvatar(params, success, error)
+    }
+
+    /**
      * 下载用户头像原图，如果已经下载，不会重复下载。
      *
      * @param {object} params = {'username': String, 'appKey': String}

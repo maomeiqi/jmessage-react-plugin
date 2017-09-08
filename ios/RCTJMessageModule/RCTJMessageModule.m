@@ -205,7 +205,10 @@ RCT_EXPORT_METHOD(login:(NSDictionary *)user
                   failCallback:(RCTResponseSenderBlock)failCallback) {
   [JMSGUser loginWithUsername:user[@"username"] password:user[@"password"] completionHandler:^(id resultObject, NSError *error) {
     if (!error) {
-      successCallback(@[@{}]);
+      JMSGUser *myInfo = [JMSGUser myInfo];
+      [myInfo thumbAvatarData:^(NSData *data, NSString *objectId, NSError *error) {
+        successCallback(@[@{}]);
+      }];
     } else {
       failCallback(@[[error errorToDictionary]]);
     }
@@ -241,7 +244,10 @@ RCT_EXPORT_METHOD(getUserInfo:(NSDictionary *)param
       if (!error) {
         NSArray *users = resultObject;
         JMSGUser *user = users[0];
-        successCallback(@[[user userToDictionary]]);
+        
+        [user thumbAvatarData:^(NSData *data, NSString *objectId, NSError *error) {
+          successCallback(@[[user userToDictionary]]);
+        }];
       } else {
         failCallback(@[[error errorToDictionary]]);
       }
@@ -1535,6 +1541,47 @@ RCT_EXPORT_METHOD(isNoDisturbGlobal:(RCTResponseSenderBlock)successCallback
                        failCallback:(RCTResponseSenderBlock)failCallback) {
   BOOL isNodisturb = [JMessage isSetGlobalNoDisturb];
   successCallback(@[@{@"isNoDisturb": @(isNodisturb)}]);
+}
+
+RCT_EXPORT_METHOD(downloadThumbUserAvatar:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallback:(RCTResponseSenderBlock)failCallback) {
+  if (param[@"username"] == nil) {
+    failCallback(@[[self getParamError]]);
+    return;
+  }
+  
+  NSString *appKey = nil;
+  if (param[@"appKey"]) {
+    appKey = param[@"appKey"];
+  } else {
+    appKey = [JMessageHelper shareInstance].JMessageAppKey;
+  }
+  
+  [JMSGUser userInfoArrayWithUsernameArray:@[param[@"username"]] appKey:appKey completionHandler:^(id resultObject, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+      return ;
+    }
+    
+    NSArray *userList = resultObject;
+    if (userList.count < 1) {
+      successCallback(@[]);
+      return;
+    }
+    
+    JMSGUser *user = userList[0];
+    [user thumbAvatarData:^(NSData *data, NSString *objectId, NSError *error) {
+      if (error) {
+        failCallback(@[[error errorToDictionary]]);
+        return ;
+      }
+      
+      successCallback(@[@{@"username": user.username,
+                          @"appKey": user.appKey,
+                          @"filePath": [user thumbAvatarLocalPath] ?: @""}]);
+    }];
+  }];
 }
 
 RCT_EXPORT_METHOD(downloadOriginalUserAvatar:(NSDictionary *)param
