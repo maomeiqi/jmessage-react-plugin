@@ -205,7 +205,10 @@ RCT_EXPORT_METHOD(login:(NSDictionary *)user
                   failCallback:(RCTResponseSenderBlock)failCallback) {
   [JMSGUser loginWithUsername:user[@"username"] password:user[@"password"] completionHandler:^(id resultObject, NSError *error) {
     if (!error) {
-      successCallback(@[@{}]);
+      JMSGUser *myInfo = [JMSGUser myInfo];
+      [myInfo thumbAvatarData:^(NSData *data, NSString *objectId, NSError *error) {
+        successCallback(@[@{}]);
+      }];
     } else {
       failCallback(@[[error errorToDictionary]]);
     }
@@ -241,7 +244,10 @@ RCT_EXPORT_METHOD(getUserInfo:(NSDictionary *)param
       if (!error) {
         NSArray *users = resultObject;
         JMSGUser *user = users[0];
-        successCallback(@[[user userToDictionary]]);
+        
+        [user thumbAvatarData:^(NSData *data, NSString *objectId, NSError *error) {
+          successCallback(@[[user userToDictionary]]);
+        }];
       } else {
         failCallback(@[[error errorToDictionary]]);
       }
