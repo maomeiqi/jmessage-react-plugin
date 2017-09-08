@@ -56,7 +56,7 @@ class ListItem extends Component {
           }
         this.props.onPress();
     }
-
+    
     render () {
         
         return (

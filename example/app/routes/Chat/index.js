@@ -41,9 +41,14 @@ export default class Chat extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { inputViewLayout: {width:window.width, height:86,}};
+    this.state = { 
+      inputViewLayout: {width:window.width, height:86,},
+      menuContainerHeight: 1000,
+      isDismissMenuContainer: false,
+    };
     
     this.updateLayout = this.updateLayout.bind(this);
+    this.onTouchMsgList = this.onTouchMsgList.bind(this);
     this.conversation = this.props.navigation.state.params.conversation
     Alert.alert("the conversation ",JSON.stringify(this.conversation))
     JMessage.getMyInfo((myInfo) => {
@@ -176,6 +181,17 @@ export default class Chat extends Component {
 
   onAvatarClick = (message) => {
       console.log(message)
+    }
+
+    onTouchMsgList() {
+      console.log("Touch msg list, hidding soft input and dismiss menu");
+      this.setState({
+        isDismissMenuContainer: true,
+        chatInputStyle: {
+          width: Dimensions.get('window').width,
+          height: 100
+        },
+      });
     }
 
   onMsgClick = (message) => {
@@ -349,6 +365,7 @@ export default class Chat extends Component {
         onAvatarClick={this.onAvatarClick}
         onMsgClick={this.onMsgClick}
         onStatusViewClick={this.onStatusViewClick}
+        onTouchMsgList = {this.onTouchMsgList}
         onTapMessageCell={this.onTapMessageCell}
         onBeginDragMessageList={this.onBeginDragMessageList}
         onPullToRefresh={this.onPullToRefresh}
@@ -358,6 +375,8 @@ export default class Chat extends Component {
         sendBubblePadding={{left:10,top:10,right:10,bottom:10}}
         />
         <InputView style={this.state.inputViewLayout}
+        menuContainerHeight = {this.state.menuContainerHeight}
+				isDismissMenuContainer = {this.state.isDismissMenuContainer}
         onSendText={this.onSendText}
         onTakePicture={this.onTakePicture}
         onStartRecordVoice={this.onStartRecordVoice}

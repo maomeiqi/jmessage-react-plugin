@@ -17,26 +17,9 @@ const {
     FlatList,
     Image,
     Modal,
-  } = ReactNative;
+} = ReactNative;
 
-  class MyListItem extends React.PureComponent {
 
-    _onPress = () => {
-      this.props.onPressItem(this.props.id);
-    };
-  
-    render() {
-      return (
-          <View>
-            <SomeOtherWidget
-                {...this.props}
-                onPress={this._onPress}
-            />
-          </View>)
-    }
-  }
-
-  
 const styles = StyleSheet.create({
     icon: {
         width: 26,
@@ -48,7 +31,7 @@ const styles = StyleSheet.create({
         height: 60,
     },
     conversationItem: {
-        flexDirection:'row',
+        flexDirection: 'row',
         margin: 10,
         alignItems: 'center',
     },
@@ -58,16 +41,16 @@ const styles = StyleSheet.create({
         marginRight: 10,
     },
 
-    modalView: {
-        flex: 1,
-        justifyContent: 'center',
+    modalView: {    
+        flex: 1,
+            justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
     modalContent: {
         width: 200,
         height: 150,
-        justifyContent: 'center',
+            justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#ffffff',
     },
@@ -76,7 +59,7 @@ const styles = StyleSheet.create({
     }
 });
 
-  var count = 0
+var count = 0
 
 //   headerRight: <Button 
 //   title="创建会话" 
@@ -87,31 +70,42 @@ const styles = StyleSheet.create({
 //       }}
 //   />,
 
-  export default class ConversationList extends React.Component {
-    static navigationOptions = ( {navigation} ) => {
-        const { params = {} } = navigation.state;
+export default class ConversationList extends React.Component {
+    static navigationOptions = ({
+        navigation
+    }) => {
+        const {
+            params = {}
+        } = navigation.state;
         return {
-            headerRight:
-                <Button title="创建会话" onPress={() => { params.createConversation() }} />,
+            headerRight: <Button title="创建会话" onPress={() => { params.createConversation() }} />,
             title: "会话",
             tabBarLabel: '会话',
-            tabBarIcon: ({ tintColor }) => (
-              <Image
+            tabBarIcon: ({
+                tintColor
+            }) => (
+                <Image
                 source={require('../../../resource/chat-icon.png')}
                 style={[styles.icon, {tintColor: tintColor}]}
               />
             ),
-          }
+        }
     };
 
     _onCreateConversation() {
-        this.setState({isShowModal: true})
+        this.setState({
+            isShowModal: true
+        })
     }
 
     constructor(props) {
         super(props);
         this.state = {
-            data: [{key:'a'}, {key:'b'}],
+            data: [{
+                key: 'a'
+            }, {
+                key: 'b'
+            }],
             modalText: "",
             isShowModal: false,
         }
@@ -119,74 +113,90 @@ const styles = StyleSheet.create({
     }
 
     componentDidMount() {
-        this.props.navigation.setParams({ createConversation: this._onCreateConversation });
+        this.props.navigation.setParams({
+            createConversation: this._onCreateConversation
+        });
     }
     componentWillMount() {
         this.reloadConversationList()
     }
 
     reloadConversationList() {
-        JMessage.getConversations((result) => {   
-            
-            var data  = result.map((conversation, index) => 
-                            {
-                                var item = {}
-                                item.key = index
-                                item.conversation = conversation
-                                if (conversation.conversationType === 'single') {
-                                     item = {key: conversation.target.username}
-                                     item.conversationType = 'single'
-                                     item.displayName = conversation.target.nickname
-                                } else {
-                                    item = {key: conversation.target.id}
-                                    item.conversationType = 'group'
-                                    item.displayName = conversation.target.name
-                                }
+        JMessage.getConversations((result) => {
 
-                                if (conversation.latestMessage === undefined) {
-                                    item.latestMessageString = ""
-                                    return item
-                                }
+            var data = result.map((conversation, index) => {
+                var item = {}
+                item.key = index
+                item.conversation = conversation
+                if (conversation.conversationType === 'single') {
+                    item = {
+                        key: conversation.target.username
+                    }
+                    item.conversationType = 'single'
+                    item.displayName = conversation.target.nickname
+                } else {
+                    item = {
+                        key: conversation.target.id
+                    }
+                    item.conversationType = 'group'
+                    item.displayName = conversation.target.name
+                }
 
-                                item.conversationType = conversation.conversationType
-                                if (conversation.latestMessage.type === 'text') {    
-                                    item.latestMessageString = conversation.latestMessage.text 
-                                }
+                if (conversation.latestMessage === undefined) {
+                    item.latestMessageString = ""
+                    return item
+                }
 
-                                if (conversation.latestMessage.type === 'image') {    
-                                    item.latestMessageString = '[图片]' 
-                                }
+                item.conversationType = conversation.conversationType
+                if (conversation.latestMessage.type === 'text') {
+                    item.latestMessageString = conversation.latestMessage.text
+                }
 
-                                if (conversation.latestMessage.type === 'voice') {    
-                                    item.latestMessageString = '[语言]' 
-                                }
+                if (conversation.latestMessage.type === 'image') {
+                    item.latestMessageString = '[图片]'
+                }
 
-                                if (conversation.latestMessage.type === 'file') {    
-                                    item.latestMessageString = '[文件]' 
-                                }
+                if (conversation.latestMessage.type === 'voice') {
+                    item.latestMessageString = '[语言]'
+                }
 
-                                return item
-                            })
-            this.setState({data: data})
+                if (conversation.latestMessage.type === 'file') {
+                    item.latestMessageString = '[文件]'
+                }
+
+                return item
+            })
+            this.setState({
+                data: data
+            })
         }, (error) => {
             Alert.alert(JSON.stringify(error))
-        })  
+        })
     }
 
     _onPress() {
-        Alert.alert("click","fasdf")
-        JMessage.createConversation({type: 'single', username: '0002'}, (conv) => {
+        Alert.alert("click", "fasdf")
+        JMessage.createConversation({
+            type: 'single',
+            username: '0002'
+        }, (conv) => {
             var item
             if (conv.conversationType === 'single') {
-                 item = {key: conv.target.username}
-                 item.conversationType = 'single'
+                item = {
+                    key: conv.target.username
+                }
+                item.conversationType = 'single'
             } else {
-                item = {key: conv.target.id}
+                item = {
+                    key: conv.target.id
+                }
                 item.conversationType = 'group'
                 Alert.alert('conversaion', JSON.stringify(conv))
             }
             this.setState({})
-            this.props.navigation.navigate('Chat', {conversation: item})
+            this.props.navigation.navigate('Chat', {
+                conversation: item
+            })
         }, (error) => {
             Alert.alert('error', JSON.stringify(error))
         })
@@ -197,25 +207,36 @@ const styles = StyleSheet.create({
             var item = {}
 
             if (conv.conversationType === 'single') {
-                item = {key: conv.target.username}
+                item = {
+                    key: conv.target.username
+                }
                 item.conversationType = 'single'
             } else {
-                item = {key: conv.target.id}
+                item = {
+                    key: conv.target.id
+                }
                 item.conversationType = 'group'
                 Alert.alert('conversaion', JSON.stringify(conv))
             }
             this.reloadConversationList()
-            this.props.navigation.navigate('Chat', {conversation: item})
+            this.props.navigation.navigate('Chat', {
+                conversation: item
+            })
         }, (error) => {
-            Alert.alert('create conversation error !', JSON.stringify(error))    
+            Alert.alert('create conversation error !', JSON.stringify(error))
         })
     }
 
     render() {
-        this.listView = <FlatList
-        data = { this.state.data }
-        renderItem = { ({item}) => (
-            <View>
+        this.listView = < FlatList
+        data = {
+            this.state.data
+        }
+        renderItem = {
+                ({
+                    item
+                }) => (
+                    <View>
                 <TouchableHighlight
                     style={[styles.conversationContent]}
                     underlayColor = '#dddddd'
@@ -234,13 +255,13 @@ const styles = StyleSheet.create({
                     </View>
                 </TouchableHighlight>
                 </View>
-            ) }
-        >
-        
-    </FlatList>
+                )
+            } >
+
+            < /FlatList>
         return (
 
-        <View>
+            <View>
             <Modal
                 transparent={true}
                 visible={ this.state.isShowModal }>
@@ -289,5 +310,5 @@ const styles = StyleSheet.create({
             </Modal>
             { this.listView }
         </View>)
-  }
+    }
 }
