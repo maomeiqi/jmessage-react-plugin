@@ -48,23 +48,36 @@ const {
 export default class MyNotificationsScreen extends React.Component {
     static navigationOptions = {
       title: "好友详情",
+      avatarPath: "",
     };
     constructor(props) {
       super(props)
       this.state = {
         userInfo: this.props.navigation.state.params.user
-      }  
+      }
+      
+      // JMessage.downloadOriginalUserAvatar({'username': this.state.userInfo.username}, (result) => {
+      //   this.setState({avatarPath: result.filePath})
+      // }, (eror) => {
+      //   Alert.alert('error',JSON.stringify(error))
+      // })
+
+      JMessage.downloadThumbUserAvatar({'username': this.state.userInfo.username}, (result) => {
+        this.setState({avatarPath: result.filePath})
+      }, (eror) => {
+        Alert.alert('error',JSON.stringify(error))
+      })
     }
 
     render() {
-      if (this.state.userInfo.avatarThumbPath === "") {
+      if (this.state.avatarPath === "") {
         this.avatar = <Image
           source={require('../../resource/group-icon.png')}
           style={styles.avatar}>
         </Image>
       } else {
         this.avatar = <Image
-        source={{isStatic:true,uri:this.state.userInfo.avatarThumbPath, scale:1}}
+        source={{isStatic:true,uri:this.state.avatarPath, scale:1}}
         style={styles.avatar}>
       </Image>
       }

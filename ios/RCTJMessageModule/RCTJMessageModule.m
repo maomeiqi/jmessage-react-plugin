@@ -65,10 +65,10 @@ RCT_EXPORT_MODULE();
                         name:kJJMessageReceiveMessage
                       object:nil];
   
-//  [defaultCenter addObserver:self
-//                    selector:@selector(conversationChanged:)
-//                        name:kJJMessageConversationChanged
-//                      object:nil];
+  [defaultCenter addObserver:self
+                    selector:@selector(conversationChanged:)
+                        name:kJJMessageConversationChanged
+                      object:nil];
   // have
   [defaultCenter addObserver:self
                     selector:@selector(didSendMessage:)
@@ -180,6 +180,10 @@ RCT_EXPORT_METHOD(setDebugMode:(NSDictionary *)param) {
 //didReceiveJMessageMessage change name
 - (void)didReceiveJMessageMessage:(NSNotification *)notification {
   [self.bridge.eventDispatcher sendAppEventWithName:receiveMsgEvent body:notification.object];
+}
+
+- (void)conversationChanged:(NSNotification *)notification {
+  [self.bridge.eventDispatcher sendAppEventWithName:conversationChangeEvent body:notification.object];
 }
 
 //#pragma mark IM - User

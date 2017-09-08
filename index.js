@@ -15,6 +15,7 @@ const syncRoamingMessage = "JMessage.SyncRoamingMessage" // 同步漫游消息�
 const messageRetract = "JMessage.MessageRetract" // 消息撤回事件
 const contactNotify = "JMessage.ContactNotify" // 收到好友请求消息事件
 const uploadProgress = "JMessage.UploadProgress" // 收到好友请求消息事件
+const conversationChange = "JMessage.conversationChange" // 会话变更事件
 
 export default class JMessage {
 
@@ -898,4 +899,23 @@ export default class JMessage {
         listeners[listener] = null;
     }
     
+    /**
+     * 会话变更事件
+     * @param {function} listener  = function (conversation) {}
+     * conversation 为会话对象，具体内容参考文档。
+     */
+    static addConversationChangeListener(listener) {
+        listeners[listener] = DeviceEventEmitter.addListener(conversationChange,
+            (message) => {
+                listener(message);
+            });
+    }
+
+    static removeConversationChangeListener(listener) {
+        if (!listeners[listener]) {
+            return;
+        }
+        listeners[listener].remove();
+        listeners[listener] = null;
+    }
 }
