@@ -1543,6 +1543,47 @@ RCT_EXPORT_METHOD(isNoDisturbGlobal:(RCTResponseSenderBlock)successCallback
   successCallback(@[@{@"isNoDisturb": @(isNodisturb)}]);
 }
 
+RCT_EXPORT_METHOD(downloadThumbUserAvatar:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallback:(RCTResponseSenderBlock)failCallback) {
+  if (param[@"username"] == nil) {
+    failCallback(@[[self getParamError]]);
+    return;
+  }
+  
+  NSString *appKey = nil;
+  if (param[@"appKey"]) {
+    appKey = param[@"appKey"];
+  } else {
+    appKey = [JMessageHelper shareInstance].JMessageAppKey;
+  }
+  
+  [JMSGUser userInfoArrayWithUsernameArray:@[param[@"username"]] appKey:appKey completionHandler:^(id resultObject, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+      return ;
+    }
+    
+    NSArray *userList = resultObject;
+    if (userList.count < 1) {
+      successCallback(@[]);
+      return;
+    }
+    
+    JMSGUser *user = userList[0];
+    [user thumbAvatarData:^(NSData *data, NSString *objectId, NSError *error) {
+      if (error) {
+        failCallback(@[[error errorToDictionary]]);
+        return ;
+      }
+      
+      successCallback(@[@{@"username": user.username,
+                          @"appKey": user.appKey,
+                          @"filePath": [user thumbAvatarLocalPath] ?: @""}]);
+    }];
+  }];
+}
+
 RCT_EXPORT_METHOD(downloadOriginalUserAvatar:(NSDictionary *)param
                   successCallback:(RCTResponseSenderBlock)successCallback
                   failCallback:(RCTResponseSenderBlock)failCallback) {
