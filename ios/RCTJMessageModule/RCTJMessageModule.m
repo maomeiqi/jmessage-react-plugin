@@ -244,10 +244,7 @@ RCT_EXPORT_METHOD(getUserInfo:(NSDictionary *)param
       if (!error) {
         NSArray *users = resultObject;
         JMSGUser *user = users[0];
-        
-        [user thumbAvatarData:^(NSData *data, NSString *objectId, NSError *error) {
-          successCallback(@[[user userToDictionary]]);
-        }];
+        successCallback(@[[user userToDictionary]]);
       } else {
         failCallback(@[[error errorToDictionary]]);
       }
