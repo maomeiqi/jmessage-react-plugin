@@ -15,6 +15,7 @@ const syncRoamingMessage = "JMessage.SyncRoamingMessage" // 同步漫游消息�
 const messageRetract = "JMessage.MessageRetract" // 消息撤回事件
 const contactNotify = "JMessage.ContactNotify" // 收到好友请求消息事件
 const uploadProgress = "JMessage.UploadProgress" // 收到好友请求消息事件
+const conversationChange = "JMessage.conversationChange" // 会话变更事件
 
 export default class JMessage {
 
@@ -897,5 +898,4 @@ export default class JMessage {
         listeners[listener].remove();
         listeners[listener] = null;
     }
-
 }
