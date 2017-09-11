@@ -104,7 +104,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void init(ReadableMap map) {
+    public void setup(ReadableMap map) {
         try {
             boolean isOpenMessageRoaming = map.getBoolean(Constant.IS_OPEN_MESSAGE_ROAMING);
             JMessageClient.init(getReactApplicationContext(), isOpenMessageRoaming);

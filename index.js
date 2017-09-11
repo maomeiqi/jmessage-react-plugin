@@ -154,7 +154,7 @@ export default class JMessage {
 
     /**
      * @param {object} params = {
-     *  'id': Number,                                  // message id
+     *  'id': String,                                  // message id
      *  'type': String,                                // 'single' / 'group'
      *  'groupId': String,                             // 当 type = group 时，groupId 不能为空
      *  'username': String,                            // 当 type = single 时，username 不能为空
@@ -869,20 +869,20 @@ export default class JMessage {
     }
 
     static removeMessageRetractListener(listener) {
-        if (!listeners[listener]) {
-            return;
+            if (!listeners[listener]) {
+                return;
+            }
+            listeners[listener].remove();
+            listeners[listener] = null;
         }
-        listeners[listener].remove();
-        listeners[listener] = null;
-    }
-    /**
-     * 
-     * @param {function} listener  = function (result) {}
-     * result = {
-     *  messageId = String, // 消息 Id
-     *  progress = Float // 消息文件上传的进度
-     * }
-     */
+        /**
+         * 
+         * @param {function} listener  = function (result) {}
+         * result = {
+         *  messageId = String, // 消息 Id
+         *  progress = Float // 消息文件上传的进度
+         * }
+         */
     static addUploadProgressListener(listener) {
         listeners[listener] = DeviceEventEmitter.addListener(uploadProgress,
             (message) => {
@@ -897,5 +897,5 @@ export default class JMessage {
         listeners[listener].remove();
         listeners[listener] = null;
     }
-    
+
 }
