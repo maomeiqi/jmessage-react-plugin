@@ -50,7 +50,8 @@ export default class Chat extends Component {
     this.updateLayout = this.updateLayout.bind(this);
     this.onTouchMsgList = this.onTouchMsgList.bind(this);
     this.conversation = this.props.navigation.state.params.conversation
-    Alert.alert("the conversation ",JSON.stringify(this.conversation))
+    console.log(JSON.stringify(this.conversation))
+    // Alert.alert("the conversation ",JSON.stringify(this.conversation))
     JMessage.getMyInfo((myInfo) => {
       this.myInfo = myInfo
     })
@@ -371,7 +372,7 @@ export default class Chat extends Component {
         onPullToRefresh={this.onPullToRefresh}
         avatarSize={{width:40,height:40}}
         sendBubbleTextSize={18}
-        sendBubbleTextColor={"000000"}
+        sendBubbleTextColor={"#000000"}
         sendBubblePadding={{left:10,top:10,right:10,bottom:10}}
         />
         <InputView style={this.state.inputViewLayout}

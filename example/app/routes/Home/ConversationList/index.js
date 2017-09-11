@@ -194,6 +194,7 @@ export default class ConversationList extends React.Component {
                 Alert.alert('conversaion', JSON.stringify(conv))
             }
             this.setState({})
+            Alert.alert('the item',JSON.stringify(item))
             this.props.navigation.navigate('Chat', {
                 conversation: item
             })

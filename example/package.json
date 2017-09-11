@@ -5,13 +5,10 @@
     "start": "node node_modules/react-native/local-cli/cli.js start"
   },
   "dependencies": {
-    "aurora-imui-react-native": "^0.4.12",
+    "aurora-imui-react-native": "^0.4.14",
     "jcore-react-native": "^1.1.8-beta",
-    "jmessage-react-plugin": "file:///Users/HuminiOS/Desktop/workproject/jmessage-react-plugin",
     "react": "16.0.0-alpha.12",
-    "react-native": "^0.41.0",
-    "react-native-dialog": "^1.0.7",
-    "react-native-svg": "^5.1.5",
+    "react-native": "^0.47.1",
     "react-navigation": "^1.0.0-beta.11"
   },
   "devDependencies": {
