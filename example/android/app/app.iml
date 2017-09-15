@@ -96,9 +96,10 @@
     <orderEntry type="jdk" jdkName="Android API 25 Platform (1)" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="okio-1.9.0" level="project" />
-    <orderEntry type="library" name="gson-2.3.1" level="project" />
+    <orderEntry type="library" name="chatinput-0.4.7" level="project" />
     <orderEntry type="library" name="imagepipeline-base-1.0.1" level="project" />
     <orderEntry type="library" name="textlayoutbuilder-1.0.0" level="project" />
+    <orderEntry type="library" name="gson-2.8.0" level="project" />
     <orderEntry type="library" name="jsr305-3.0.0" level="project" />
     <orderEntry type="library" name="transition-25.3.1" level="project" />
     <orderEntry type="library" name="design-25.3.1" level="project" />
@@ -114,12 +115,12 @@
     <orderEntry type="library" name="support-core-utils-25.3.1" level="project" />
     <orderEntry type="library" name="support-fragment-25.3.1" level="project" />
     <orderEntry type="library" name="fresco-1.0.1" level="project" />
-    <orderEntry type="library" name="messagelist-0.4.6" level="project" />
     <orderEntry type="library" name="jmessage-android_v2.2.1" level="project" />
-    <orderEntry type="library" name="chatinput-0.4.6-beta" level="project" />
     <orderEntry type="library" name="soloader-0.1.0" level="project" />
     <orderEntry type="library" name="imagepipeline-1.0.1" level="project" />
     <orderEntry type="library" name="javax.inject-1" level="project" />
+    <orderEntry type="library" name="eventbus-3.0.0" level="project" />
+    <orderEntry type="library" name="messagelist-0.4.8" level="project" />
     <orderEntry type="library" name="flexbox-0.2.5" level="project" />
     <orderEntry type="library" name="okhttp-ws-3.4.1" level="project" />
     <orderEntry type="library" name="support-v4-25.3.1" level="project" />

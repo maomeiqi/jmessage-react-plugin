@@ -134,6 +134,9 @@ export default class ConversationList extends React.Component {
                     }
                     item.conversationType = 'single'
                     item.displayName = conversation.target.nickname
+                    if (item.displayName == "") {
+                        item.displayName = conversation.target.username
+                    }
                 } else {
                     item = {
                         key: conversation.target.id
@@ -157,7 +160,7 @@ export default class ConversationList extends React.Component {
                 }
 
                 if (conversation.latestMessage.type === 'voice') {
-                    item.latestMessageString = '[语言]'
+                    item.latestMessageString = '[语音]'
                 }
 
                 if (conversation.latestMessage.type === 'file') {
