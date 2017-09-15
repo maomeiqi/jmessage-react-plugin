@@ -419,7 +419,7 @@ RCT_EXPORT_METHOD(sendTextMessage:(NSDictionary *)param
     if (param[@"extras"] && [param[@"extras"] isKindOfClass: [NSDictionary class]]) {
       NSDictionary *extras = param[@"extras"];
       for (NSString *key in extras.allKeys) {
-        [message updateMessageExtraValue: extras[key] forKey: key];
+        [message.content addStringExtra:extras[key] forKey:key];
       }
     }
     
@@ -446,7 +446,7 @@ RCT_EXPORT_METHOD(sendTextMessage:(NSDictionary *)param
     if (param[@"extras"] && [param[@"extras"] isKindOfClass: [NSDictionary class]]) {
       NSDictionary *extras = param[@"extras"];
       for (NSString *key in extras.allKeys) {
-        [message updateMessageExtraValue: extras[key] forKey: key];
+        [message.content addStringExtra:extras[key] forKey:key];
       }
     }
     
@@ -508,7 +508,7 @@ RCT_EXPORT_METHOD(sendImageMessage:(NSDictionary *)param
     if (param[@"extras"] && [param[@"extras"] isKindOfClass: [NSDictionary class]]) {
       NSDictionary *extras = param[@"extras"];
       for (NSString *key in extras.allKeys) {
-        [message updateMessageExtraValue: extras[key] forKey: key];
+        [message.content addStringExtra:extras[key] forKey:key];
       }
     }
     [JMSGConversation createSingleConversationWithUsername:param[@"username"]
@@ -540,7 +540,7 @@ RCT_EXPORT_METHOD(sendImageMessage:(NSDictionary *)param
     if (param[@"extras"] && [param[@"extras"] isKindOfClass: [NSDictionary class]]) {
       NSDictionary *extras = param[@"extras"];
       for (NSString *key in extras.allKeys) {
-        [message updateMessageExtraValue: extras[key] forKey: key];
+        [message.content addStringExtra:extras[key] forKey:key];
       }
     }
     self.SendMsgCallbackDic[message.msgId] = @[successCallback,failCallback];
@@ -605,7 +605,7 @@ RCT_EXPORT_METHOD(sendVoiceMessage:(NSDictionary *)param
     if (param[@"extras"] && [param[@"extras"] isKindOfClass: [NSDictionary class]]) {
       NSDictionary *extras = param[@"extras"];
       for (NSString *key in extras.allKeys) {
-        [message updateMessageExtraValue: extras[key] forKey: key];
+        [message.content addStringExtra:extras[key] forKey:key];
       }
     }
     [JMSGConversation createSingleConversationWithUsername:param[@"username"] appKey:appKey completionHandler:^(id resultObject, NSError *error) {
@@ -629,7 +629,7 @@ RCT_EXPORT_METHOD(sendVoiceMessage:(NSDictionary *)param
       if (param[@"extras"] && [param[@"extras"] isKindOfClass: [NSDictionary class]]) {
         NSDictionary *extras = param[@"extras"];
         for (NSString *key in extras.allKeys) {
-          [message updateMessageExtraValue: extras[key] forKey: key];
+          [message.content addStringExtra:extras[key] forKey:key];
         }
       }
       self.SendMsgCallbackDic[message.msgId] = @[successCallback, failCallback];
@@ -738,7 +738,7 @@ RCT_EXPORT_METHOD(sendLocationMessage:(NSDictionary *)param
     if (param[@"extras"] && [param[@"extras"] isKindOfClass: [NSDictionary class]]) {
       NSDictionary *extras = param[@"extras"];
       for (NSString *key in extras.allKeys) {
-        [message updateMessageExtraValue: extras[key] forKey: key];
+        [message.content addStringExtra:extras[key] forKey:key];
       }
     }
     [JMSGConversation createSingleConversationWithUsername:param[@"username"] appKey:appKey completionHandler:^(id resultObject, NSError *error) {
@@ -765,7 +765,7 @@ RCT_EXPORT_METHOD(sendLocationMessage:(NSDictionary *)param
       if (param[@"extras"] && [param[@"extras"] isKindOfClass: [NSDictionary class]]) {
         NSDictionary *extras = param[@"extras"];
         for (NSString *key in extras.allKeys) {
-          [message updateMessageExtraValue: extras[key] forKey: key];
+          [message.content addStringExtra:extras[key] forKey:key];
         }
       }
       
@@ -827,7 +827,7 @@ RCT_EXPORT_METHOD(sendFileMessage:(NSDictionary *)param
     if (param[@"extras"] && [param[@"extras"] isKindOfClass: [NSDictionary class]]) {
       NSDictionary *extras = param[@"extras"];
       for (NSString *key in extras.allKeys) {
-        [message updateMessageExtraValue: extras[key] forKey: key];
+        [message.content addStringExtra:extras[key] forKey:key];
       }
     }
     [JMSGConversation createSingleConversationWithUsername:param[@"username"] appKey:appKey completionHandler:^(id resultObject, NSError *error) {
@@ -857,7 +857,7 @@ RCT_EXPORT_METHOD(sendFileMessage:(NSDictionary *)param
       if (param[@"extras"] && [param[@"extras"] isKindOfClass: [NSDictionary class]]) {
         NSDictionary *extras = param[@"extras"];
         for (NSString *key in extras.allKeys) {
-          [message updateMessageExtraValue: extras[key] forKey: key];
+          [message.content addStringExtra:extras[key] forKey:key];
         }
       }
       
@@ -2334,7 +2334,7 @@ RCT_EXPORT_METHOD(createSendMessage:(NSDictionary *)param
         if (param[@"extras"] && [param[@"extras"] isKindOfClass: [NSDictionary class]]) {
           NSDictionary *extras = param[@"extras"];
           for (NSString *key in extras.allKeys) {
-            [message updateMessageExtraValue: extras[key] forKey: key];
+            [message.content addStringExtra:extras[key] forKey:key];
           }
         }
         callback(@[[message messageToDictionary]]);
