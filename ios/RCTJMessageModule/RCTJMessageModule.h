@@ -18,6 +18,7 @@
 
 
 #define receiveMsgEvent @"JMessage.ReceiveMsgEvent" // 接收到消息事件
+#define conversationChangeEvent @"JMessage.conversationChange" // 会话变更事件
 #define loginStateChangedEvent @"JMessage.LoginStateChanged" //
 #define clickMessageNotificationEvent @"JMessage.ClickMessageNotification" // 点击推送 Android Only
 #define syncOfflineMessageEvent @"JMessage.SyncOfflineMessage" // 同步离线消息事件

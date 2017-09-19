@@ -17,26 +17,9 @@ const {
     FlatList,
     Image,
     Modal,
-  } = ReactNative;
+} = ReactNative;
 
-  class MyListItem extends React.PureComponent {
 
-    _onPress = () => {
-      this.props.onPressItem(this.props.id);
-    };
-  
-    render() {
-      return (
-          <View>
-            <SomeOtherWidget
-                {...this.props}
-                onPress={this._onPress}
-            />
-          </View>)
-    }
-  }
-
-  
 const styles = StyleSheet.create({
     icon: {
         width: 26,
@@ -48,7 +31,7 @@ const styles = StyleSheet.create({
         height: 60,
     },
     conversationItem: {
-        flexDirection:'row',
+        flexDirection: 'row',
         margin: 10,
         alignItems: 'center',
     },
@@ -58,16 +41,16 @@ const styles = StyleSheet.create({
         marginRight: 10,
     },
 
-    modalView: {
-        flex: 1,
-        justifyContent: 'center',
+    modalView: {    
+        flex: 1,
+            justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
     modalContent: {
         width: 200,
         height: 150,
-        justifyContent: 'center',
+            justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#ffffff',
     },
@@ -76,7 +59,7 @@ const styles = StyleSheet.create({
     }
 });
 
-  var count = 0
+var count = 0
 
 //   headerRight: <Button 
 //   title="创建会话" 
@@ -87,31 +70,42 @@ const styles = StyleSheet.create({
 //       }}
 //   />,
 
-  export default class ConversationList extends React.Component {
-    static navigationOptions = ( {navigation} ) => {
-        const { params = {} } = navigation.state;
+export default class ConversationList extends React.Component {
+    static navigationOptions = ({
+        navigation
+    }) => {
+        const {
+            params = {}
+        } = navigation.state;
         return {
-            headerRight:
-                <Button title="创建会话" onPress={() => { params.createConversation() }} />,
+            headerRight: <Button title="创建会话" onPress={() => { params.createConversation() }} />,
             title: "会话",
             tabBarLabel: '会话',
-            tabBarIcon: ({ tintColor }) => (
-              <Image
+            tabBarIcon: ({
+                tintColor
+            }) => (
+                <Image
                 source={require('../../../resource/chat-icon.png')}
                 style={[styles.icon, {tintColor: tintColor}]}
               />
             ),
-          }
+        }
     };
 
     _onCreateConversation() {
-        this.setState({isShowModal: true})
+        this.setState({
+            isShowModal: true
+        })
     }
 
     constructor(props) {
         super(props);
         this.state = {
-            data: [{key:'a'}, {key:'b'}],
+            data: [{
+                key: 'a'
+            }, {
+                key: 'b'
+            }],
             modalText: "",
             isShowModal: false,
         }
@@ -119,80 +113,134 @@ const styles = StyleSheet.create({
     }
 
     componentDidMount() {
-        this.props.navigation.setParams({ createConversation: this._onCreateConversation });
-      }
+        this.props.navigation.setParams({
+            createConversation: this._onCreateConversation
+        });
+    }
     componentWillMount() {
-        JMessage.getConversations((result) => {   
-            
-            var data  = result.map((conversation, index) => 
-                            {
-                                var item = {}
-                                item.key = index
-                                item.conversation = conversation
-                                if (conversation.conversationType === 'single') {
-                                     item = {key: conversation.target.username}
-                                     item.conversationType = 'single'
-                                     item.displayName = conversation.target.nickname
-                                } else {
-                                    item = {key: conversation.target.id}
-                                    item.conversationType = 'group'
-                                    item.displayName = conversation.target.name
-                                }
+        this.reloadConversationList()
+    }
 
-                                if (conversation.latestMessage === undefined) {
-                                    item.latestMessageString = ""
-                                    return item
-                                }
+    reloadConversationList() {
+        JMessage.getConversations((result) => {
 
-                                item.conversationType = conversation.conversationType
-                                if (conversation.latestMessage.type === 'text') {    
-                                    item.latestMessageString = conversation.latestMessage.text 
-                                }
+            var data = result.map((conversation, index) => {
+                var item = {}
+                item.key = index
+                item.conversation = conversation
+                if (conversation.conversationType === 'single') {
+                    item = {
+                        key: conversation.target.username
+                    }
+                    item.conversationType = 'single'
+                    item.displayName = conversation.target.nickname
+                    if (item.displayName == "") {
+                        item.displayName = conversation.target.username
+                    }
+                } else {
+                    item = {
+                        key: conversation.target.id
+                    }
+                    item.conversationType = 'group'
+                    item.displayName = conversation.target.name
+                }
 
-                                if (conversation.latestMessage.type === 'image') {    
-                                    item.latestMessageString = '[图片]' 
-                                }
+                if (conversation.latestMessage === undefined) {
+                    item.latestMessageString = ""
+                    return item
+                }
 
-                                if (conversation.latestMessage.type === 'voice') {    
-                                    item.latestMessageString = '[语言]' 
-                                }
+                item.conversationType = conversation.conversationType
+                if (conversation.latestMessage.type === 'text') {
+                    item.latestMessageString = conversation.latestMessage.text
+                }
 
-                                if (conversation.latestMessage.type === 'file') {    
-                                    item.latestMessageString = '[文件]' 
-                                }
+                if (conversation.latestMessage.type === 'image') {
+                    item.latestMessageString = '[图片]'
+                }
 
-                                return item
-                            })
-            this.setState({data: data})
+                if (conversation.latestMessage.type === 'voice') {
+                    item.latestMessageString = '[语音]'
+                }
+
+                if (conversation.latestMessage.type === 'file') {
+                    item.latestMessageString = '[文件]'
+                }
+
+                return item
+            })
+            this.setState({
+                data: data
+            })
         }, (error) => {
             Alert.alert(JSON.stringify(error))
-        })    
+        })
     }
 
     _onPress() {
-        Alert.alert("click","fasdf")
-        JMessage.createConversation({type: 'single', username: '0002'}, (conv) => {
+        Alert.alert("click", "fasdf")
+        JMessage.createConversation({
+            type: 'single',
+            username: '0002'
+        }, (conv) => {
             var item
             if (conv.conversationType === 'single') {
-                 item = {key: conv.target.username}
-                 item.conversationType = 'single'
+                item = {
+                    key: conv.target.username
+                }
+                item.conversationType = 'single'
             } else {
-                item = {key: conv.target.id}
+                item = {
+                    key: conv.target.id
+                }
                 item.conversationType = 'group'
                 Alert.alert('conversaion', JSON.stringify(conv))
             }
             this.setState({})
-            this.props.navigation.navigate('Chat', {conversation: item})
+            Alert.alert('the item',JSON.stringify(item))
+            this.props.navigation.navigate('Chat', {
+                conversation: item
+            })
         }, (error) => {
             Alert.alert('error', JSON.stringify(error))
         })
     }
 
+    enterConversation(params) {
+        JMessage.createConversation(params, (conv) => {
+            var item = {}
+
+            if (conv.conversationType === 'single') {
+                item = {
+                    key: conv.target.username
+                }
+                item.conversationType = 'single'
+            } else {
+                item = {
+                    key: conv.target.id
+                }
+                item.conversationType = 'group'
+                Alert.alert('conversaion', JSON.stringify(conv))
+            }
+            this.reloadConversationList()
+            this.props.navigation.navigate('Chat', {
+                conversation: item
+            })
+        }, (error) => {
+            Alert.alert('create conversation error !', JSON.stringify(error))
+        })
+    }
+
     render() {
-        this.listView = <FlatList
-        data = { this.state.data }
-        renderItem = { ({item}) => (
-            <View>
+        this.listView = < FlatList
+        data = {
+            this.state.data
+        }
+        renderItem = {
+                ({
+                    item
+                }) => (
+                    <View>
                 <TouchableHighlight
                     style={[styles.conversationContent]}
                     underlayColor = '#dddddd'
@@ -209,17 +257,15 @@ const styles = StyleSheet.create({
                             <Text>{ item.latestMessageString }</Text>
                         </View>
                     </View>
-                    
-                    
                 </TouchableHighlight>
                 </View>
-            ) }
-        >
-        
-    </FlatList>
+                )
+            } >
+
+            < /FlatList>
         return (
 
-        <View>
+            <View>
             <Modal
                 transparent={true}
                 visible={ this.state.isShowModal }>
@@ -237,63 +283,36 @@ const styles = StyleSheet.create({
                                 params.type = 'single'
                                 params.username = this.state.modalText
                                 this.setState({isShowModal: false})
-                                JMessage.createConversation(params, (conv) => {
-                                        var item = {}
-
-                                        if (conv.conversationType === 'single') {
-                                            item = {key: conv.target.username}
-                                            item.conversationType = 'single'
-                                        } else {
-                                            item = {key: conv.target.id}
-                                            item.conversationType = 'group'
-                                            Alert.alert('conversaion', JSON.stringify(conv))
-                                        }
-                                        
-                                        this.props.navigation.navigate('Chat', {conversation: item})
-                                    }, (error) => {
-                                        Alert.alert('error !', JSON.stringify(error))    
-                                    })
+                                this.enterConversation(params)
                             } }
                             style={styles.modalButton}
-                            title='创建单聊'>
-                        </Button>
+                            title='创建单聊'/>
                         <Button
                             onPress={ () => {
 
                                 JMessage.createGroup({name: this.state.modalText,desc: ""}, (group) => {
                                     var params = {}
-                                    params.type = 'single'
+                                    params.type = 'group'
                                     params.groupId = group.id
                                     this.setState({isShowModal: false})
-                                    JMessage.createConversation(params, (conv) => {
-                                        var item = {}
-
-                                        if (conv.conversationType === 'single') {
-                                            item = {key: conv.target.username}
-                                            item.conversationType = 'single'
-                                        } else {
-                                            item = {key: conv.target.id}
-                                            item.conversationType = 'group'
-                                            Alert.alert('conversaion', JSON.stringify(conv))
-                                        }
-                                        this.props.navigation.navigate('Chat', {conversation: item})
-                                    }, (error) => {
-                                        Alert.alert('error !', JSON.stringify(error))    
-                                    })
+                                    this.enterConversation(params)
                                 }, (error) => {
-                                    Alert.alert('error !', JSON.stringify(error))
+                                    Alert.alert('create group error !', JSON.stringify(error))
                                 })
                                 
                             } }
                             style={styles.modalButton}
-                            title='创建群聊'>
+                            title='创建群聊'/>
                             
-                        </Button>
+                        <Button
+                            onPress = { () => { this.setState({isShowModal: false}) }}
+                            style={styles.modalButton}
+                            title='离开'/>
                     </View>
                     
                 </View>
             </Modal>
             { this.listView }
         </View>)
-  }
+    }
 }

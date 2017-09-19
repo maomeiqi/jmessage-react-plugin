@@ -104,7 +104,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void init(ReadableMap map) {
+    public void setup(ReadableMap map) {
         try {
             boolean isOpenMessageRoaming = map.getBoolean(Constant.IS_OPEN_MESSAGE_ROAMING);
             JMessageClient.init(getReactApplicationContext(), isOpenMessageRoaming);
@@ -1161,6 +1161,34 @@ public class JMessageModule extends ReactContextBaseJavaModule {
             } else {
                 mJMessageUtils.handleError(fail, ERR_CODE_CONVERSATION, ERR_MSG_CONVERSATION);
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            mJMessageUtils.handleError(fail, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);
+        }
+    }
+
+    @ReactMethod
+    public void downloadThumbUserAvatar(ReadableMap map, final Callback success, final Callback fail) {
+        try {
+            final String username = map.getString(Constant.USERNAME);
+            final String appKey = map.hasKey(Constant.APP_KEY) ? map.getString(Constant.APP_KEY) : "";
+            JMessageClient.getUserInfo(username, appKey, new GetUserInfoCallback() {
+                @Override
+                public void gotResult(int status, String desc, UserInfo userInfo) {
+                    if (status == 0) {
+                        if (userInfo.getAvatar() != null) {
+                            File file = userInfo.getAvatarFile();
+                            WritableMap result = Arguments.createMap();
+                            result.putString(Constant.USERNAME, username);
+                            result.putString(Constant.APP_KEY, appKey);
+                            result.putString(Constant.FILE_PATH, file.getAbsolutePath());
+                            mJMessageUtils.handleCallbackWithObject(status, desc, success, fail, result);
+                        }
+                    } else {
+                        mJMessageUtils.handleError(fail, status, desc);
+                    }
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
             mJMessageUtils.handleError(fail, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);

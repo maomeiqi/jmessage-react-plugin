@@ -1,7 +1,4 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- */
+
 'use strict';
 import React from 'react';
 import {
@@ -15,14 +12,12 @@ import LaunchPage from './app/routes/Launch/index.js';
 import HomePage from './app/routes/Home/index.js';
 import LoginPage from './app/routes/Login/index.js';
 import ChatPage from './app/routes/Chat/index.js';
-// import ConversationListPage from './app/routes/ConversationList/index.js';
-
-// import mainPage from './app/routes/UserInfo/index.js'
+import UpdateMyInfoPage from './app/routes/UpdateMyInfo/index.js';
+import GroupsPage from './app/routes/Groups/index.js';
+import FriendInfoPage from './app/routes/FriendInfo/index.js';
 
 import CardStackStyleInterpolator from 'react-navigation/src/views/CardStackStyleInterpolator';
-// ConversationList: {screen: ConversationListPage},
-// ,
-// MainPage: {screen: mainPage}
+
 const ReactJChat = StackNavigator({
 	Launch: { screen: LaunchPage },
 	Home: {
@@ -43,6 +38,19 @@ const ReactJChat = StackNavigator({
     type: 'Reset',
     screen: ChatPage,
     path: 'people/:conversation'
+  },
+  UpdataMyInfo: {
+    type: 'Reset',
+    screen: UpdateMyInfoPage,
+  },
+  Groups: {
+    type: 'Reset',
+    screen: GroupsPage,
+  },
+  FriendInfo: {
+    type: 'Reset',
+    screen: FriendInfoPage,
+    path: 'people/:user'
   }
 });
 

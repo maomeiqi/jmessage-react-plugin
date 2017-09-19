@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.facebook.react.ReactApplication;
 
+import cn.jiguang.imui.messagelist.ReactIMUIPackage;
 import cn.jpush.im.android.api.JMessageClient;
 import io.jchat.android.JMessageReactPackage;
 
@@ -12,8 +13,6 @@ import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
-import com.honaf.dialog.MyDialogPackage;
-import com.horcrux.svg.SvgPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -33,8 +32,7 @@ public class MainApplication extends Application implements ReactApplication {
             return Arrays.<ReactPackage>asList(
                     new MainReactPackage(),
                     new JMessageReactPackage(SHUTDOWN_TOAST),
-                    new MyDialogPackage(),
-                    new SvgPackage()
+                    new ReactIMUIPackage()
             );
         }
     };

@@ -15,6 +15,7 @@ const syncRoamingMessage = "JMessage.SyncRoamingMessage" // 同步漫游消息�
 const messageRetract = "JMessage.MessageRetract" // 消息撤回事件
 const contactNotify = "JMessage.ContactNotify" // 收到好友请求消息事件
 const uploadProgress = "JMessage.UploadProgress" // 收到好友请求消息事件
+const conversationChange = "JMessage.conversationChange" // 会话变更事件
 
 export default class JMessage {
 
@@ -154,7 +155,7 @@ export default class JMessage {
 
     /**
      * @param {object} params = {
-     *  'id': Number,                                  // message id
+     *  'id': String,                                  // message id
      *  'type': String,                                // 'single' / 'group'
      *  'groupId': String,                             // 当 type = group 时，groupId 不能为空
      *  'username': String,                            // 当 type = single 时，username 不能为空
@@ -544,6 +545,17 @@ export default class JMessage {
     }
 
     /**
+     * 下载用户头像缩略图，如果已经下载，不会重复下载。
+     *
+     * @param {object} params = {'username': String, 'appKey': String}
+     * @param {function} success = function ({'username': String, 'appKey': String, 'filePath': String}) {}
+     * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+     */
+    static downloadThumbUserAvatar(params, success, error) {
+        JMessageModule.downloadThumbUserAvatar(params, success, error)
+    }
+
+    /**
      * 下载用户头像原图，如果已经下载，不会重复下载。
      *
      * @param {object} params = {'username': String, 'appKey': String}
@@ -858,20 +870,20 @@ export default class JMessage {
     }
 
     static removeMessageRetractListener(listener) {
-        if (!listeners[listener]) {
-            return;
+            if (!listeners[listener]) {
+                return;
+            }
+            listeners[listener].remove();
+            listeners[listener] = null;
         }
-        listeners[listener].remove();
-        listeners[listener] = null;
-    }
-    /**
-     * 
-     * @param {function} listener  = function (result) {}
-     * result = {
-     *  messageId = String, // 消息 Id
-     *  progress = Float // 消息文件上传的进度
-     * }
-     */
+        /**
+         * 
+         * @param {function} listener  = function (result) {}
+         * result = {
+         *  messageId = String, // 消息 Id
+         *  progress = Float // 消息文件上传的进度
+         * }
+         */
     static addUploadProgressListener(listener) {
         listeners[listener] = DeviceEventEmitter.addListener(uploadProgress,
             (message) => {
@@ -886,5 +898,4 @@ export default class JMessage {
         listeners[listener].remove();
         listeners[listener] = null;
     }
-    
 }

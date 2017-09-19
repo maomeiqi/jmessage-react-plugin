@@ -59,7 +59,7 @@ public class ResultUtils {
 
     public static WritableMap toJSObject(final UserInfo userInfo) {
         if (userInfo == null) {
-            return null;
+            return Arguments.createMap();
         }
         final WritableMap result = Arguments.createMap();
         result.putString("type", "user");
@@ -109,7 +109,7 @@ public class ResultUtils {
     public static WritableMap toJSObject(Message msg) {
         WritableMap result = Arguments.createMap();
         try {
-            result.putInt("id", msg.getId());
+            result.putString("id", String.valueOf(msg.getId()));
             result.putMap("from", toJSObject(msg.getFromUser()));
 
             if (msg.getDirect() == MessageDirect.send) {
@@ -127,8 +127,6 @@ public class ResultUtils {
             MessageContent content = msg.getContent();
             if (content.getStringExtras() != null) {
                 result.putMap("extras", toJSObject(content.getStringExtras()));
-            } else {
-                result.putNull("extras");
             }
 
             result.putDouble("createTime", msg.getCreateTime());
@@ -195,13 +193,11 @@ public class ResultUtils {
 
         try {
             map.putString("title", conversation.getTitle());
-            map.putString("conversationType", conversation.getType().getLabel());
+            map.putString("conversationType", conversation.getType().name());
             map.putInt("unreadCount", conversation.getUnReadMsgCnt());
 
             if (conversation.getLatestMessage() != null) {
                 map.putMap("latestMessage", toJSObject(conversation.getLatestMessage()));
-            } else {
-                map.putNull("latestMessage");
             }
 
             if (conversation.getType() == ConversationType.single) {
