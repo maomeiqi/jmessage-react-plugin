@@ -48,6 +48,7 @@ export default class Chat extends Component {
       inputViewLayout: {width:window.width, height:100,},
       menuContainerHeight: 1000,
       isDismissMenuContainer: false,
+      shouldExpandMenuContainer: false,
     };
     
     this.updateLayout = this.updateLayout.bind(this);
@@ -208,12 +209,17 @@ export default class Chat extends Component {
           width: Dimensions.get('window').width,
           height: 100
         },
+        shouldExpandMenuContainer: false,
       });
     }
 
-  onTouchEditText() {
+  onTouchEditText = () => {
     console.log("scroll to bottom")
     AuroraIController.scrollToBottom(true);
+    if (this.state.shouldExpandMenuContainer) {
+      this.setState({inputViewLayout: {width:window.width, height:420,}})
+    }
+    
   }
 
   onMsgClick = (message) => {
@@ -366,7 +372,15 @@ export default class Chat extends Component {
   }
 
   onSwitchToCameraMode = () => {
-    this.updateLayout({width:window.width, height:420,})
+    if (Platform.OS == "android") {
+      this.updateLayout({width:window.width, height: 480})
+      this.setState({
+        shouldExpandMenuContainer: true
+      })
+    } else {
+      this.updateLayout({width:window.width, height:420,})
+    }
+    
   }
 
   onShowKeyboard = (keyboard_height) => {
