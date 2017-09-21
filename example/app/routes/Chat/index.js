@@ -222,6 +222,18 @@ export default class Chat extends Component {
     
   }
 
+  onFullScreen = () => {
+    this.setState({
+      inputViewLayout: {width: window.width, height:window.height}
+    })
+  }
+
+  onRecoverScreen = () => {
+    this.setState({
+      inputViewLayout: {width: window.width, height: 480}
+    })
+  }
+
   onMsgClick = (message) => {
       console.log(message)
     }
@@ -364,7 +376,7 @@ export default class Chat extends Component {
   }
 
   onSwitchToMicrophoneMode = () => {
-    this.updateLayout({width:window.width, height:420,})
+    this.updateLayout({width:window.width, height:480,})
   }
 
   onSwitchToGalleryMode = () => {
@@ -427,6 +439,8 @@ export default class Chat extends Component {
         onSwitchToCameraMode={this.onSwitchToCameraMode}
         onShowKeyboard={this.onShowKeyboard}
         onTouchEditText={this.onTouchEditText}
+        onFullScreen={this.onFullScreen}
+        onRecoverScreen={this.onRecoverScreen}
         />
       </View>
     );
