@@ -45,7 +45,7 @@ export default class Chat extends Component {
   constructor(props) {
     super(props);
     this.state = { 
-      inputViewLayout: {width:window.width, height:100,},
+      inputViewLayout: {width:window.width, height:86,},
       menuContainerHeight: 1000,
       isDismissMenuContainer: false,
       shouldExpandMenuContainer: false,
@@ -190,7 +190,10 @@ export default class Chat extends Component {
   componentWillUnmount() {
     JMessage.removeReceiveMessageListener(this.receiveMessageCallBack)
     AuroraIController.removeMessageListDidLoadListener(this.messageListDidLoadCallback)
-    UIManager.dispatchViewManagerCommand(findNodeHandle(this.refs["MessageList"]), 1, null)
+    if (Platform.OS === 'android') {
+      UIManager.dispatchViewManagerCommand(findNodeHandle(this.refs["MessageList"]), 1, null)  
+    }
+    
   }
 
   updateLayout(layout) {
@@ -376,21 +379,21 @@ export default class Chat extends Component {
   }
 
   onSwitchToMicrophoneMode = () => {
-    this.updateLayout({width:window.width, height:480,})
+    this.updateLayout({width:window.width, height:338,})
   }
 
   onSwitchToGalleryMode = () => {
-    this.updateLayout({width:window.width, height:420,})
+    this.updateLayout({width:window.width, height:338,})
   }
 
   onSwitchToCameraMode = () => {
     if (Platform.OS == "android") {
-      this.updateLayout({width:window.width, height: 480})
+      this.updateLayout({width:window.width, height: 338})
       this.setState({
         shouldExpandMenuContainer: true
       })
     } else {
-      this.updateLayout({width:window.width, height:420,})
+      this.updateLayout({width:window.width, height:338,})
     }
     
   }
