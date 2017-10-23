@@ -225,6 +225,24 @@ public class JMessageModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void updateMyAvatar(ReadableMap map, final Callback success, final Callback fail) {
+        try {
+            String path = map.getString("imgPath");
+            File file = new File(path);
+            if (file.exists() && file.isFile()) {
+                JMessageClient.updateUserAvatar(file, new BasicCallback() {
+                    @Override
+                    public void gotResult(int status, String desc) {
+                        mJMessageUtils.handleCallback(status, desc, success, fail);
+                    }
+                });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @ReactMethod
     public void updateMyInfo(ReadableMap map, final Callback success, final Callback fail) {
         UserInfo myInfo = JMessageClient.getMyInfo();
         if (map.hasKey(Constant.NICKNAME)) {

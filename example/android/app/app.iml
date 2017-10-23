@@ -95,10 +95,12 @@
     <orderEntry type="jdk" jdkName="Android API 25 Platform (1)" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="okio-1.9.0" level="project" />
-    <orderEntry type="library" name="chatinput-0.4.8" level="project" />
     <orderEntry type="library" name="imagepipeline-base-1.0.1" level="project" />
+    <orderEntry type="library" name="chatinput-0.4.9" level="project" />
+    <orderEntry type="library" name="XhsEmoticonsKeyboard-2.0.4" level="project" />
     <orderEntry type="library" name="textlayoutbuilder-1.0.0" level="project" />
     <orderEntry type="library" name="gson-2.8.0" level="project" />
+    <orderEntry type="library" name="AndroidEmoji-1.0.0" level="project" />
     <orderEntry type="library" name="jsr305-3.0.0" level="project" />
     <orderEntry type="library" name="transition-25.3.1" level="project" />
     <orderEntry type="library" name="design-25.3.1" level="project" />
