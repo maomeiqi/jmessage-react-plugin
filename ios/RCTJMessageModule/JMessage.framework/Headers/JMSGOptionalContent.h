@@ -14,7 +14,10 @@
 
 @class JMSGCustomNotification;
 
-/// 发送消息的可选功能
+/*!
+ * @abstract 发送消息的可选功能
+ *
+ */
 @interface JMSGOptionalContent : NSObject
 
 /*!
@@ -28,7 +31,15 @@
 @property(nonatomic, assign) BOOL noSaveNotification;
 
 /*!
+ * @abstract 设置这条消息的发送是否需要对方发送已读回执，NO，默认值
+ */
+@property(nonatomic, assign) BOOL needReadReceipt;
+
+
+/*!
  * @abstract 自定义消息通知栏的内容
+ *
+ * @discussion 这个属性可以具体参考 JMSGCustomNotification 类
  */
 @property(nonatomic, strong) JMSGCustomNotification *customNotification;
 
