@@ -116,6 +116,7 @@ export default class ConversationList extends React.Component {
         this.props.navigation.setParams({
             createConversation: this._onCreateConversation
         });
+        
     }
     componentWillMount() {
         this.reloadConversationList()

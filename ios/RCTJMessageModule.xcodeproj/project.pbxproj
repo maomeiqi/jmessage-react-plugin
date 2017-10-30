@@ -239,6 +239,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/RCTJMessageModule",
 				);
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../react-native/React/**";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -253,6 +254,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/RCTJMessageModule",
 				);
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../react-native/React/**";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

@@ -212,6 +212,10 @@ typedef NS_ENUM(NSInteger, JMSGEventNotificationType) {
   
   /// 事件类型: 消息撤回
   kJMSGEventNotificationMessageRetract = 55,
+  /// 事件类型: 消息透传
+  kJMSGEventNotificationMessageTransparent = 58,
+  /// 事件类型: 消息回执变更
+  kJMSGEventNotificationMessageReceiptStatusChange = 68,
 
   // 消息事件
   /// 事件类型: 群组被创建
@@ -314,6 +318,8 @@ typedef NS_ENUM(NSInteger, JMSGSDKErrorCode) {
   kJMSGErrorSDKMediaHashCodeIllegal = 864006,
   /// 媒体HASH校验失败
   kJMSGErrorSDKMediaHashVerifyFailed = 864007,
+  /// 这条消息不支持转发
+  kJMSGErrorSDKMessageNotSupportForward = 864008,
   
   // ------------------------ Message (865xxx)
 
@@ -413,6 +419,8 @@ typedef NS_ENUM(NSUInteger, JMSGTcpErrorCode) {
   kJMSGErrorTcpUserNotRegistered = 801003,
   /// 用户密码错误
   kJMSGErrorTcpUserPasswordError = 801004,
+  /// 多通道同时登录错误，登录失败
+  kJMSGErrorTcpLoginMultiChannelError = 801007,
   /// 目标用户不存在
   kJMSGErrorTcpTargetUserNotExist = 803003,
   /// 目标群组不存在
@@ -455,14 +463,6 @@ static NSString *const KEY_REGION = @"region";      //区域
 static NSString *const KEY_SIGNATURE = @"signature";//签名
 static NSString *const KEY_ADDRESS = @"address";    //地址
 static NSString *const KEY_STAR = @"star";
-static NSString *const KEY_UID = @"uid";
-static NSString *const KEY_NO_DISTURB = @"no_disturb";
-static NSString *const KEY_BLACKLIST = @"blicklist";
-static NSString *const KEY_NOTE_NAME = @"memo_name";//note_name
-static NSString *const KEY_NOTE_TEXT = @"memo_others";//note_text
-static NSString *const KEY_SHIELD_GROUP = @"shield_group";
-static NSString *const KEY_USER_MTIME = @"mtime";
-static NSString *const KEY_USER_CTIME = @"ctime";
 
 
 

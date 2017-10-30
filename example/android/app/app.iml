@@ -76,7 +76,6 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/blame" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/check-manifest" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/classes" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/classes-jar" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/javaPrecompile" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/jniLibs" />
@@ -96,10 +95,12 @@
     <orderEntry type="jdk" jdkName="Android API 25 Platform (1)" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="okio-1.9.0" level="project" />
-    <orderEntry type="library" name="chatinput-0.4.7" level="project" />
     <orderEntry type="library" name="imagepipeline-base-1.0.1" level="project" />
+    <orderEntry type="library" name="chatinput-0.4.9" level="project" />
+    <orderEntry type="library" name="XhsEmoticonsKeyboard-2.0.4" level="project" />
     <orderEntry type="library" name="textlayoutbuilder-1.0.0" level="project" />
     <orderEntry type="library" name="gson-2.8.0" level="project" />
+    <orderEntry type="library" name="AndroidEmoji-1.0.0" level="project" />
     <orderEntry type="library" name="jsr305-3.0.0" level="project" />
     <orderEntry type="library" name="transition-25.3.1" level="project" />
     <orderEntry type="library" name="design-25.3.1" level="project" />

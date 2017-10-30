@@ -45,9 +45,10 @@ export default class Chat extends Component {
   constructor(props) {
     super(props);
     this.state = { 
-      inputViewLayout: {width:window.width, height:100,},
+      inputViewLayout: {width:window.width, height:86,},
       menuContainerHeight: 1000,
       isDismissMenuContainer: false,
+      shouldExpandMenuContainer: false,
     };
     
     this.updateLayout = this.updateLayout.bind(this);
@@ -189,7 +190,10 @@ export default class Chat extends Component {
   componentWillUnmount() {
     JMessage.removeReceiveMessageListener(this.receiveMessageCallBack)
     AuroraIController.removeMessageListDidLoadListener(this.messageListDidLoadCallback)
-    UIManager.dispatchViewManagerCommand(findNodeHandle(this.refs["MessageList"]), 1, null)
+    if (Platform.OS === 'android') {
+      UIManager.dispatchViewManagerCommand(findNodeHandle(this.refs["MessageList"]), 1, null)  
+    }
+    
   }
 
   updateLayout(layout) {
@@ -208,12 +212,29 @@ export default class Chat extends Component {
           width: Dimensions.get('window').width,
           height: 100
         },
+        shouldExpandMenuContainer: false,
       });
     }
 
-  onTouchEditText() {
+  onTouchEditText = () => {
     console.log("scroll to bottom")
     AuroraIController.scrollToBottom(true);
+    if (this.state.shouldExpandMenuContainer) {
+      this.setState({inputViewLayout: {width:window.width, height:420,}})
+    }
+    
+  }
+
+  onFullScreen = () => {
+    this.setState({
+      inputViewLayout: {width: window.width, height:window.height}
+    })
+  }
+
+  onRecoverScreen = () => {
+    this.setState({
+      inputViewLayout: {width: window.width, height: 480}
+    })
   }
 
   onMsgClick = (message) => {
@@ -358,15 +379,23 @@ export default class Chat extends Component {
   }
 
   onSwitchToMicrophoneMode = () => {
-    this.updateLayout({width:window.width, height:420,})
+    this.updateLayout({width:window.width, height:338,})
   }
 
   onSwitchToGalleryMode = () => {
-    this.updateLayout({width:window.width, height:420,})
+    this.updateLayout({width:window.width, height:338,})
   }
 
   onSwitchToCameraMode = () => {
-    this.updateLayout({width:window.width, height:420,})
+    if (Platform.OS == "android") {
+      this.updateLayout({width:window.width, height: 338})
+      this.setState({
+        shouldExpandMenuContainer: true
+      })
+    } else {
+      this.updateLayout({width:window.width, height:338,})
+    }
+    
   }
 
   onShowKeyboard = (keyboard_height) => {
@@ -413,6 +442,8 @@ export default class Chat extends Component {
         onSwitchToCameraMode={this.onSwitchToCameraMode}
         onShowKeyboard={this.onShowKeyboard}
         onTouchEditText={this.onTouchEditText}
+        onFullScreen={this.onFullScreen}
+        onRecoverScreen={this.onRecoverScreen}
         />
       </View>
     );
