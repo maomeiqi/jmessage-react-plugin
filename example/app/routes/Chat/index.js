@@ -35,7 +35,6 @@ import Translations from '../../resource/Translations'
 
 var themsgid = 1
 
-
 export default class Chat extends Component {
 
   static navigationOptions = {
@@ -68,7 +67,6 @@ export default class Chat extends Component {
     
     if (jmessage.type === 'text') {    
       auroraMsg.text = jmessage.text
-      // auroraMsg.text = "jmessage.text"
     }
   
     if (jmessage.type === 'image') {    
@@ -79,7 +77,13 @@ export default class Chat extends Component {
       auroraMsg.mediaPath = jmessage.path
       auroraMsg.duration = jmessage.duration
     }
-  
+
+    if (jmessage.type === 'file') {    
+      auroraMsg.mediaPath = jmessage.path
+      auroraMsg.duration = jmessage.duration
+      auroraMsg.msgType = "video"
+    }
+
     var user = {
         userId: "1",
         displayName: "",
@@ -96,7 +100,7 @@ export default class Chat extends Component {
     }
     auroraMsg.fromUser = user
     console.log("from user: " + JSON.stringify(auroraMsg.fromUser))
-    auroraMsg.status = "send_going"
+    auroraMsg.status = "send_succeed"
 
     auroraMsg.isOutgoing = true
 
@@ -125,14 +129,12 @@ export default class Chat extends Component {
   }
 
   componentDidMount() {  
-    // Alert.alert(this.props.navigation.state.params.key)
-
     var parames = {
 
       'from': 0,            // 开始的消息下标。
       'limit': 10            // 要获取的消息数。比如当 from = 0, limit = 10 时，是获取第 0 - 9 条历史消息。
      }
-    //  Alert.alert('conversation', this.conversation)
+    
      if (this.conversation.conversationType === 'single') {
       parames.type = 'single'
       parames.username = this.conversation.key
@@ -143,7 +145,6 @@ export default class Chat extends Component {
      this.messageListDidLoadCallback = () => {
 
         JMessage.getHistoryMessages(parames, (messages) => {
-          
           var auroraMessages = messages.map((message) => {
             var normalMessage = this.convertJMessageToAuroraMsg(message)
             if (normalMessage.msgType === "unknow") {
@@ -155,7 +156,6 @@ export default class Chat extends Component {
             AuroraIController.insertMessagesToTop(auroraMessages)
           } else {
             AuroraIController.insertMessagesToTop(auroraMessages)
-            // AuroraIController.scrollToBottom(true)
           }
         }, (error) => {
           Alert.alert('error!', JSON.stringify(error))
@@ -171,7 +171,6 @@ export default class Chat extends Component {
               }
               Alert.alert('message.target.username', message.target.username)
               Alert.alert('this.conversation.key', this.conversation.key)
-              // Alert.alert("1111:", JSON.stringify(message)) 
             }
           } else {
             if (message.target.type === 'group') {
@@ -210,7 +209,7 @@ export default class Chat extends Component {
         isDismissMenuContainer: true,
         inputViewLayout: {
           width: Dimensions.get('window').width,
-          height: 100
+          height: 86
         },
         shouldExpandMenuContainer: false,
       });
@@ -260,58 +259,58 @@ export default class Chat extends Component {
   onSendText = (text) => {
 
     var message = this.getNormalMessage()
-    
     message.text = text
-    JMessage.sendTextMessage(message, (message) => {
-      var auroraMsg = this.convertJMessageToAuroraMsg(message)
+    message.messageType = "text"
+  
+    JMessage.createSendMessage(message, (msg) => {
+      var auroraMsg = this.convertJMessageToAuroraMsg(msg)
+      auroraMsg.status = 'send_going'
       AuroraIController.appendMessages([auroraMsg])
       AuroraIController.scrollToBottom(true)
-    }, (error) => {
-      Alert.alert(JSON.stringify(error))
+      
+      if (this.conversation.conversationType === 'single') {
+        msg.type = 'single'
+        msg.username = this.conversation.key
+      } else {
+        msg.type = 'group'
+        msg.groupId = this.conversation.key
+      }
+
+      JMessage.sendMessage(msg, (jmessage) => {
+        
+        var auroraMsg = this.convertJMessageToAuroraMsg(jmessage)
+        AuroraIController.updateMessage(auroraMsg)
+      }, (error) => {
+      })
     })
   }
 
   onTakePicture = (mediaPath) => {
-    var message = this.getNormalMessage()
-    message.path = mediaPath
-    message.messageType = "image"
-    JMessage.createSendMessage(message, (message) => {
-      Alert.alert("the message:", JSON.stringify(message))
-      // {
-      //   *  'id': Number,                                  // message id
-      //   *  'type': String,                                // 'single' / 'group'
-      //   *  'groupId': String,                             // 当 type = group 时，groupId 不能为空
-      //   *  'username': String,                            // 当 type = single 时，username 不能为空
-      //   *  'appKey': String,                              // 当 type = single 时，用于指定对象所属应用的 appKey。如果为空，默认为当前应用。
-      //   *  'messageSendingOptions': MessageSendingOptions // Optional. MessageSendingOptions 对象
-      //   * }
-      var msg = {}
-      msg.id = message.id
-      console.log(JSON.stringify(message))
-      // msg.type = message.target.type
-      if (message.target.type === 'user') {
-        msg.username = message.target.username
-        msg.type = 'single'
-      } else {
-        msg.groupId = message.target.id
-        msg.type = 'group'
-      }
-
-      JMessage.sendMessage(msg,(message) => {
-
-      },(error) => {
-
-      },(progress) => {
-        // console.log("" + progress)
+      var message = this.getNormalMessage()
+      message.messageType = "image"
+      message.path = mediaPath
+    
+      JMessage.createSendMessage(message, (msg) => {
+        var auroraMsg = this.convertJMessageToAuroraMsg(msg)
+        auroraMsg.status = 'send_going'
+        AuroraIController.appendMessages([auroraMsg])
+        AuroraIController.scrollToBottom(true)
+        
+        if (this.conversation.conversationType === 'single') {
+          msg.type = 'single'
+          msg.username = this.conversation.key
+        } else {
+          msg.type = 'group'
+          msg.groupId = this.conversation.key
+        }
+  
+        JMessage.sendMessage(msg, (jmessage) => {
+          var auroraMsg = this.convertJMessageToAuroraMsg(jmessage)
+          AuroraIController.updateMessage(auroraMsg)
+        }, (error) => {
+          Alert.alert('send image fail')
+        })
       })
-    })
-    // JMessage.sendImageMessage(message, (message) => {
-    //   var auroraMsg = this.convertJMessageToAuroraMsg(message)
-    //   AuroraIController.appendMessages([auroraMsg])
-    //   AuroraIController.scrollToBottom(true)
-    // }, (error) => {
-    //   Alert.alert(JSON.stringify(error))
-    // })
 
   }
 
@@ -320,16 +319,31 @@ export default class Chat extends Component {
   }
 
   onFinishRecordVoice = (mediaPath, duration) => {
-
     var message = this.getNormalMessage()
+    message.messageType = "voice"
     message.path = mediaPath
-    JMessage.sendVoiceMessage(message, (message) => {
-      var auroraMsg = this.convertJMessageToAuroraMsg(message)
+  
+    JMessage.createSendMessage(message, (msg) => {
+      var auroraMsg = this.convertJMessageToAuroraMsg(msg)
+      auroraMsg.status = 'send_going'
       AuroraIController.appendMessages([auroraMsg])
       AuroraIController.scrollToBottom(true)
-    }, (error) => {
-      Alert.alert(JSON.stringify(error))
-    }) 
+      
+      if (this.conversation.conversationType === 'single') {
+        msg.type = 'single'
+        msg.username = this.conversation.key
+      } else {
+        msg.type = 'group'
+        msg.groupId = this.conversation.key
+      }
+
+      JMessage.sendMessage(msg, (jmessage) => {
+        var auroraMsg = this.convertJMessageToAuroraMsg(jmessage)
+        AuroraIController.updateMessage(auroraMsg)
+      }, (error) => {
+        Alert.alert('send image fail')
+      })
+    })
   }
 
   onCancelRecordVoice = () => {
@@ -341,39 +355,59 @@ export default class Chat extends Component {
   }
 
   onFinishRecordVideo = (mediaPath) => {
-
     var message = this.getNormalMessage()
+    message.messageType = "file"
     message.path = mediaPath
-    message.extras = {type: "video"}
-    message.fileName = "video"
-    JMessage.sendFileMessage(message, (message) => {
-      var auroraMsg = this.convertJMessageToAuroraMsg(message)
+  
+    JMessage.createSendMessage(message, (msg) => {
+      var auroraMsg = this.convertJMessageToAuroraMsg(msg)
+      auroraMsg.status = 'send_going'
       AuroraIController.appendMessages([auroraMsg])
       AuroraIController.scrollToBottom(true)
-    }, (error) => {
-      Alert.alert(JSON.stringify(error))
+      
+      if (this.conversation.conversationType === 'single') {
+        msg.type = 'single'
+        msg.username = this.conversation.key
+      } else {
+        msg.type = 'group'
+        msg.groupId = this.conversation.key
+      }
+
+      JMessage.sendMessage(msg, (jmessage) => {
+        var auroraMsg = this.convertJMessageToAuroraMsg(jmessage)
+        AuroraIController.updateMessage(auroraMsg)
+      }, (error) => {
+        Alert.alert('send image fail')
+      })
     })
   }
     
   onSendGalleryFiles = (mediaFiles) => {
-    
-
-    /**
-     * WARN: 这里返回的是原图，直接插入大会话列表会很大且耗内存.
-     * 应该做裁剪操作后再插入到 messageListView 中，
-     * 一般的 IM SDK 会提供裁剪操作，或者开发者手动进行裁剪。
-     * 
-     * 代码用例不做裁剪操作。
-     */ 
     for(index in mediaFiles) {
       var message = this.getNormalMessage()
+      message.messageType = "image"
       message.path = mediaFiles[index].mediaPath
-      JMessage.sendImageMessage(message, (message) => {
-        var auroraMsg = this.convertJMessageToAuroraMsg(message)
+    
+      JMessage.createSendMessage(message, (msg) => {
+        var auroraMsg = this.convertJMessageToAuroraMsg(msg)
+        auroraMsg.status = 'send_going'
         AuroraIController.appendMessages([auroraMsg])
         AuroraIController.scrollToBottom(true)
-      }, (error) => {
-        Alert.alert(JSON.stringify(error))
+        
+        if (this.conversation.conversationType === 'single') {
+          msg.type = 'single'
+          msg.username = this.conversation.key
+        } else {
+          msg.type = 'group'
+          msg.groupId = this.conversation.key
+        }
+  
+        JMessage.sendMessage(msg, (jmessage) => {
+          var auroraMsg = this.convertJMessageToAuroraMsg(jmessage)
+          AuroraIController.updateMessage(auroraMsg)
+        }, (error) => {
+          Alert.alert('send image fail')
+        })
       })
     }
   }
@@ -395,7 +429,6 @@ export default class Chat extends Component {
     } else {
       this.updateLayout({width:window.width, height:338,})
     }
-    
   }
 
   onShowKeyboard = (keyboard_height) => {
@@ -403,6 +436,16 @@ export default class Chat extends Component {
     this.updateLayout({width:window.width, height:inputViewHeight,})
   }
 
+  onSwitchToEmojiMode = () => {
+    if (Platform.OS == "android") {
+      this.updateLayout({width:window.width, height: 338})
+      this.setState({
+        shouldExpandMenuContainer: true
+      })
+    } else {
+      this.updateLayout({width:window.width, height:338,})
+    }
+  }
 
   onInitPress() {
       console.log('on click init push ');
@@ -437,6 +480,7 @@ export default class Chat extends Component {
         onStartRecordVideo={this.onStartRecordVideo}
         onFinishRecordVideo={this.onFinishRecordVideo}
         onSendGalleryFiles={this.onSendGalleryFiles}
+        onSwitchToEmojiMode={this.onSwitchToEmojiMode}
         onSwitchToMicrophoneMode={this.onSwitchToMicrophoneMode}
         onSwitchToGalleryMode={this.onSwitchToGalleryMode}
         onSwitchToCameraMode={this.onSwitchToCameraMode}
