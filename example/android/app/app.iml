@@ -121,7 +121,7 @@
     <orderEntry type="library" name="imagepipeline-1.0.1" level="project" />
     <orderEntry type="library" name="javax.inject-1" level="project" />
     <orderEntry type="library" name="eventbus-3.0.0" level="project" />
-    <orderEntry type="library" name="messagelist-0.4.8" level="project" />
+    <orderEntry type="library" name="messagelist-0.4.9" level="project" />
     <orderEntry type="library" name="flexbox-0.2.5" level="project" />
     <orderEntry type="library" name="okhttp-ws-3.4.1" level="project" />
     <orderEntry type="library" name="support-v4-25.3.1" level="project" />
