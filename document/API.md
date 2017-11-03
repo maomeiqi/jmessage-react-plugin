@@ -15,6 +15,7 @@ import JMessage from 'jmessage-react-plugin';
   - [register](#register)
   - [login](#login)
   - [logout](#logout)
+  - [getMyInfo](#getmyinfo)
   - [getUserInfo](#getuserinfo)
   - [updateMyPassword](#updatemypassword)
   - [updateMyAvatar](#updatemyavatar)
@@ -165,6 +166,22 @@ JMessage.getMyInfo((UserInf) => {
 })
 ```
 
+### getUserInfo
+
+获取用户信息。该接口可以获取不同 AppKey 下（即不同应用）的用户信息，如果 AppKey 为空，则默认为当前应用下。
+
+#### 示例
+
+```js
+JMessage.getUserInfo({ username: 'username', appKey: 'your_app_key' },
+  (userInfo) => {
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
 ### updateMyPassword
 
 更新当前登录用户的密码。
