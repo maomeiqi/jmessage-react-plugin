@@ -287,7 +287,6 @@ export default class Chat extends Component {
 
   onTakePicture = (mediaPath) => {
       var message = this.getNormalMessage()
-      message.text = text
       message.messageType = "image"
       message.path = mediaPath
     
