@@ -1,6 +1,7 @@
 'use strict'
 
 import React from 'react'
+import PropTypes from 'prop-types';
 import
 {
   StyleSheet,
@@ -9,7 +10,6 @@ import
 } from 'react-native'
 
 var {
-    PropTypes,
     Component,
 } = React;
 
