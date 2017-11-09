@@ -10,6 +10,7 @@
     "jmessage-react-plugin": "^2.1.0",
     "react": "16.0.0-alpha.12",
     "react-native": "^0.47.1",
+    "react-native-fs": "^2.8.3",
     "react-navigation": "^1.0.0-beta.11",
     "react-timer-mixin": "^0.13.3"
   },

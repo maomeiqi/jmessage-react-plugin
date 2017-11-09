@@ -2,10 +2,13 @@
 
 import React from 'react';
 import ReactNative from 'react-native';
+
 import JMessage from 'jmessage-react-plugin';
 import {
 	TabNavigator
 } from 'react-navigation';
+
+var RNFS = require('react-native-fs');
 
 import ListItem from '../../../views/ListItem'
 
@@ -60,12 +63,27 @@ export default class MyNotificationsScreen extends React.Component {
     constructor(props) {
       super(props)
       this.state = {
-        myInfo: {}
+        myInfo: {},
+        headerImage: "",
       }
     }
     componentWillMount() {
       JMessage.getMyInfo((user) => {
-        this.setState({myInfo: user})
+        Alert.alert("RNFS.MainBundlePath",RNFS.MainBundlePath)
+        Alert.alert("user.avatarThumbPath",user.avatarThumbPath)
+        this.setState({myInfo: user,})
+        RNFS.readFile(user.avatarThumbPath,'base64')
+        .then((data)=>{
+             //字符串转json
+            this.setState({myInfo: 'data:image/png;base64,' + data,})
+            this.setState({headerImage: 'data:image/png;base64,' + data,})
+
+        })
+        .catch((data)=>{
+            console.log('读取失败');
+        });
+
+        
       })
       
     }
@@ -77,9 +95,9 @@ export default class MyNotificationsScreen extends React.Component {
         </Image>
       } else {
         this.avatar = <Image
-        source={{isStatic:true,uri:this.state.myInfo.avatarThumbPath, scale:1}}
+        source={{isStatic:true,uri: this.state.headerImage}}
         style={styles.avatar}>
-      </Image>
+       </Image>
       }
       return (
         <View>

@@ -99,6 +99,7 @@ export default class UpdataMyInfoScreen extends Component {
 
     updateMyInfo() {
       JMessage.getMyInfo((user) => {
+        
         this.setState({myInfo: user})
       })
     }
@@ -112,6 +113,7 @@ export default class UpdataMyInfoScreen extends Component {
 
 
     render() {
+        
       if (this.state.myInfo.avatarThumbPath === "") {
         this.avatar = <Image
           source={require('../../resource/group-icon.png')}
