@@ -21,11 +21,10 @@ import {
   findNodeHandle,
 } from 'react-native';
 
-var ReactNative = require('react-native');          
-
 import IMUI from 'aurora-imui-react-native'
 var InputView = IMUI.ChatInput;
 var MessageListView = IMUI.MessageList;
+var AndroidPtrLayout = IMUI.AndroidPtrLayout;
 const AuroraIController = IMUI.AuroraIMUIController;
 const window = Dimensions.get('window');
 
@@ -43,13 +42,13 @@ export default class Chat extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { 
-      inputViewLayout: {width:window.width, height:86,},
+    this.state = {
+      inputViewLayout: { width: window.width, height: 200, },
       menuContainerHeight: 1000,
       isDismissMenuContainer: false,
       shouldExpandMenuContainer: false,
     };
-    
+
     this.updateLayout = this.updateLayout.bind(this);
     this.onTouchMsgList = this.onTouchMsgList.bind(this);
     this.conversation = this.props.navigation.state.params.conversation
@@ -64,30 +63,30 @@ export default class Chat extends Component {
     var auroraMsg = {}
     auroraMsg.msgType = jmessage.type
     auroraMsg.msgId = jmessage.id
-    
-    if (jmessage.type === 'text') {    
+
+    if (jmessage.type === 'text') {
       auroraMsg.text = jmessage.text
     }
-  
-    if (jmessage.type === 'image') {    
+
+    if (jmessage.type === 'image') {
       auroraMsg.mediaPath = jmessage.thumbPath
     }
-  
-    if (jmessage.type === 'voice') {    
+
+    if (jmessage.type === 'voice') {
       auroraMsg.mediaPath = jmessage.path
       auroraMsg.duration = jmessage.duration
     }
 
-    if (jmessage.type === 'file') {    
+    if (jmessage.type === 'file') {
       auroraMsg.mediaPath = jmessage.path
       auroraMsg.duration = jmessage.duration
       auroraMsg.msgType = "video"
     }
 
     var user = {
-        userId: "1",
-        displayName: "",
-        avatarPath: ""
+      userId: "1",
+      displayName: "",
+      avatarPath: ""
     }
     user.userId = jmessage.from.username
     user.displayName = jmessage.from.nickname
@@ -111,163 +110,171 @@ export default class Chat extends Component {
     }
 
     auroraMsg.timeString = ""
-    
+
     return auroraMsg
   }
 
-  getNormalMessage () {
+  getNormalMessage() {
     var message = {}
-    
+
     if (this.conversation.conversationType === 'single') {
       message.type = 'single'
       message.username = this.conversation.key
     } else {
-    message.type = 'group'
-    message.groupId = this.conversation.key
+      message.type = 'group'
+      message.groupId = this.conversation.key
     }
     return message
   }
 
-  componentDidMount() {  
+  componentDidMount() {
     var parames = {
 
       'from': 0,            // 开始的消息下标。
       'limit': 10            // 要获取的消息数。比如当 from = 0, limit = 10 时，是获取第 0 - 9 条历史消息。
-     }
-    
-     if (this.conversation.conversationType === 'single') {
+    }
+
+    if (this.conversation.conversationType === 'single') {
       parames.type = 'single'
       parames.username = this.conversation.key
-     } else {
+    } else {
       parames.type = 'group'
       parames.groupId = this.conversation.key
-     }
-     this.messageListDidLoadCallback = () => {
+    }
+    this.messageListDidLoadCallback = () => {
 
-        JMessage.getHistoryMessages(parames, (messages) => {
-          var auroraMessages = messages.map((message) => {
-            var normalMessage = this.convertJMessageToAuroraMsg(message)
-            if (normalMessage.msgType === "unknow") {
-              return
-            }
-            return normalMessage
-          })
-          if (Platform.OS == 'ios') {
-            AuroraIController.insertMessagesToTop(auroraMessages)
-          } else {
-            AuroraIController.insertMessagesToTop(auroraMessages)
+      JMessage.getHistoryMessages(parames, (messages) => {
+        var auroraMessages = messages.map((message) => {
+          var normalMessage = this.convertJMessageToAuroraMsg(message)
+          if (normalMessage.msgType === "unknow") {
+            return
           }
-        }, (error) => {
-          Alert.alert('error!', JSON.stringify(error))
+          return normalMessage
         })
+        if (Platform.OS == 'ios') {
+          AuroraIController.insertMessagesToTop(auroraMessages)
+        } else {
+          AuroraIController.insertMessagesToTop(auroraMessages)
+        }
+      }, (error) => {
+        Alert.alert('error!', JSON.stringify(error))
+      })
 
-        this.receiveMessageCallBack = (message) => {
-          
-          if (this.conversation.conversationType === 'single') {
-            if (message.target.type === 'user' ) {
-              if (message.from.username === this.conversation.key) {
-                var msg = this.convertJMessageToAuroraMsg(message)
-                AuroraIController.appendMessages([msg])
-              }
-              Alert.alert('message.target.username', message.target.username)
-              Alert.alert('this.conversation.key', this.conversation.key)
+      this.receiveMessageCallBack = (message) => {
+
+        if (this.conversation.conversationType === 'single') {
+          if (message.target.type === 'user') {
+            if (message.from.username === this.conversation.key) {
+              var msg = this.convertJMessageToAuroraMsg(message)
+              AuroraIController.appendMessages([msg])
             }
-          } else {
-            if (message.target.type === 'group') {
-              if (message.from.id === this.conversation.key) {
-                var msg = this.convertJMessageToAuroraMsg(message)
-                AuroraIController.appendMessages([msg])
-              }
+            Alert.alert('message.target.username', message.target.username)
+            Alert.alert('this.conversation.key', this.conversation.key)
+          }
+        } else {
+          if (message.target.type === 'group') {
+            if (message.from.id === this.conversation.key) {
+              var msg = this.convertJMessageToAuroraMsg(message)
+              AuroraIController.appendMessages([msg])
             }
           }
         }
-        JMessage.addReceiveMessageListener(this.receiveMessageCallBack)
       }
-     AuroraIController.addMessageListDidLoadListener(this.messageListDidLoadCallback)
+      JMessage.addReceiveMessageListener(this.receiveMessageCallBack)
+    }
+    AuroraIController.addMessageListDidLoadListener(this.messageListDidLoadCallback)
   }
 
   componentWillUnmount() {
     JMessage.removeReceiveMessageListener(this.receiveMessageCallBack)
     AuroraIController.removeMessageListDidLoadListener(this.messageListDidLoadCallback)
     if (Platform.OS === 'android') {
-      UIManager.dispatchViewManagerCommand(findNodeHandle(this.refs["MessageList"]), 1, null)  
+      UIManager.dispatchViewManagerCommand(findNodeHandle(this.refs["PtrLayout"]), 1, null)
     }
-    
+    this.timer && clearTimeout(this.timer);
+
   }
 
   updateLayout(layout) {
-    this.setState({inputViewLayout: layout})
+    this.setState({ inputViewLayout: layout })
   }
 
   onAvatarClick = (message) => {
-      console.log(message)
-    }
+    console.log(message)
+  }
 
-    onTouchMsgList() {
-      console.log("Touch msg list, hidding soft input and dismiss menu");
-      this.setState({
-        isDismissMenuContainer: true,
-        inputViewLayout: {
-          width: Dimensions.get('window').width,
-          height: 86
-        },
-        shouldExpandMenuContainer: false,
-      });
-    }
+  onTouchMsgList() {
+    console.log("Touch msg list, hidding soft input and dismiss menu");
+    this.setState({
+      isDismissMenuContainer: true,
+      inputViewLayout: {
+        width: Dimensions.get('window').width,
+        height: 200
+      },
+      shouldExpandMenuContainer: false,
+    });
+  }
 
   onTouchEditText = () => {
     console.log("scroll to bottom")
     AuroraIController.scrollToBottom(true);
     if (this.state.shouldExpandMenuContainer) {
-      this.setState({inputViewLayout: {width:window.width, height:420,}})
+      this.setState({ inputViewLayout: { width: window.width, height: 825, } })
     }
-    
+
   }
 
   onFullScreen = () => {
     this.setState({
-      inputViewLayout: {width: window.width, height:window.height}
+      inputViewLayout: { width: window.width, height: window.height }
     })
   }
 
   onRecoverScreen = () => {
     this.setState({
-      inputViewLayout: {width: window.width, height: 480}
+      inputViewLayout: { width: window.width, height: 825 }
     })
   }
 
   onMsgClick = (message) => {
-      console.log(message)
-    }
-    
+    console.log(message)
+  }
+
   onStatusViewClick = (message) => {
-      console.log(message)
-      message.status = 'send_succeed'
-      message.fromUser.avatarPath = message.mediaPath
-      AuroraIController.updateMessage(message)
-    }
+    console.log(message)
+    message.status = 'send_succeed'
+    message.fromUser.avatarPath = message.mediaPath
+    AuroraIController.updateMessage(message)
+  }
 
   onBeginDragMessageList = () => {
-      this.updateLayout({width:window.width, height:86,})
-      AuroraIController.hidenFeatureView(true)
-    }
+    this.updateLayout({ width: window.width, height: 86, })
+    AuroraIController.hidenFeatureView(true)
+  }
 
   onPullToRefresh = () => {
-      console.log("on pull to refresh")
+    console.log("on pull to refresh")
+    // After loading history messages
+    if (Platform.OS === "android") {
+      this.timer = setTimeout(() => {
+        console.log("send refresh complete event")
+        this.refs["PtrLayout"].refreshComplete() 
+        },2000);
     }
+  }
 
   onSendText = (text) => {
 
     var message = this.getNormalMessage()
     message.text = text
     message.messageType = "text"
-  
+
     JMessage.createSendMessage(message, (msg) => {
       var auroraMsg = this.convertJMessageToAuroraMsg(msg)
       auroraMsg.status = 'send_going'
       AuroraIController.appendMessages([auroraMsg])
       AuroraIController.scrollToBottom(true)
-      
+
       if (this.conversation.conversationType === 'single') {
         msg.type = 'single'
         msg.username = this.conversation.key
@@ -277,7 +284,7 @@ export default class Chat extends Component {
       }
 
       JMessage.sendMessage(msg, (jmessage) => {
-        
+
         var auroraMsg = this.convertJMessageToAuroraMsg(jmessage)
         AuroraIController.updateMessage(auroraMsg)
       }, (error) => {
@@ -286,31 +293,31 @@ export default class Chat extends Component {
   }
 
   onTakePicture = (mediaPath) => {
-      var message = this.getNormalMessage()
-      message.messageType = "image"
-      message.path = mediaPath
-    
-      JMessage.createSendMessage(message, (msg) => {
-        var auroraMsg = this.convertJMessageToAuroraMsg(msg)
-        auroraMsg.status = 'send_going'
-        AuroraIController.appendMessages([auroraMsg])
-        AuroraIController.scrollToBottom(true)
-        
-        if (this.conversation.conversationType === 'single') {
-          msg.type = 'single'
-          msg.username = this.conversation.key
-        } else {
-          msg.type = 'group'
-          msg.groupId = this.conversation.key
-        }
-  
-        JMessage.sendMessage(msg, (jmessage) => {
-          var auroraMsg = this.convertJMessageToAuroraMsg(jmessage)
-          AuroraIController.updateMessage(auroraMsg)
-        }, (error) => {
-          Alert.alert('send image fail')
-        })
+    var message = this.getNormalMessage()
+    message.messageType = "image"
+    message.path = mediaPath
+
+    JMessage.createSendMessage(message, (msg) => {
+      var auroraMsg = this.convertJMessageToAuroraMsg(msg)
+      auroraMsg.status = 'send_going'
+      AuroraIController.appendMessages([auroraMsg])
+      AuroraIController.scrollToBottom(true)
+
+      if (this.conversation.conversationType === 'single') {
+        msg.type = 'single'
+        msg.username = this.conversation.key
+      } else {
+        msg.type = 'group'
+        msg.groupId = this.conversation.key
+      }
+
+      JMessage.sendMessage(msg, (jmessage) => {
+        var auroraMsg = this.convertJMessageToAuroraMsg(jmessage)
+        AuroraIController.updateMessage(auroraMsg)
+      }, (error) => {
+        Alert.alert('send image fail')
       })
+    })
 
   }
 
@@ -322,13 +329,13 @@ export default class Chat extends Component {
     var message = this.getNormalMessage()
     message.messageType = "voice"
     message.path = mediaPath
-  
+
     JMessage.createSendMessage(message, (msg) => {
       var auroraMsg = this.convertJMessageToAuroraMsg(msg)
       auroraMsg.status = 'send_going'
       AuroraIController.appendMessages([auroraMsg])
       AuroraIController.scrollToBottom(true)
-      
+
       if (this.conversation.conversationType === 'single') {
         msg.type = 'single'
         msg.username = this.conversation.key
@@ -358,13 +365,13 @@ export default class Chat extends Component {
     var message = this.getNormalMessage()
     message.messageType = "file"
     message.path = mediaPath
-  
+
     JMessage.createSendMessage(message, (msg) => {
       var auroraMsg = this.convertJMessageToAuroraMsg(msg)
       auroraMsg.status = 'send_going'
       AuroraIController.appendMessages([auroraMsg])
       AuroraIController.scrollToBottom(true)
-      
+
       if (this.conversation.conversationType === 'single') {
         msg.type = 'single'
         msg.username = this.conversation.key
@@ -381,19 +388,19 @@ export default class Chat extends Component {
       })
     })
   }
-    
+
   onSendGalleryFiles = (mediaFiles) => {
-    for(index in mediaFiles) {
+    for (index in mediaFiles) {
       var message = this.getNormalMessage()
       message.messageType = "image"
       message.path = mediaFiles[index].mediaPath
-    
+
       JMessage.createSendMessage(message, (msg) => {
         var auroraMsg = this.convertJMessageToAuroraMsg(msg)
         auroraMsg.status = 'send_going'
         AuroraIController.appendMessages([auroraMsg])
         AuroraIController.scrollToBottom(true)
-        
+
         if (this.conversation.conversationType === 'single') {
           msg.type = 'single'
           msg.username = this.conversation.key
@@ -401,7 +408,7 @@ export default class Chat extends Component {
           msg.type = 'group'
           msg.groupId = this.conversation.key
         }
-  
+
         JMessage.sendMessage(msg, (jmessage) => {
           var auroraMsg = this.convertJMessageToAuroraMsg(jmessage)
           AuroraIController.updateMessage(auroraMsg)
@@ -413,84 +420,147 @@ export default class Chat extends Component {
   }
 
   onSwitchToMicrophoneMode = () => {
-    this.updateLayout({width:window.width, height:338,})
+    if (Platform.OS === "android") {
+      this.updateLayout({ width: window.width, height: 825, })
+    } else {
+      this.updateLayout({ width: window.width, height: 338, })
+    }
+    
   }
 
   onSwitchToGalleryMode = () => {
-    this.updateLayout({width:window.width, height:338,})
+    if (Platform.OS === "android") {
+      this.updateLayout({ width: window.width, height: 825, })
+    } else {
+      this.updateLayout({ width: window.width, height: 338, })
+    }
   }
 
   onSwitchToCameraMode = () => {
     if (Platform.OS == "android") {
-      this.updateLayout({width:window.width, height: 338})
+      this.updateLayout({ width: window.width, height: 825 })
       this.setState({
         shouldExpandMenuContainer: true
       })
     } else {
-      this.updateLayout({width:window.width, height:338,})
+      this.updateLayout({ width: window.width, height: 338, })
     }
   }
 
   onShowKeyboard = (keyboard_height) => {
     var inputViewHeight = keyboard_height + 86
-    this.updateLayout({width:window.width, height:inputViewHeight,})
+    this.updateLayout({ width: window.width, height: inputViewHeight, })
   }
 
   onSwitchToEmojiMode = () => {
     if (Platform.OS == "android") {
-      this.updateLayout({width:window.width, height: 338})
+      this.updateLayout({ width: window.width, height: 825 })
       this.setState({
         shouldExpandMenuContainer: true
       })
     } else {
-      this.updateLayout({width:window.width, height:338,})
+      this.updateLayout({ width: window.width, height: 338, })
     }
   }
 
   onInitPress() {
-      console.log('on click init push ');
-      this.updateAction();
+    console.log('on click init push ');
+    this.updateAction();
   }
 
-  render() {
+  generateAndroidView() {
+    return (
+      <View style={styles.container}>
+        <AndroidPtrLayout
+          ref="PtrLayout"
+          onPullToRefresh={this.onPullToRefresh}>
+          <MessageListView style={styles.messageList}
+            ref="MessageList"
+            onAvatarClick={this.onAvatarClick}
+            onMsgClick={this.onMsgClick}
+            onStatusViewClick={this.onStatusViewClick}
+            onTouchMsgList={this.onTouchMsgList}
+            onTapMessageCell={this.onTapMessageCell}
+            onBeginDragMessageList={this.onBeginDragMessageList}
+            avatarSize={{ width: 40, height: 40 }}
+            sendBubbleTextSize={18}
+            sendBubbleTextColor={"#000000"}
+            sendBubblePadding={{ left: 10, top: 10, right: 20, bottom: 10 }}
+          />
+        </AndroidPtrLayout>
+        <InputView style={this.state.inputViewLayout}
+          menuContainerHeight={this.state.menuContainerHeight}
+          isDismissMenuContainer={this.state.isDismissMenuContainer}
+          onSendText={this.onSendText}
+          onTakePicture={this.onTakePicture}
+          onStartRecordVoice={this.onStartRecordVoice}
+          onFinishRecordVoice={this.onFinishRecordVoice}
+          onCancelRecordVoice={this.onCancelRecordVoice}
+          onStartRecordVideo={this.onStartRecordVideo}
+          onFinishRecordVideo={this.onFinishRecordVideo}
+          onSendGalleryFiles={this.onSendGalleryFiles}
+          onSwitchToEmojiMode={this.onSwitchToEmojiMode}
+          onSwitchToMicrophoneMode={this.onSwitchToMicrophoneMode}
+          onSwitchToGalleryMode={this.onSwitchToGalleryMode}
+          onSwitchToCameraMode={this.onSwitchToCameraMode}
+          onTouchEditText={this.onTouchEditText}
+          onFullScreen={this.onFullScreen}
+          onRecoverScreen={this.onRecoverScreen}
+        />
+      </View>
+    )
+  }
+
+  generateIOSView() {
     return (
       <View style={styles.container}>
         <MessageListView style={styles.messageList}
-        ref="MessageList"
-        onAvatarClick={this.onAvatarClick}
-        onMsgClick={this.onMsgClick}
-        onStatusViewClick={this.onStatusViewClick}
-        onTouchMsgList = {this.onTouchMsgList}
-        onTapMessageCell={this.onTapMessageCell}
-        onBeginDragMessageList={this.onBeginDragMessageList}
-        onPullToRefresh={this.onPullToRefresh}
-        avatarSize={{width:40,height:40}}
-        sendBubbleTextSize={18}
-        sendBubbleTextColor={"#000000"}
-        sendBubblePadding={{left:10,top:10,right:15,bottom:10}}
+          ref="MessageList"
+          onAvatarClick={this.onAvatarClick}
+          onMsgClick={this.onMsgClick}
+          onStatusViewClick={this.onStatusViewClick}
+          onTouchMsgList={this.onTouchMsgList}
+          onTapMessageCell={this.onTapMessageCell}
+          onBeginDragMessageList={this.onBeginDragMessageList}
+          onPullToRefresh={this.onPullToRefresh}
+          avatarSize={{ width: 40, height: 40 }}
+          sendBubbleTextSize={18}
+          sendBubbleTextColor={"#000000"}
+          sendBubblePadding={{ left: 10, top: 10, right: 15, bottom: 10 }}
         />
+        }
         <InputView style={this.state.inputViewLayout}
-        menuContainerHeight = {this.state.menuContainerHeight}
-				isDismissMenuContainer = {this.state.isDismissMenuContainer}
-        onSendText={this.onSendText}
-        onTakePicture={this.onTakePicture}
-        onStartRecordVoice={this.onStartRecordVoice}
-        onFinishRecordVoice={this.onFinishRecordVoice}
-        onCancelRecordVoice={this.onCancelRecordVoice}
-        onStartRecordVideo={this.onStartRecordVideo}
-        onFinishRecordVideo={this.onFinishRecordVideo}
-        onSendGalleryFiles={this.onSendGalleryFiles}
-        onSwitchToEmojiMode={this.onSwitchToEmojiMode}
-        onSwitchToMicrophoneMode={this.onSwitchToMicrophoneMode}
-        onSwitchToGalleryMode={this.onSwitchToGalleryMode}
-        onSwitchToCameraMode={this.onSwitchToCameraMode}
-        onShowKeyboard={this.onShowKeyboard}
-        onTouchEditText={this.onTouchEditText}
-        onFullScreen={this.onFullScreen}
-        onRecoverScreen={this.onRecoverScreen}
+          menuContainerHeight={this.state.menuContainerHeight}
+          isDismissMenuContainer={this.state.isDismissMenuContainer}
+          onSendText={this.onSendText}
+          onTakePicture={this.onTakePicture}
+          onStartRecordVoice={this.onStartRecordVoice}
+          onFinishRecordVoice={this.onFinishRecordVoice}
+          onCancelRecordVoice={this.onCancelRecordVoice}
+          onStartRecordVideo={this.onStartRecordVideo}
+          onFinishRecordVideo={this.onFinishRecordVideo}
+          onSendGalleryFiles={this.onSendGalleryFiles}
+          onSwitchToEmojiMode={this.onSwitchToEmojiMode}
+          onSwitchToMicrophoneMode={this.onSwitchToMicrophoneMode}
+          onSwitchToGalleryMode={this.onSwitchToGalleryMode}
+          onSwitchToCameraMode={this.onSwitchToCameraMode}
+          onShowKeyboard={this.onShowKeyboard}
+          onTouchEditText={this.onTouchEditText}
+          onFullScreen={this.onFullScreen}
+          onRecoverScreen={this.onRecoverScreen}
         />
       </View>
-    );
+    )
+  }
+
+  render() {
+    let chat;
+    if (Platform.OS === "android") {
+      chat = this.generateAndroidView()
+    } else {
+      chat = this.generateIOSView()
+    }
+    return chat;
   }
 }
 
@@ -505,13 +575,13 @@ const styles = StyleSheet.create({
     flex: 1,
     marginTop: 0,
     width: window.width,
-    margin:0,
+    margin: 0,
   },
   inputView: {
     backgroundColor: 'green',
     width: window.width,
-    height:100,
-    
+    height: 100,
+
   },
   btnStyle: {
     marginTop: 10,

@@ -41,16 +41,16 @@ const styles = StyleSheet.create({
         marginRight: 10,
     },
 
-    modalView: {    
+    modalView: {
         flex: 1,
-            justifyContent: 'center',
+        justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
     modalContent: {
         width: 200,
         height: 150,
-            justifyContent: 'center',
+        justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#ffffff',
     },
@@ -84,11 +84,11 @@ export default class ConversationList extends React.Component {
             tabBarIcon: ({
                 tintColor
             }) => (
-                <Image
-                source={require('../../../resource/chat-icon.png')}
-                style={[styles.icon, {tintColor: tintColor}]}
-              />
-            ),
+                    <Image
+                        source={require('../../../resource/chat-icon.png')}
+                        style={[styles.icon, { tintColor: tintColor }]}
+                    />
+                ),
         }
     };
 
@@ -116,7 +116,7 @@ export default class ConversationList extends React.Component {
         this.props.navigation.setParams({
             createConversation: this._onCreateConversation
         });
-        
+        JMessage.setDebugMode({ enable: true });
     }
     componentWillMount() {
         this.reloadConversationList()
@@ -198,7 +198,7 @@ export default class ConversationList extends React.Component {
                 Alert.alert('conversaion', JSON.stringify(conv))
             }
             this.setState({})
-            Alert.alert('the item',JSON.stringify(item))
+            Alert.alert('the item', JSON.stringify(item))
             this.props.navigation.navigate('Chat', {
                 conversation: item
             })
@@ -233,87 +233,87 @@ export default class ConversationList extends React.Component {
     }
 
     render() {
-        this.listView = < FlatList
-        data = {
-            this.state.data
-        }
-        renderItem = {
+        this.listView = <FlatList
+            data={
+                this.state.data
+            }
+            renderItem={
                 ({
                     item
                 }) => (
-                    <View>
-                <TouchableHighlight
-                    style={[styles.conversationContent]}
-                    underlayColor = '#dddddd'
-                    onPress={ () => {
-                            this.props.navigation.navigate('Chat', {conversation: item})
-                        }}>
-                    <View style={ [styles.conversationItem]}>
-                        <Image 
-                            source={require('../../../resource/group-icon.png')}
-                            style={[styles.conversationAvatar]}>
-                        </Image>
                         <View>
-                            <Text>{ item.displayName }</Text>
-                            <Text>{ item.latestMessageString }</Text>
+                            <TouchableHighlight
+                                style={[styles.conversationContent]}
+                                underlayColor='#dddddd'
+                                onPress={() => {
+                                    this.props.navigation.navigate('Chat', { conversation: item })
+                                }}>
+                                <View style={[styles.conversationItem]}>
+                                    <Image
+                                        source={require('../../../resource/group-icon.png')}
+                                        style={[styles.conversationAvatar]}>
+                                    </Image>
+                                    <View>
+                                        <Text>{item.displayName}</Text>
+                                        <Text>{item.latestMessageString}</Text>
+                                    </View>
+                                </View>
+                            </TouchableHighlight>
                         </View>
-                    </View>
-                </TouchableHighlight>
-                </View>
-                )
+                    )
             } >
 
-            < /FlatList>
+        </FlatList>
         return (
 
             <View>
-            <Modal
-                transparent={true}
-                visible={ this.state.isShowModal }>
-                <View
-                    style={ styles.modalView }>
+                <Modal
+                    transparent={true}
+                    visible={this.state.isShowModal}>
                     <View
-                        style={ styles.modalContent}>
-                        <TextInput
-                            placeholder = "用户名或群聊名称"
-                            onChangeText = { (e) => { this.setState({modalText: e}) } }>
-                        </TextInput>
-                        <Button
-                            onPress={() => {
-                                var params = {}
-                                params.type = 'single'
-                                params.username = this.state.modalText
-                                this.setState({isShowModal: false})
-                                this.enterConversation(params)
-                            } }
-                            style={styles.modalButton}
-                            title='创建单聊'/>
-                        <Button
-                            onPress={ () => {
-
-                                JMessage.createGroup({name: this.state.modalText,desc: ""}, (group) => {
+                        style={styles.modalView}>
+                        <View
+                            style={styles.modalContent}>
+                            <TextInput
+                                placeholder="用户名或群聊名称"
+                                onChangeText={(e) => { this.setState({ modalText: e }) }}>
+                            </TextInput>
+                            <Button
+                                onPress={() => {
                                     var params = {}
-                                    params.type = 'group'
-                                    params.groupId = group.id
-                                    this.setState({isShowModal: false})
+                                    params.type = 'single'
+                                    params.username = this.state.modalText
+                                    this.setState({ isShowModal: false })
                                     this.enterConversation(params)
-                                }, (error) => {
-                                    Alert.alert('create group error !', JSON.stringify(error))
-                                })
-                                
-                            } }
-                            style={styles.modalButton}
-                            title='创建群聊'/>
-                            
-                        <Button
-                            onPress = { () => { this.setState({isShowModal: false}) }}
-                            style={styles.modalButton}
-                            title='离开'/>
+                                }}
+                                style={styles.modalButton}
+                                title='创建单聊' />
+                            <Button
+                                onPress={() => {
+
+                                    JMessage.createGroup({ name: this.state.modalText, desc: "" }, (group) => {
+                                        var params = {}
+                                        params.type = 'group'
+                                        params.groupId = group.id
+                                        this.setState({ isShowModal: false })
+                                        this.enterConversation(params)
+                                    }, (error) => {
+                                        Alert.alert('create group error !', JSON.stringify(error))
+                                    })
+
+                                }}
+                                style={styles.modalButton}
+                                title='创建群聊' />
+
+                            <Button
+                                onPress={() => { this.setState({ isShowModal: false }) }}
+                                style={styles.modalButton}
+                                title='离开' />
+                        </View>
+
                     </View>
-                    
-                </View>
-            </Modal>
-            { this.listView }
-        </View>)
+                </Modal>
+                {this.listView}
+            </View>)
     }
 }
