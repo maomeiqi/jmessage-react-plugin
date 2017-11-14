@@ -497,6 +497,34 @@ export default class JMessage {
     }
 
     /**
+     * 设置是否屏蔽群消息。
+     *
+     * @param {Object} params = { id: String, isBlock: boolean }
+     */
+    static blockGroupMessage(params, success, error) {
+        JMessageModule.blockGroupMessage(params, success, error)
+    }
+
+    /**
+     * 判断指定群组是否被屏蔽。
+     *
+     * @param {object} params = { id: String }
+     * @param {function} success = function ({ isBlocked: boolean }) {} // 以参数形式返回结果。
+     */
+    static isGroupBlocked(params, success, error) {
+        JMessageModule.isGroupBlocked(params, success, error)
+    }
+    
+    /**
+     * 获取当前用户的群屏蔽列表。
+     *
+     * @param {function} success = function (groupArr) {} // 以参数形式返回结果。
+     */
+    static getBlockedGroupList(success, error) {
+        JMessageModule.getBlockedGroupList(success, error)
+    }
+
+    /**
      * 设置某个用户或群组是否免打扰。
      *
      * @param {object} params = {

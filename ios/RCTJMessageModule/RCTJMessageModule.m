@@ -2419,5 +2419,69 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)param
   }
 }
 
+RCT_EXPORT_METHOD(blockGroupMessage:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallBack:(RCTResponseSenderBlock)failCallback) {
+  
+  if (!param[@"id"] || !param[@"isBlock"]) {
+    failCallback(@[[self getParamError]]);
+    return;
+  }
+  
+  NSNumber *isBlock = param[@"isBlock"];
+  
+  [JMSGGroup groupInfoWithGroupId:param[@"id"] completionHandler:^(id resultObject, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+      return;
+    }
+    
+    JMSGGroup *group = resultObject;
+    [group setIsShield:[isBlock boolValue] handler:^(id resultObject, NSError *error) {
+      if (error) {
+        failCallback(@[[error errorToDictionary]]);
+      } else {
+        successCallback(@[]);
+      }
+    }];
+  }];
+}
 
+RCT_EXPORT_METHOD(isGroupBlocked:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallBack:(RCTResponseSenderBlock)failCallback) {
+
+  if (!param[@"id"]) {
+    failCallback(@[[self getParamError]]);
+    return;
+  }
+  
+  [JMSGGroup groupInfoWithGroupId:param[@"id"] completionHandler:^(id resultObject, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+      return;
+    }
+    
+    JMSGGroup *group = resultObject;
+    successCallback(@[@{@"isBlocked": @(group.isShieldMessage)}]);
+  }];
+}
+
+RCT_EXPORT_METHOD(getBlockedGroupList:(RCTResponseSenderBlock)successCallback
+                  failCallBack:(RCTResponseSenderBlock)failCallback) {
+  [JMSGGroup shieldList:^(id resultObject, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+    }
+    
+    NSArray *groupArr = resultObject;
+    NSMutableArray *groupList = @[].mutableCopy;
+    
+    for (JMSGGroup *group in groupArr) {
+      [groupList addObject:[group groupToDictionary]];
+    }
+    
+    successCallback(@[groupList]);
+  }];
+}
 @end
