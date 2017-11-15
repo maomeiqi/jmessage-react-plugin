@@ -117,10 +117,11 @@ export default class JMessage {
      *
      * @param {object} params = {'field': '需要更新的字段值'}
      *
-     *  field 包括：nickname（昵称）, birthday（生日）, signature（签名）, gender（性别）, region（地区）, address（具体地址）。
+     *  field 包括：nickname（昵称）, birthday（生日）, signature（签名）, gender（性别）, region（地区）, address（具体地址），extras （附加信息）。
      *  如：{
      *    'birthday': Number,  // 生日日期的微秒数
      *    'gender': String,    // 'male' / 'female' / 'unknown'
+     *    'extras': {String: String} // 附加字段
      *    ...                  // 其余皆为 String 类型
      *  }
      * @param {function} success = function () {}
@@ -780,6 +781,25 @@ export default class JMessage {
     static downloadOriginalGroupAvatar(params, success, error) {
         JMessageModule.downloadOriginalGroupAvatar(params, success, error)
     }
+
+    /**
+     * 增加或更新扩展字段,可扩展会话属性，比如：会话置顶、标识特殊会话等
+     *
+     * @param {object} params = {
+     *  'extra': Object            // 附加字段对象
+     *  'type': String,            // 'single' / 'group'
+     *  'groupId': String,         // 目标群组 id。
+     *  'username': String,        // 目标用户名。
+     *  'appKey': String,          // 目标用户所属 AppKey。
+     * }
+     * @param {function} success = function ({'id': String, 'filePath': String}) {}
+     * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+     */
+    static setConversationExtras(params, success, error) {
+        JMessageModule.setConversationExtras(params, success, error)
+    }
+
+
 
     /**
      * 

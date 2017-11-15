@@ -290,15 +290,14 @@ RCT_EXPORT_METHOD(updateMyAvatar:(NSDictionary *)param
   if([[NSFileManager defaultManager] fileExistsAtPath: mediaPath]){
     mediaPath = mediaPath;
     NSData *img = [NSData dataWithContentsOfFile: mediaPath];
-    
-    [JMSGUser updateMyInfoWithParameter:img userFieldType:kJMSGUserFieldsAvatar completionHandler:^(id resultObject, NSError *error) {
-      if (!error) {
-        successCallback(@[]);
-      } else {
-        failCallback(@[[error errorToDictionary]]);
-      }
+
+    [JMSGUser updateMyAvatarWithData:img avatarFormat:[mediaPath pathExtension] completionHandler:^(id resultObject, NSError *error) {
+        if (!error) {
+          successCallback(@[]);
+        } else {
+          failCallback(@[[error errorToDictionary]]);
+        }
     }];
-    
   } else {
     failCallback(@[[self getParamError]]);
   }
@@ -321,6 +320,10 @@ RCT_EXPORT_METHOD(updateMyInfo:(NSDictionary *)param
   
   if (param[@"signature"]) {
     info.signature = param[@"signature"];
+  }
+  
+  if (param[@"extras"]) {
+    info.extras = param[@"extras"];
   }
   
   if (param[@"gender"]) {
@@ -498,7 +501,7 @@ RCT_EXPORT_METHOD(sendImageMessage:(NSDictionary *)param
   
   if ([param[@"type"] isEqual: @"single"] && param[@"username"] != nil) {
     JMSGImageContent *content = [[JMSGImageContent alloc] initWithImageData: [NSData dataWithContentsOfFile: mediaPath]];
-    
+    content.format = [mediaPath pathExtension];
     content.uploadHandler = ^(float percent, NSString *msgID) {
       [self.bridge.eventDispatcher sendAppEventWithName:uploadProgressEvent body:@{@"messageId": msgID,
                                                                                    @"progress": @(percent)}];
@@ -529,7 +532,7 @@ RCT_EXPORT_METHOD(sendImageMessage:(NSDictionary *)param
     
   } else if ([param[@"type"] isEqual: @"group"] && param[@"groupId"] != nil) {
     JMSGImageContent *content = [[JMSGImageContent alloc] initWithImageData: [NSData dataWithContentsOfFile: mediaPath]];
-    
+    content.format = [mediaPath pathExtension];
     content.uploadHandler = ^(float percent, NSString *msgID) {
       
       [self.bridge.eventDispatcher sendAppEventWithName:uploadProgressEvent body:@{@"messageId": msgID,
@@ -1946,6 +1949,7 @@ RCT_EXPORT_METHOD(createConversation:(NSDictionary *)param
   }
   
   if ([param[@"type"] isEqualToString:@"single"]) {
+    
     [JMSGConversation createSingleConversationWithUsername:param[@"username"]
                                                     appKey:appKey
                                          completionHandler:^(id resultObject, NSError *error) {
@@ -2255,7 +2259,9 @@ RCT_EXPORT_METHOD(createSendMessage:(NSDictionary *)param
   }
   
   if ([param[@"messageType"] isEqualToString:@"image"]) {
-    content = [[JMSGImageContent alloc] initWithImageData: [NSData dataWithContentsOfFile: mediaPath]];
+    JMSGImageContent *imgContent = [[JMSGImageContent alloc] initWithImageData: [NSData dataWithContentsOfFile: mediaPath]];
+    imgContent.format = [mediaPath pathExtension];
+    content = imgContent;
   }
   
   if ([param[@"messageType"] isEqualToString:@"voice"]) {
@@ -2498,7 +2504,7 @@ RCT_EXPORT_METHOD(updateGroupAvatar:(NSDictionary *)param
   
   if([[NSFileManager defaultManager] fileExistsAtPath: mediaPath]){
     mediaPath = mediaPath;
-    NSData *img = [[NSData dataWithContentsOfFile: mediaPath];
+    NSData *img = [NSData dataWithContentsOfFile: mediaPath];
                    
     [JMSGGroup updateGroupAvatarWithGroupId:param[@"id"] avatarData:img avatarFormat:[mediaPath pathExtension] completionHandler:^(id resultObject, NSError *error) {
         if (!error) {
