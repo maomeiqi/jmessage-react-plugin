@@ -813,14 +813,12 @@ export default class JMessage {
      *  'username': String,        // 目标用户名。
      *  'appKey': String,          // 目标用户所属 AppKey。
      * }
-     * @param {function} success = function ({'id': String, 'filePath': String}) {}
+     * @param {function} success = function (conversation) {} // 具体字段参考文档
      * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
      */
     static setConversationExtras(params, success, error) {
         JMessageModule.setConversationExtras(params, success, error)
     }
-
-
 
     /**
      * 

@@ -2714,4 +2714,69 @@ RCT_EXPORT_METHOD(downloadOriginalGroupAvatar:(NSDictionary *)param
     }];
   }];
 }
+
+
+RCT_EXPORT_METHOD(setConversationExtras:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallBack:(RCTResponseSenderBlock)failCallback) {
+  
+  if (!param[@"type"]) {
+    failCallback(@[[self getParamError]]);
+    return;
+  }
+  
+  if (!param[@"extras"]) {
+    failCallback(@[[self getParamError]]);
+    return;
+  }
+  
+  if ([param[@"type"] isEqual: @"single"] && param[@"username"] != nil) {
+    
+  } else {
+    if ([param[@"type"] isEqual: @"group"] && param[@"groupId"] != nil) {
+      
+    } else {
+      failCallback(@[[self getParamError]]);
+      return;
+    }
+  }
+  
+  NSString *appKey = nil;
+  if (param[@"appKey"]) {
+    appKey = param[@"appKey"];
+  } else {
+    appKey = [JMessageHelper shareInstance].JMessageAppKey;
+  }
+  
+  if ([param[@"type"] isEqualToString:@"single"]) {
+    [JMSGConversation createSingleConversationWithUsername:param[@"username"]
+                                                    appKey:appKey
+                                         completionHandler:^(id resultObject, NSError *error) {
+                                           if (error) {
+                                             failCallback(@[[error errorToDictionary]]);
+                                             return;
+                                           }
+                                           JMSGConversation *conversation = resultObject;
+                                           NSDictionary *extras = param[@"extras"];
+                                           for (NSString *key in extras) {
+                                             [conversation setExtraValue:extras[key] forKey:key];
+                                           }
+                                           successCallback(@[[conversation conversationToDictionary]]);
+                                         }];
+  } else {
+    [JMSGConversation createGroupConversationWithGroupId:param[@"groupId"] completionHandler:^(id resultObject, NSError *error) {
+      if (error) {
+        failCallback(@[[error errorToDictionary]]);
+        return;
+      }
+      JMSGConversation *conversation = resultObject;
+      NSDictionary *extras = param[@"extras"];
+      for (NSString *key in extras) {
+        [conversation setExtraValue:extras[key] forKey:key];
+      }
+      successCallback(@[[conversation conversationToDictionary]]);
+    }];
+  }
+}
+
 @end
