@@ -514,7 +514,7 @@ export default class JMessage {
     static isGroupBlocked(params, success, error) {
         JMessageModule.isGroupBlocked(params, success, error)
     }
-    
+
     /**
      * 获取当前用户的群屏蔽列表。
      *
@@ -744,7 +744,42 @@ export default class JMessage {
         JMessageModule.resetUnreadMessageCount(params, success, error)
     }
 
+    /**
+     * 更新当前用户头像。
+     * 
+     * @param {object} params = {
+     *  id: string // 目标群组的 id。
+     *  imgPath: string // 本地图片绝对路径。
+     * }  
+     * 注意 Android 与 iOS 的文件路径是不同的：
+     *   - Android 类似：/storage/emulated/0/DCIM/Camera/IMG_20160526_130223.jpg
+     *   - iOS 类似：/var/mobile/Containers/Data/Application/7DC5CDFF-6581-4AD3-B165-B604EBAB1250/tmp/photo.jpg
+     */
+    static updateGroupAvatar(params, success, error) {
+        JMessageModule.updateGroupAvatar(params, success, error)
+    }
 
+    /**
+     * 下载用户头像缩略图，如果已经下载，不会重复下载。
+     *
+     * @param {object} params = {'id': String}
+     * @param {function} success = function ({'id': String, 'filePath': String}) {}
+     * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+     */
+    static downloadThumbGroupAvatar(params, success, error) {
+        JMessageModule.downloadThumbGroupAvatar(params, success, error)
+    }
+
+    /**
+     * 下载用户头像原图，如果已经下载，不会重复下载。
+     *
+     * @param {object} params = {'id': String}
+     * @param {function} success = function ({'id': String, 'filePath': String}) {}
+     * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+     */
+    static downloadOriginalGroupAvatar(params, success, error) {
+        JMessageModule.downloadOriginalGroupAvatar(params, success, error)
+    }
 
     /**
      * 

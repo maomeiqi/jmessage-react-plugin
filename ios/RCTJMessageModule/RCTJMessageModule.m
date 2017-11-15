@@ -2484,4 +2484,84 @@ RCT_EXPORT_METHOD(getBlockedGroupList:(RCTResponseSenderBlock)successCallback
     successCallback(@[groupList]);
   }];
 }
+
+RCT_EXPORT_METHOD(updateGroupAvatar:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallBack:(RCTResponseSenderBlock)failCallback) {
+  
+  if (!param[@"id"]) {
+    failCallback(@[[self getParamError]]);
+    return;
+  }
+
+  NSString *mediaPath = param[@"imgPath"];
+  
+  if([[NSFileManager defaultManager] fileExistsAtPath: mediaPath]){
+    mediaPath = mediaPath;
+    NSData *img = [[NSData dataWithContentsOfFile: mediaPath];
+                   
+    [JMSGGroup updateGroupAvatarWithGroupId:param[@"id"] avatarData:img avatarFormat:[mediaPath pathExtension] completionHandler:^(id resultObject, NSError *error) {
+        if (!error) {
+          successCallback(@[]);
+        } else {
+          failCallback(@[[error errorToDictionary]]);
+        }
+    }];
+  } else {
+    failCallback(@[[self getParamError]]);
+  }
+}
+
+RCT_EXPORT_METHOD(downloadThumbGroupAvatar:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallBack:(RCTResponseSenderBlock)failCallback) {
+  
+  if (!param[@"id"]) {
+    failCallback(@[[self getParamError]]);
+    return;
+  }
+  
+  [JMSGGroup groupInfoWithGroupId:param[@"id"] completionHandler:^(id resultObject, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+      return ;
+    }
+    
+    JMSGGroup *group = resultObject;
+    [group thumbAvatarData:^(NSData *data, NSString *objectId, NSError *error) {
+      if (error) {
+        failCallback(@[[error errorToDictionary]]);
+        return ;
+      }
+      
+      successCallback(@[@{@"id": objectId, @"filePath": group.thumbAvatarLocalPath}]);
+    }];
+  }];
+}
+
+RCT_EXPORT_METHOD(downloadOriginalGroupAvatar:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallBack:(RCTResponseSenderBlock)failCallback) {
+  if (!param[@"id"]) {
+    failCallback(@[[self getParamError]]);
+    return;
+  }
+  
+  [JMSGGroup groupInfoWithGroupId:param[@"id"] completionHandler:^(id resultObject, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+      return ;
+    }
+    
+    JMSGGroup *group = resultObject;
+    [group largeAvatarData:^(NSData *data, NSString *objectId, NSError *error) {
+      if (error) {
+        failCallback(@[[error errorToDictionary]]);
+        return ;
+      }
+      
+      successCallback(@[@{@"id": objectId, @"filePath": group.largeAvatarLocalPath}]);
+    }];
+  }];
+}
 @end
