@@ -2425,6 +2425,150 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)param
   }
 }
 
+RCT_EXPORT_METHOD(forwardMessage:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallBack:(RCTResponseSenderBlock)failCallback) {
+  
+  NSString *appKey = nil;
+  if (param[@"appKey"]) {
+    appKey = param[@"appKey"];
+  } else {
+    appKey = [JMessageHelper shareInstance].JMessageAppKey;
+  }
+  
+  if ([param[@"type"] isEqual: @"single"] && param[@"username"] != nil) {
+    [JMSGConversation createSingleConversationWithUsername:param[@"username"] appKey:appKey completionHandler:^(id resultObject, NSError *error) {
+      if (error) {
+        failCallback(@[[error errorToDictionary]]);
+        return;
+      }
+      
+      JMSGConversation *conversation = resultObject;
+      JMSGMessage *message = [conversation messageWithMessageId: param[@"id"]];
+      
+      if ([message.content isKindOfClass:[JMSGMediaAbstractContent class]]) {
+        JMSGMediaAbstractContent *content = (JMSGMediaAbstractContent *)message.content;
+        content.uploadHandler = ^(float percent, NSString *msgID) {
+          
+          [self.bridge.eventDispatcher sendAppEventWithName:uploadProgressEvent body:@{@"messageId": msgID,
+                                                                                       @"progress": @(percent)}];
+        };
+      }
+      
+      JMSGOptionalContent *messageSendingOptions = nil;
+      if (param[@"messageSendingOptions"] && [param[@"messageSendingOptions"] isKindOfClass: [NSDictionary class]]) {
+        messageSendingOptions = [self convertDicToJMSGOptionalContent:param[@"messageSendingOptions"]];
+      }
+      
+      NSDictionary *target = nil;
+      if (param[@"target"]) {
+         target = param[@""];
+      } else {
+        failCallback(@[[self getParamError]]);
+        return;
+      }
+      
+      if ([target[@"type"] isEqualToString:@"group"]) {
+        [JMSGGroup groupInfoWithGroupId:target[@"id"] completionHandler:^(id resultObject, NSError *error) {
+          if (error) {
+            failCallback(@[[error errorToDictionary]]);
+            return ;
+          }
+          JMSGGroup *group = resultObject;
+          [JMSGMessage forwardMessage:message target:group optionalContent:messageSendingOptions];
+        }];
+      } else {
+        NSString *targetAppkey = nil;
+        if (target[@"appKey"]) {
+          targetAppkey = target[@"appKey"];
+        }
+        [JMSGUser userInfoArrayWithUsernameArray:@[target[@"user"]] appKey:targetAppkey completionHandler:^(id resultObject, NSError *error) {
+          if (error) {
+            failCallback(@[[error errorToDictionary]]);
+            return ;
+          }
+          
+          NSArray *userArr = resultObject;
+          if (userArr.count < 1) {
+            failCallback(@[[self getErrorWithLog:@"cann't find user by usernaem"]]);
+          } else {
+            JMSGUser *user = resultObject[0];
+            [JMSGMessage forwardMessage:message target:user optionalContent:messageSendingOptions];
+          }
+        }];
+      }
+      
+    }];
+  } else {
+    [JMSGConversation createGroupConversationWithGroupId:param[@"groupId"] completionHandler:^(id resultObject, NSError *error) {
+      if (error) {
+        failCallback(@[[error errorToDictionary]]);
+        return;
+      }
+      
+      JMSGConversation *conversation = resultObject;
+      JMSGMessage *message = [conversation messageWithMessageId: param[@"id"]];
+      
+      if ([message.content isKindOfClass:[JMSGMediaAbstractContent class]]) {
+        JMSGMediaAbstractContent *content = (JMSGMediaAbstractContent *)message.content;
+        content.uploadHandler = ^(float percent, NSString *msgID) {
+          [self.bridge.eventDispatcher sendAppEventWithName:uploadProgressEvent body:@{@"messageId": msgID,
+                                                                                       @"progress": @(percent)}];
+        };
+      }
+      
+      JMSGOptionalContent *messageSendingOptions = nil;
+      if (param[@"messageSendingOptions"] && [param[@"messageSendingOptions"] isKindOfClass: [NSDictionary class]]) {
+        messageSendingOptions = [self convertDicToJMSGOptionalContent:param[@"messageSendingOptions"]];
+      }
+      
+      NSDictionary *target = nil;
+      if (param[@"target"]) {
+        target = param[@""];
+      } else {
+        failCallback(@[[self getParamError]]);
+        return;
+      }
+      
+      if ([target[@"type"] isEqualToString:@"group"]) {
+        [JMSGGroup groupInfoWithGroupId:target[@"id"] completionHandler:^(id resultObject, NSError *error) {
+          if (error) {
+            failCallback(@[[error errorToDictionary]]);
+            return ;
+          }
+          JMSGGroup *group = resultObject;
+          [JMSGMessage forwardMessage:message target:group optionalContent:messageSendingOptions];
+        }];
+      } else {
+        NSString *targetAppkey = nil;
+        if (target[@"appKey"]) {
+          targetAppkey = target[@"appKey"];
+        }
+        [JMSGUser userInfoArrayWithUsernameArray:@[target[@"user"]] appKey:targetAppkey completionHandler:^(id resultObject, NSError *error) {
+          if (error) {
+            failCallback(@[[error errorToDictionary]]);
+            return ;
+          }
+          
+          NSArray *userArr = resultObject;
+          if (userArr.count < 1) {
+            failCallback(@[[self getErrorWithLog:@"cann't find user by usernaem"]]);
+          } else {
+            JMSGUser *user = resultObject[0];
+            [JMSGMessage forwardMessage:message target:user optionalContent:messageSendingOptions];
+          }
+        }];
+      }
+//      if (messageSendingOptions) {
+//        [conversation sendMessage:message optionalContent:messageSendingOptions];
+//      } else {
+//        [conversation sendMessage:message];
+//      }
+      
+    }];
+  }
+}
+
 RCT_EXPORT_METHOD(blockGroupMessage:(NSDictionary *)param
                   successCallback:(RCTResponseSenderBlock)successCallback
                   failCallBack:(RCTResponseSenderBlock)failCallback) {

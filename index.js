@@ -171,6 +171,27 @@ export default class JMessage {
     }
 
     /**
+     * 消息转发。
+     * 注意：只能转发消息状态为 SendSucceed 和 ReceiveSucceed 的消息。
+     * @param {object} params = {
+     *  'id': String,                                  // message id
+     *  'type': String,                                // 'single' / 'group'
+     *  'groupId': String,                             // 当 type = group 时，groupId 不能为空
+     *  'username': String,                            // 当 type = single 时，username 不能为空
+     *  'target': Object (User or Group)               // 转发的对象，
+     *     > 如果 target 是 user : {'type': 'user','username': string, appKey: string}, appkey 缺省时为应用 Appkey，
+     *     > 如果 target 是 group: {'type': 'group','id': string }
+     * 
+     *  'messageSendingOptions': MessageSendingOptions // Optional. MessageSendingOptions 对象
+     * } 
+     * @param {function} success = function (msg) {}   // 以参数形式返回消息对象。
+     * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+     */
+    static forwardMessage(params, success, error) {
+        JMessageModule.sendMessage(params, success, error);
+    }
+    
+    /**
      * @param {object} params = {
      *  'type': String,                                // 'single' / 'group'
      *  'groupId': String,                             // 当 type = group 时，groupId 不能为空
