@@ -84,7 +84,7 @@ def enableProguardInReleaseBuilds = false
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    buildToolsVersion "26.0.2"
 
     defaultConfig {
         applicationId "com.sample.applicaiton"
@@ -141,6 +141,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-fs')
     compile project(':jmessage-react-plugin')
     compile project(':jcore-react-native')
     compile project(':aurora-imui-react-native')

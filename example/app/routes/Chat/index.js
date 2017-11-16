@@ -7,6 +7,7 @@
 import React, { Component } from 'react';
 import {
   AppRegistry,
+  Button,
   StyleSheet,
   Text,
   View,
@@ -127,6 +128,33 @@ export default class Chat extends Component {
     return message
   }
 
+  sendCustomMessage = () => {
+    var messages = [];
+    for (var i=0; i< 10; i++) {
+      var message = this.getNormalMessage()
+      message.msgType = "custom"
+      message.msgId = "10"
+      message.status = "send_going"
+      message.isOutgoing = true
+      message.content = '<body bgcolor="#ff3399"><h5>This is a custom message. </h5>\
+      <img src="/storage/emulated/0/XhsEmoticonsKeyboard/Emoticons/wxemoticons/icon_040_cover.png"></img></body>'
+      message.contentSize = {'height': 400, 'width': 400}
+      message.extras = {"extras": "fdfsf"}
+      var user = {
+        userId: "1",
+        displayName: "",
+        avatarPath: ""
+      }
+      user.displayName = "0001"
+      user.avatarPath = "ironman"
+      message.fromUser = user
+      messages[i] = message;
+    }
+    
+    AuroraIController.appendMessages(messages);
+    
+  }
+
   componentDidMount() {
     var parames = {
 
@@ -183,6 +211,10 @@ export default class Chat extends Component {
       JMessage.addReceiveMessageListener(this.receiveMessageCallBack)
     }
     AuroraIController.addMessageListDidLoadListener(this.messageListDidLoadCallback)
+    this.timer = setTimeout(() => {
+      console.log("Sending custom message")
+      this.sendCustomMessage();
+    }, 2000)
   }
 
   componentWillUnmount() {
@@ -258,8 +290,8 @@ export default class Chat extends Component {
     if (Platform.OS === "android") {
       this.timer = setTimeout(() => {
         console.log("send refresh complete event")
-        this.refs["PtrLayout"].refreshComplete() 
-        },2000);
+        this.refs["PtrLayout"].refreshComplete()
+      }, 2000);
     }
   }
 
@@ -425,7 +457,7 @@ export default class Chat extends Component {
     } else {
       this.updateLayout({ width: window.width, height: 338, })
     }
-    
+
   }
 
   onSwitchToGalleryMode = () => {
