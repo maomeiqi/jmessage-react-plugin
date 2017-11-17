@@ -5,7 +5,7 @@ import ReactNative from 'react-native';
 
 import JMessage from 'jmessage-react-plugin';
 import {
-	TabNavigator
+  TabNavigator
 } from 'react-navigation';
 
 var RNFS = require('react-native-fs');
@@ -13,94 +13,105 @@ var RNFS = require('react-native-fs');
 import ListItem from '../../../views/ListItem'
 
 const {
-    View,
-    Text,
-    TouchableHighlight,
-    StyleSheet,
-    Button,
-    Alert,
-    TextInput,
-    Image,
-  } = ReactNative;
+  View,
+  Text,
+  TouchableHighlight,
+  StyleSheet,
+  Button,
+  Alert,
+  TextInput,
+  Image,
+  Platform,
+} = ReactNative;
 
 const styles = StyleSheet.create({
-    header: {
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginTop: 20,
-      borderBottomWidth: 1,
-      borderColor: "#cccccc",
-    },
-    avatar: {
-      width: 60,
-      height: 60,
-    },
-    icon: {
-        width: 26,
-        height: 26,
-    },
-    username: {
-      marginTop: 10,
-      marginBottom: 20,
-      justifyContent: 'center',
-      alignItems: 'center',
-      textAlign: 'center',
+  header: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+    borderBottomWidth: 1,
+    borderColor: "#cccccc",
+  },
+  avatar: {
+    width: 60,
+    height: 60,
+  },
+  icon: {
+    width: 26,
+    height: 26,
+  },
+  username: {
+    marginTop: 10,
+    marginBottom: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlign: 'center',
 
-    },
+  },
 });
 
 export default class MyNotificationsScreen extends React.Component {
-    static navigationOptions = {
-      title: "我",
-      tabBarLabel: '我',
-      tabBarIcon: ({ tintColor }) => (
-        <Image
+  static navigationOptions = {
+    title: "我",
+    tabBarLabel: '我',
+    tabBarIcon: ({
+      tintColor
+    }) => (
+      <Image
           source={require('../../../resource/user-icon.png')}
           style={[styles.icon, {tintColor: tintColor}]}
         />
-      ),
-    };
-    constructor(props) {
-      super(props)
-      this.state = {
-        myInfo: {},
-        headerImage: "",
-      }
+    ),
+  };
+  constructor(props) {
+    super(props)
+    this.state = {
+      myInfo: {},
+      headerImage: "",
     }
-    componentWillMount() {
-      JMessage.getMyInfo((user) => {
-        Alert.alert("RNFS.MainBundlePath",RNFS.MainBundlePath)
-        Alert.alert("user.avatarThumbPath",user.avatarThumbPath)
-        this.setState({myInfo: user,})
-        RNFS.readFile(user.avatarThumbPath,'base64')
-        .then((data)=>{
-             //字符串转json
-            this.setState({myInfo: 'data:image/png;base64,' + data,})
-            this.setState({headerImage: 'data:image/png;base64,' + data,})
+  }
+  componentWillMount() {
+    JMessage.getMyInfo((user) => {
+      Alert.alert("RNFS.MainBundlePath", RNFS.MainBundlePath)
+      Alert.alert("user.avatarThumbPath", user.avatarThumbPath)
+      this.setState({
+        myInfo: user,
+      })
+      if (Platform.OS === "ios") {
+        RNFS.readFile(user.avatarThumbPath, 'base64')
+        .then((data) => {
+          //字符串转json
+          this.setState({
+            myInfo: 'data:image/png;base64,' + data,
+          })
+          this.setState({
+            headerImage: 'data:image/png;base64,' + data,
+          })
 
         })
-        .catch((data)=>{
-            console.log('读取失败');
+        .catch((data) => {
+          console.log('读取失败');
         });
+      }
 
-        
-      })
-      
-    }
-    render() {
-      if (this.state.myInfo.avatarThumbPath === "") {
-        this.avatar = <Image
+
+    })
+
+  }
+  render() {
+    if (this.state.myInfo.avatarThumbPath === "") {
+      this.avatar = <Image
           source={require('../../../resource/group-icon.png')}
           style={styles.avatar}>
         </Image>
-      } else {
-        this.avatar = <Image
+    } else {
+      this.avatar = <Image
         source={{isStatic:true,uri: this.state.headerImage}}
         style={styles.avatar}>
        </Image>
-      }
-      return (
-        <View>
+    }
+    return (
+      <View>
           <View
             style={[styles.header]}>
             { this.avatar }
@@ -134,6 +145,6 @@ export default class MyNotificationsScreen extends React.Component {
           />
 
         </View>
-      );
-    }
+    );
+  }
 }

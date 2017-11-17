@@ -782,7 +782,7 @@ export default class JMessage {
     }
 
     /**
-     * 下载用户头像缩略图，如果已经下载，不会重复下载。
+     * 下载群组头像缩略图，如果已经下载，不会重复下载。
      *
      * @param {object} params = {'id': String}
      * @param {function} success = function ({'id': String, 'filePath': String}) {}
@@ -793,7 +793,7 @@ export default class JMessage {
     }
 
     /**
-     * 下载用户头像原图，如果已经下载，不会重复下载。
+     * 下载群组头像原图，如果已经下载，不会重复下载。
      *
      * @param {object} params = {'id': String}
      * @param {function} success = function ({'id': String, 'filePath': String}) {}
@@ -807,7 +807,7 @@ export default class JMessage {
      * 增加或更新扩展字段,可扩展会话属性，比如：会话置顶、标识特殊会话等
      *
      * @param {object} params = {
-     *  'extra': Object            // 附加字段对象
+     *  'extras': Object            // 附加字段对象
      *  'type': String,            // 'single' / 'group'
      *  'groupId': String,         // 目标群组 id。
      *  'username': String,        // 目标用户名。

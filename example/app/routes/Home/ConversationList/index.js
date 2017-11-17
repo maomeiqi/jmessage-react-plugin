@@ -84,11 +84,11 @@ export default class ConversationList extends React.Component {
             tabBarIcon: ({
                 tintColor
             }) => (
-                    <Image
+                <Image
                         source={require('../../../resource/chat-icon.png')}
                         style={[styles.icon, { tintColor: tintColor }]}
                     />
-                ),
+            ),
         }
     };
 
@@ -116,7 +116,9 @@ export default class ConversationList extends React.Component {
         this.props.navigation.setParams({
             createConversation: this._onCreateConversation
         });
-        JMessage.setDebugMode({ enable: true });
+        JMessage.setDebugMode({
+            enable: true
+        });
     }
     componentWillMount() {
         this.reloadConversationList()
@@ -234,14 +236,14 @@ export default class ConversationList extends React.Component {
 
     render() {
         this.listView = <FlatList
-            data={
-                this.state.data
-            }
-            renderItem={
+        data = {
+            this.state.data
+        }
+        renderItem = {
                 ({
                     item
                 }) => (
-                        <View>
+                    <View>
                             <TouchableHighlight
                                 style={[styles.conversationContent]}
                                 underlayColor='#dddddd'
@@ -260,10 +262,10 @@ export default class ConversationList extends React.Component {
                                 </View>
                             </TouchableHighlight>
                         </View>
-                    )
+                )
             } >
 
-        </FlatList>
+            </FlatList>
         return (
 
             <View>

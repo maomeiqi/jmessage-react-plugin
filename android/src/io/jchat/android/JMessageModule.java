@@ -16,9 +16,11 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.google.gson.jpush.JsonObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -34,6 +36,7 @@ import cn.jpush.im.android.api.callback.GetAvatarBitmapCallback;
 import cn.jpush.im.android.api.callback.GetBlacklistCallback;
 import cn.jpush.im.android.api.callback.GetGroupIDListCallback;
 import cn.jpush.im.android.api.callback.GetGroupInfoCallback;
+import cn.jpush.im.android.api.callback.GetGroupInfoListCallback;
 import cn.jpush.im.android.api.callback.GetGroupMembersCallback;
 import cn.jpush.im.android.api.callback.GetNoDisurbListCallback;
 import cn.jpush.im.android.api.callback.GetUserInfoCallback;
@@ -268,6 +271,14 @@ public class JMessageModule extends ReactContextBaseJavaModule {
         }
         if (map.hasKey(Constant.ADDRESS)) {
             myInfo.setAddress(map.getString(Constant.ADDRESS));
+        }
+        if (map.hasKey(Constant.EXTRAS)) {
+            ReadableMap extras = map.getMap(Constant.EXTRAS);
+            ReadableMapKeySetIterator iterator = extras.keySetIterator();
+            while (iterator.hasNextKey()) {
+                String key = iterator.nextKey();
+                myInfo.setUserExtras(key, extras.getString(key));
+            }
         }
         JMessageClient.updateMyInfo(UserInfo.Field.all, myInfo, new BasicCallback() {
             @Override
@@ -632,7 +643,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
             JMessageClient.createGroup(name, desc, new CreateGroupCallback() {
                 @Override
                 public void gotResult(int status, String desc, long groupId) {
-                    mJMessageUtils.handleCallbackWithValue(status, desc, success, fail,String.valueOf(groupId));
+                    mJMessageUtils.handleCallbackWithValue(status, desc, success, fail, String.valueOf(groupId));
                 }
             });
         } catch (Exception e) {
@@ -803,7 +814,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
             JMessageClient.addUsersToBlacklist(usernameList, appKey, new BasicCallback() {
                 @Override
                 public void gotResult(int status, String desc) {
-                    mJMessageUtils.handleCallback(status, desc, success,fail);
+                    mJMessageUtils.handleCallback(status, desc, success, fail);
                 }
             });
         } catch (Exception e) {
@@ -953,14 +964,10 @@ public class JMessageModule extends ReactContextBaseJavaModule {
                         public void gotResult(int status, String desc, Bitmap bitmap) {
                             if (status == 0) {
                                 String packageName = mContext.getPackageName();
-                                String fileName = username + appKey;
-                                String filePath = mJMessageUtils.getAvatarPath(packageName);
-                                File avatarFile = new File(filePath + fileName + ".png");
-                                if (!avatarFile.exists()) {
-                                    mJMessageUtils.storeImage(bitmap, fileName, packageName);
-                                }
+                                String fileName = username + appKey + "original";
+                                String path = mJMessageUtils.storeImage(bitmap, fileName, packageName);
                                 WritableMap result = Arguments.createMap();
-                                result.putString(Constant.FILE_PATH, filePath);
+                                result.putString(Constant.FILE_PATH, path);
                                 mJMessageUtils.handleCallbackWithObject(status, desc, success, fail, result);
                             } else {
                                 mJMessageUtils.handleError(fail, status, desc);
@@ -1213,6 +1220,233 @@ public class JMessageModule extends ReactContextBaseJavaModule {
         }
     }
 
+    @ReactMethod
+    public void isGroupBlocked(ReadableMap map, final Callback success, final Callback fail) {
+        try {
+            String groupId = map.getString(Constant.GROUP_ID);
+            JMessageClient.getGroupInfo(Long.parseLong(groupId), new GetGroupInfoCallback() {
+                @Override
+                public void gotResult(int status, String desc, GroupInfo groupInfo) {
+                    if (status == 0) {
+                        boolean isBlocked = groupInfo.isGroupBlocked() == 1;
+                        WritableMap result = Arguments.createMap();
+                        result.putBoolean(Constant.IS_BLOCKED, isBlocked);
+                        mJMessageUtils.handleCallbackWithObject(status, desc, success, fail, result);
+                    } else {
+                        mJMessageUtils.handleError(fail, status, desc);
+                    }
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            mJMessageUtils.handleError(fail, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);
+        }
+    }
+
+    @ReactMethod
+    public void getBlockedGroupList(final Callback success, final Callback fail) {
+        JMessageClient.getBlockedGroupsList(new GetGroupInfoListCallback() {
+            @Override
+            public void gotResult(int status, String desc, List<GroupInfo> list) {
+                if (status == 0) {
+                    WritableArray array = Arguments.createArray();
+                    for (GroupInfo groupInfo : list) {
+                        array.pushMap(ResultUtils.toJSObject(groupInfo));
+                    }
+                    mJMessageUtils.handleCallbackWithArray(status, desc, success, fail, array);
+                } else {
+                    mJMessageUtils.handleError(fail, status, desc);
+                }
+            }
+        });
+    }
+
+    @ReactMethod
+    public void updateGroupAvatar(final ReadableMap map, final Callback success, final Callback fail) {
+        try {
+            String groupId = map.getString(Constant.GROUP_ID);
+            JMessageClient.getGroupInfo(Long.parseLong(groupId), new GetGroupInfoCallback() {
+                @Override
+                public void gotResult(int status, String desc, GroupInfo groupInfo) {
+                    if (status == 0) {
+                        String path = map.getString("imgPath");
+                        String format = path.substring(path.lastIndexOf(".") + 1);
+                        File file = new File(path);
+                        if (file.exists()) {
+                            groupInfo.updateAvatar(file, format, new BasicCallback() {
+                                @Override
+                                public void gotResult(int status, String desc) {
+                                    mJMessageUtils.handleCallback(status, desc, success, fail);
+                                }
+                            });
+                        } else {
+                            mJMessageUtils.handleError(fail, ERR_CODE_PARAMETER, "File is not exist!");
+                        }
+                    } else {
+                        mJMessageUtils.handleError(fail, status, desc);
+                    }
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            mJMessageUtils.handleError(fail, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);
+        }
+    }
+
+    @ReactMethod
+    public void downloadThumbGroupAvatar(ReadableMap map, final Callback success, final Callback fail) {
+        try {
+            final String groupId = map.getString(Constant.GROUP_ID);
+            JMessageClient.getGroupInfo(Long.parseLong(groupId), new GetGroupInfoCallback() {
+                @Override
+                public void gotResult(int status, String desc, final GroupInfo groupInfo) {
+                    if (status == 0) {
+                        if (groupInfo.getAvatar() != null) {
+                            File file = groupInfo.getAvatarFile();
+                            final WritableMap result = Arguments.createMap();
+                            result.putString(Constant.ID, groupId);
+                            if (file.exists()) {
+                                result.putString(Constant.FILE_PATH, file.getAbsolutePath());
+                                mJMessageUtils.handleCallbackWithObject(status, desc, success, fail, result);
+                            } else {
+                                groupInfo.getAvatarBitmap(new GetAvatarBitmapCallback() {
+                                    @Override
+                                    public void gotResult(int status, String desc, Bitmap bitmap) {
+                                        if (status == 0) {
+                                            String fileName = groupId + groupInfo.getGroupName();
+                                            String path = mJMessageUtils.storeImage(bitmap, fileName,
+                                                    mContext.getPackageName());
+                                            result.putString(Constant.FILE_PATH, path);
+                                        } else {
+                                            mJMessageUtils.handleError(fail, status, desc);
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    } else {
+                        mJMessageUtils.handleError(fail, status, desc);
+                    }
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            mJMessageUtils.handleError(fail, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);
+        }
+    }
+
+    @ReactMethod
+    public void downloadOriginalGroupAvatar(ReadableMap map, final Callback success, final Callback fail) {
+        try {
+            final String groupId = map.getString(Constant.GROUP_ID);
+            JMessageClient.getGroupInfo(Long.parseLong(groupId), new GetGroupInfoCallback() {
+                @Override
+                public void gotResult(int status, String desc, final GroupInfo groupInfo) {
+                    if (status == 0) {
+                        if (groupInfo.getAvatar() != null) {
+                            File file = groupInfo.getBigAvatarFile();
+                            final WritableMap result = Arguments.createMap();
+                            result.putString(Constant.ID, groupId);
+                            if (file.exists()) {
+                                result.putString(Constant.FILE_PATH, file.getAbsolutePath());
+                                mJMessageUtils.handleCallbackWithObject(status, desc, success, fail, result);
+                            } else {
+                                groupInfo.getBigAvatarBitmap(new GetAvatarBitmapCallback() {
+                                    @Override
+                                    public void gotResult(int status, String desc, Bitmap bitmap) {
+                                        if (status == 0) {
+                                            String fileName = groupId + groupInfo.getGroupName() + "original";
+                                            String path = mJMessageUtils.storeImage(bitmap, fileName,
+                                                    mContext.getPackageName());
+                                            result.putString(Constant.FILE_PATH, path);
+                                        } else {
+                                            mJMessageUtils.handleError(fail, status, desc);
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            mJMessageUtils.handleError(fail, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);
+        }
+    }
+
+    @ReactMethod
+    public void setConversationExtras(ReadableMap map, Callback success, Callback fail) {
+        try {
+            Conversation conversation = mJMessageUtils.getConversation(map);
+            ReadableMap extraMap = map.getMap(Constant.EXTRAS);
+            ReadableMapKeySetIterator iterator = extraMap.keySetIterator();
+            JsonObject jsonObject = new JsonObject();
+            while(iterator.hasNextKey()) {
+                String key = iterator.nextKey();
+                jsonObject.addProperty(key, extraMap.getString(key));
+            }
+            conversation.updateConversationExtra(jsonObject.toString());
+            Log.e("JMessageModule", "extra : " + jsonObject.toString());
+            WritableMap result = ResultUtils.toJSObject(conversation);
+            mJMessageUtils.handleCallbackWithObject(0, "Set extra succeed", success, fail, result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            mJMessageUtils.handleError(fail, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);
+        }
+    }
+
+    @ReactMethod
+    public void forwardMessage(ReadableMap map, final Callback success, final Callback fail) {
+        try {
+            Conversation conversation = mJMessageUtils.getConversation(map);
+            if (conversation != null) {
+                Message message = conversation.getMessage(Integer.parseInt(map.getString(Constant.ID)));
+                MessageSendingOptions options = null;
+                if (map.hasKey(Constant.SENDING_OPTIONS)) {
+                    options = new MessageSendingOptions();
+                    ReadableMap optionMap = map.getMap(Constant.SENDING_OPTIONS);
+                    options.setShowNotification(optionMap.getBoolean("isShowNotification"));
+                    options.setRetainOffline(optionMap.getBoolean("isRetainOffline"));
+
+                    if (optionMap.hasKey("isCustomNotificationEnabled")) {
+                        options.setCustomNotificationEnabled(
+                                optionMap.getBoolean("isCustomNotificationEnabled"));
+                    }
+                    if (optionMap.hasKey("notificationTitle")) {
+                        options.setNotificationText(optionMap.getString("notificationTitle"));
+                    }
+                    if (optionMap.hasKey("notificationText")) {
+                        options.setNotificationText(optionMap.getString("notificationText"));
+                    }
+                }
+                ReadableMap target = map.getMap(Constant.TARGET);
+                String type = target.getString(Constant.TYPE);
+                Conversation targetConversation = null;
+                if (type.equals(Constant.TYPE_USER)) {
+                    String username = map.getString(Constant.USERNAME);
+                    String appKey = "";
+                    if (map.hasKey(Constant.APP_KEY)) {
+                        appKey = map.getString(Constant.APP_KEY);
+                    }
+                    targetConversation = Conversation.createSingleConversation(username, appKey);
+                } else {
+                    String groupId = map.getString(Constant.GROUP_ID);
+                    targetConversation = Conversation.createGroupConversation(Long.parseLong(groupId));
+                }
+                JMessageClient.forwardMessage(message, targetConversation, options, new BasicCallback() {
+                    @Override
+                    public void gotResult(int status, String desc) {
+                        mJMessageUtils.handleCallback(status, desc, success, fail);
+                    }
+                });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            mJMessageUtils.handleError(fail, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);
+        }
+    }
+
     public void onEvent(LoginStateChangeEvent event) {
         Log.d(TAG, "登录状态改变事件：event = " + event.toString());
         WritableMap map = Arguments.createMap();
@@ -1292,7 +1526,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
             }
             final WritableArray msgArray = Arguments.createArray();
             if (lastMediaMsgIndex == -1) {
-                for (Message msg: offlineMsgList) {
+                for (Message msg : offlineMsgList) {
                     msgArray.pushMap(ResultUtils.toJSObject(msg));
                 }
                 map.putArray(Constant.MESSAGE_ARRAY, msgArray);

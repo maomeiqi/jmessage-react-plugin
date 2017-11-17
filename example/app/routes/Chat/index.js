@@ -7,7 +7,6 @@
 import React, { Component } from 'react';
 import {
   AppRegistry,
-  Button,
   StyleSheet,
   Text,
   View,
@@ -87,8 +86,9 @@ export default class Chat extends Component {
     var user = {
       userId: "1",
       displayName: "",
-      avatarPath: ""
+      avatarPath: "1111111"
     }
+    console.log("from user: " + jmessage.from.avatarThumbPath)
     user.userId = jmessage.from.username
     user.displayName = jmessage.from.nickname
     user.avatarPath = jmessage.from.avatarThumbPath
@@ -99,7 +99,7 @@ export default class Chat extends Component {
       user.avatarPath = "ironman"
     }
     auroraMsg.fromUser = user
-    console.log("from user: " + JSON.stringify(auroraMsg.fromUser))
+    console.log("from user11111: " + JSON.stringify(auroraMsg.fromUser))
     auroraMsg.status = "send_succeed"
 
     auroraMsg.isOutgoing = true
@@ -211,10 +211,10 @@ export default class Chat extends Component {
       JMessage.addReceiveMessageListener(this.receiveMessageCallBack)
     }
     AuroraIController.addMessageListDidLoadListener(this.messageListDidLoadCallback)
-    this.timer = setTimeout(() => {
-      console.log("Sending custom message")
-      this.sendCustomMessage();
-    }, 2000)
+    //this.timer = setTimeout(() => {
+    //  console.log("Sending custom message")
+    //  this.sendCustomMessage();
+    //}, 2000)
   }
 
   componentWillUnmount() {
