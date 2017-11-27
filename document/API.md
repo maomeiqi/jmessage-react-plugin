@@ -70,7 +70,7 @@ import JMessage from 'jmessage-react-plugin';
 ## 初始化
 
 ### init
-
+**注意 Android 仍需在 build.gradle 中配置 appKey，具体可以[参考这个文件](https://github.com/jpush/jmessage-react-plugin/blob/dev/example/android/app/build.gradle)**
 初始化插件。建议在应用起始页的构造函数中调用。
 
 #### 示例
@@ -84,7 +84,7 @@ JMessage.init({
 ```
 #### 参数说明
 
-- appkey：极光官网注册的应用 AppKey。
+- appkey：极光官网注册的应用 AppKey。**Android 仍需配置 app 下 build.gradle 中的 AppKey。**
 - isOpenMessageRoaming：是否开启消息漫游，不传默认关闭。
 - isProduction：是否为生产模式。
 - channel：(选填)应用的渠道名称。
