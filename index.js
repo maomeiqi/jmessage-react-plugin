@@ -117,10 +117,11 @@ export default class JMessage {
      *
      * @param {object} params = {'field': '需要更新的字段值'}
      *
-     *  field 包括：nickname（昵称）, birthday（生日）, signature（签名）, gender（性别）, region（地区）, address（具体地址）。
+     *  field 包括：nickname（昵称）, birthday（生日）, signature（签名）, gender（性别）, region（地区）, address（具体地址），extras （附加信息）。
      *  如：{
      *    'birthday': Number,  // 生日日期的微秒数
      *    'gender': String,    // 'male' / 'female' / 'unknown'
+     *    'extras': {String: String} // 附加字段
      *    ...                  // 其余皆为 String 类型
      *  }
      * @param {function} success = function () {}
@@ -169,6 +170,27 @@ export default class JMessage {
         JMessageModule.sendMessage(params, success, error);
     }
 
+    /**
+     * 消息转发。
+     * 注意：只能转发消息状态为 SendSucceed 和 ReceiveSucceed 的消息。
+     * @param {object} params = {
+     *  'id': String,                                  // message id
+     *  'type': String,                                // 'single' / 'group'
+     *  'groupId': String,                             // 当 type = group 时，groupId 不能为空
+     *  'username': String,                            // 当 type = single 时，username 不能为空
+     *  'target': Object (User or Group)               // 转发的对象，
+     *     > 如果 target 是 user : {'type': 'user','username': string, appKey: string}, appkey 缺省时为应用 Appkey，
+     *     > 如果 target 是 group: {'type': 'group','id': string }
+     * 
+     *  'messageSendingOptions': MessageSendingOptions // Optional. MessageSendingOptions 对象
+     * } 
+     * @param {function} success = function (msg) {}   // 以参数形式返回消息对象。
+     * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+     */
+    static forwardMessage(params, success, error) {
+        JMessageModule.sendMessage(params, success, error);
+    }
+    
     /**
      * @param {object} params = {
      *  'type': String,                                // 'single' / 'group'
@@ -497,6 +519,34 @@ export default class JMessage {
     }
 
     /**
+     * 设置是否屏蔽群消息。
+     *
+     * @param {Object} params = { id: String, isBlock: boolean }
+     */
+    static blockGroupMessage(params, success, error) {
+        JMessageModule.blockGroupMessage(params, success, error)
+    }
+
+    /**
+     * 判断指定群组是否被屏蔽。
+     *
+     * @param {object} params = { id: String }
+     * @param {function} success = function ({ isBlocked: boolean }) {} // 以参数形式返回结果。
+     */
+    static isGroupBlocked(params, success, error) {
+        JMessageModule.isGroupBlocked(params, success, error)
+    }
+
+    /**
+     * 获取当前用户的群屏蔽列表。
+     *
+     * @param {function} success = function (groupArr) {} // 以参数形式返回结果。
+     */
+    static getBlockedGroupList(success, error) {
+        JMessageModule.getBlockedGroupList(success, error)
+    }
+
+    /**
      * 设置某个用户或群组是否免打扰。
      *
      * @param {object} params = {
@@ -716,7 +766,59 @@ export default class JMessage {
         JMessageModule.resetUnreadMessageCount(params, success, error)
     }
 
+    /**
+     * 更新当前用户头像。
+     * 
+     * @param {object} params = {
+     *  id: string // 目标群组的 id。
+     *  imgPath: string // 本地图片绝对路径。
+     * }  
+     * 注意 Android 与 iOS 的文件路径是不同的：
+     *   - Android 类似：/storage/emulated/0/DCIM/Camera/IMG_20160526_130223.jpg
+     *   - iOS 类似：/var/mobile/Containers/Data/Application/7DC5CDFF-6581-4AD3-B165-B604EBAB1250/tmp/photo.jpg
+     */
+    static updateGroupAvatar(params, success, error) {
+        JMessageModule.updateGroupAvatar(params, success, error)
+    }
 
+    /**
+     * 下载群组头像缩略图，如果已经下载，不会重复下载。
+     *
+     * @param {object} params = {'id': String}
+     * @param {function} success = function ({'id': String, 'filePath': String}) {}
+     * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+     */
+    static downloadThumbGroupAvatar(params, success, error) {
+        JMessageModule.downloadThumbGroupAvatar(params, success, error)
+    }
+
+    /**
+     * 下载群组头像原图，如果已经下载，不会重复下载。
+     *
+     * @param {object} params = {'id': String}
+     * @param {function} success = function ({'id': String, 'filePath': String}) {}
+     * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+     */
+    static downloadOriginalGroupAvatar(params, success, error) {
+        JMessageModule.downloadOriginalGroupAvatar(params, success, error)
+    }
+
+    /**
+     * 增加或更新扩展字段,可扩展会话属性，比如：会话置顶、标识特殊会话等
+     *
+     * @param {object} params = {
+     *  'extras': Object            // 附加字段对象
+     *  'type': String,            // 'single' / 'group'
+     *  'groupId': String,         // 目标群组 id。
+     *  'username': String,        // 目标用户名。
+     *  'appKey': String,          // 目标用户所属 AppKey。
+     * }
+     * @param {function} success = function (conversation) {} // 具体字段参考文档
+     * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+     */
+    static setConversationExtras(params, success, error) {
+        JMessageModule.setConversationExtras(params, success, error)
+    }
 
     /**
      * 

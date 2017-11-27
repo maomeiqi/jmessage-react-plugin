@@ -2,11 +2,16 @@ package io.jchat.android.utils;
 
 
 
+import android.text.TextUtils;
+
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
+import com.google.gson.jpush.JsonElement;
+import com.google.gson.jpush.JsonObject;
+import com.google.gson.jpush.JsonParser;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,8 +36,10 @@ import cn.jpush.im.android.api.model.Conversation;
 import cn.jpush.im.android.api.model.GroupInfo;
 import cn.jpush.im.android.api.model.Message;
 import cn.jpush.im.android.api.model.UserInfo;
+import io.jchat.android.Constant;
 
 public class ResultUtils {
+
 
     public static Map<String, String> fromMap(ReadableMap extras) {
         Map<String, String> map = new HashMap<String, String>();
@@ -62,121 +69,123 @@ public class ResultUtils {
             return Arguments.createMap();
         }
         final WritableMap result = Arguments.createMap();
-        result.putString("type", "user");
+        result.putString(Constant.TYPE, Constant.TYPE_USER);
         if (null != userInfo.getGender()) {
-            result.putString("gender", userInfo.getGender().toString());
+            result.putString(Constant.GENDER, userInfo.getGender().toString());
         } else {
-            result.putString("gender", "unknown");
+            result.putString(Constant.GENDER, "unknown");
         }
-        result.putString("username", userInfo.getUserName());
-        result.putString("appKey", userInfo.getAppKey());
-        result.putString("nickname", userInfo.getNickname());
+        result.putString(Constant.USERNAME, userInfo.getUserName());
+        result.putString(Constant.APP_KEY, userInfo.getAppKey());
+        result.putString(Constant.NICKNAME, userInfo.getNickname());
 
         if (userInfo.getAvatarFile() != null) {
-            result.putString("avatarThumbPath", userInfo.getAvatarFile().getAbsolutePath());
+            result.putString(Constant.AVATAR_THUMB_PATH, userInfo.getAvatarFile().getAbsolutePath());
         } else {
             result.putString("avatarThumbPath", "");
         }
-
-        result.putDouble("birthday", userInfo.getBirthday());
-        result.putString("region", userInfo.getRegion());
-        result.putString("signature", userInfo.getSignature());
-        result.putString("address", userInfo.getAddress());
-        result.putString("noteName", userInfo.getNotename());
-        result.putString("noteText", userInfo.getNoteText());
-        result.putBoolean("isNoDisturb", userInfo.getNoDisturb() == 1);
-        result.putBoolean("isInBlackList", userInfo.getNoDisturb() == 1);
-        result.putBoolean("isFriend", userInfo.isFriend());
+        if (userInfo.getExtras() != null && userInfo.getExtras().size() > 0) {
+            result.putMap(Constant.EXTRAS, toJSObject(userInfo.getExtras()));
+        }
+        result.putDouble(Constant.BIRTHDAY, userInfo.getBirthday());
+        result.putString(Constant.REGION, userInfo.getRegion());
+        result.putString(Constant.SIGNATURE, userInfo.getSignature());
+        result.putString(Constant.ADDRESS, userInfo.getAddress());
+        result.putString(Constant.NOTE_NAME, userInfo.getNotename());
+        result.putString(Constant.NOTE_TEXT, userInfo.getNoteText());
+        result.putBoolean(Constant.IS_NO_DISTURB, userInfo.getNoDisturb() == 1);
+        result.putBoolean(Constant.IS_IN_BLACKLIST, userInfo.getBlacklist() == 1);
+        result.putBoolean(Constant.IS_FRIEND, userInfo.isFriend());
         return result;
     }
 
     public static WritableMap toJSObject(GroupInfo groupInfo) {
         WritableMap result = Arguments.createMap();
 
-        result.putString("type", "group");
-        result.putDouble("id", groupInfo.getGroupID());
-        result.putString("name", groupInfo.getGroupName());
-        result.putString("desc", groupInfo.getGroupDescription());
-        result.putInt("level", groupInfo.getGroupLevel());
-        result.putString("owner", groupInfo.getGroupOwner());
-        result.putString("ownerAppKey", groupInfo.getOwnerAppkey());
-        result.putInt("maxMemberCount", groupInfo.getMaxMemberCount());
-        result.putBoolean("isNoDisturb", groupInfo.getNoDisturb() == 1);
-        result.putBoolean("isBlocked", groupInfo.isGroupBlocked() == 1);
+        result.putString(Constant.TYPE, Constant.TYPE_GROUP);
+        result.putDouble(Constant.ID, groupInfo.getGroupID());
+        result.putString(Constant.NAME, groupInfo.getGroupName());
+        result.putString(Constant.DESC, groupInfo.getGroupDescription());
+        result.putInt(Constant.LEVEL, groupInfo.getGroupLevel());
+        result.putString(Constant.OWNER, groupInfo.getGroupOwner());
+        result.putString(Constant.OWNER_APP_KEY, groupInfo.getOwnerAppkey());
+        result.putInt(Constant.MAX_MEMBER_COUNT, groupInfo.getMaxMemberCount());
+        result.putBoolean(Constant.IS_NO_DISTURB, groupInfo.getNoDisturb() == 1);
+        result.putBoolean(Constant.IS_BLOCKED, groupInfo.isGroupBlocked() == 1);
         return result;
     }
 
     public static WritableMap toJSObject(Message msg) {
         WritableMap result = Arguments.createMap();
         try {
-            result.putString("id", String.valueOf(msg.getId()));
-            result.putMap("from", toJSObject(msg.getFromUser()));
+            result.putString(Constant.ID, String.valueOf(msg.getId()));
+            result.putMap(Constant.FROM, toJSObject(msg.getFromUser()));
 
             if (msg.getDirect() == MessageDirect.send) {
                 if (msg.getTargetType() == ConversationType.single) {
-                    result.putMap("target", toJSObject((UserInfo) msg.getTargetInfo()));
+                    result.putMap(Constant.TARGET, toJSObject((UserInfo) msg.getTargetInfo()));
                 } else if (msg.getTargetType() == ConversationType.group) {
-                    result.putMap("target", toJSObject((GroupInfo) msg.getTargetInfo()));
+                    result.putMap(Constant.TARGET, toJSObject((GroupInfo) msg.getTargetInfo()));
                 }
 
             } else {
                 UserInfo myInfo = JMessageClient.getMyInfo();
-                result.putMap("target", toJSObject(myInfo));
+                result.putMap(Constant.TARGET, toJSObject(myInfo));
             }
 
             MessageContent content = msg.getContent();
             if (content.getStringExtras() != null) {
-                result.putMap("extras", toJSObject(content.getStringExtras()));
+                result.putMap(Constant.EXTRAS, toJSObject(content.getStringExtras()));
             }
 
-            result.putDouble("createTime", msg.getCreateTime());
+            result.putDouble(Constant.CREATE_TIME, msg.getCreateTime());
 
             switch (msg.getContentType()) {
                 case text:
-                    result.putString("type", "text");
-                    result.putString("text", ((TextContent) content).getText());
+                    result.putString(Constant.TYPE, Constant.TEXT);
+                    result.putString(Constant.TEXT, ((TextContent) content).getText());
                     break;
                 case image:
-                    result.putString("type", "image");
-                    result.putString("thumbPath", ((ImageContent) content).getLocalThumbnailPath());
+                    result.putString(Constant.TYPE, Constant.IMAGE);
+                    result.putString(Constant.THUMB_PATH, ((ImageContent) content).getLocalThumbnailPath());
                     break;
                 case voice:
-                    result.putString("type", "voice");
-                    result.putString("path", ((VoiceContent) content).getLocalPath());
-                    result.putInt("duration", ((VoiceContent) content).getDuration());
+                    result.putString(Constant.TYPE, Constant.VOICE);
+                    result.putString(Constant.PATH, ((VoiceContent) content).getLocalPath());
+                    result.putInt(Constant.DURATION, ((VoiceContent) content).getDuration());
                     break;
                 case file:
-                    result.putString("type", "file");
-                    result.putString("fileName", ((FileContent) content).getFileName());
+                    result.putString(Constant.TYPE, Constant.FILE);
+                    result.putString(Constant.FILE_NAME, ((FileContent) content).getFileName());
                     break;
                 case custom:
-                    result.putString("type", "custom");
+                    result.putString(Constant.TYPE, Constant.CUSTOM);
                     Map<String, String> customObject = ((CustomContent) content).getAllStringValues();
-                    result.putMap("customObject", toJSObject(customObject));
+                    result.putMap(Constant.CUSTOM_OBJECT, toJSObject(customObject));
                     break;
                 case location:
-                    result.putString("type", "location");
-                    result.putDouble("latitude", ((LocationContent) content).getLatitude().doubleValue());
-                    result.putDouble("longitude", ((LocationContent) content).getLongitude().doubleValue());
-                    result.putString("address", ((LocationContent) content).getAddress());
-                    result.putDouble("scale", ((LocationContent) content).getScale().doubleValue());
+                    result.putString(Constant.TYPE, Constant.LOCATION);
+                    result.putDouble(Constant.LATITUDE, ((LocationContent) content).getLatitude().doubleValue());
+                    result.putDouble(Constant.LONGITUDE, ((LocationContent) content).getLongitude().doubleValue());
+                    result.putString(Constant.ADDRESS, ((LocationContent) content).getAddress());
+                    result.putDouble(Constant.SCALE, ((LocationContent) content).getScale().doubleValue());
                     break;
                 case eventNotification:
-                    result.putString("type", "event");
+                    result.putString(Constant.TYPE, "event");
                     List usernameList = ((EventNotificationContent) content).getUserNames();
-                    result.putArray("usernames", toJSArray(usernameList));
+                    result.putArray(Constant.USERNAMES, toJSArray(usernameList));
                     switch (((EventNotificationContent) content).getEventNotificationType()) {
                         case group_member_added:
                             //群成员加群事件
-                            result.putString("eventType", "group_member_added");
+                            result.putString(Constant.EVENT_TYPE, "group_member_added");
                             break;
                         case group_member_removed:
                             //群成员被踢事件
-                            result.putString("eventType", "group_member_removed");
+                            result.putString(Constant.EVENT_TYPE, "group_member_removed");
                             break;
                         case group_member_exit:
                             //群成员退群事件
-                            result.putString("eventType", "group_member_exit");
+                            result.putString(Constant.EVENT_TYPE, "group_member_exit");
                             break;
                     }
                 default:
@@ -192,21 +201,32 @@ public class ResultUtils {
         WritableMap map = Arguments.createMap();
 
         try {
-            map.putString("title", conversation.getTitle());
-            map.putString("conversationType", conversation.getType().name());
-            map.putInt("unreadCount", conversation.getUnReadMsgCnt());
+            map.putString(Constant.TITLE, conversation.getTitle());
+            map.putString(Constant.CONVERSATION_TYPE, conversation.getType().name());
+            map.putInt(Constant.UNREAD_COUNT, conversation.getUnReadMsgCnt());
 
             if (conversation.getLatestMessage() != null) {
-                map.putMap("latestMessage", toJSObject(conversation.getLatestMessage()));
+                map.putMap(Constant.LATEST_MESSAGE, toJSObject(conversation.getLatestMessage()));
+            }
+
+            if (!TextUtils.isEmpty(conversation.getExtra())) {
+                WritableMap extrasMap = Arguments.createMap();
+                String extras = conversation.getExtra();
+                JsonParser parser = new JsonParser();
+                JsonObject jsonObject = parser.parse(extras).getAsJsonObject();
+                for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
+                    extrasMap.putString(entry.getKey(), entry.getValue().toString());
+                }
+                map.putMap(Constant.EXTRAS, extrasMap);
             }
 
             if (conversation.getType() == ConversationType.single) {
                 UserInfo targetInfo = (UserInfo) conversation.getTargetInfo();
-                map.putMap("target", toJSObject(targetInfo));
+                map.putMap(Constant.TARGET, toJSObject(targetInfo));
 
             } else if (conversation.getType() == ConversationType.group) {
                 GroupInfo targetInfo = (GroupInfo) conversation.getTargetInfo();
-                map.putMap("target", toJSObject(targetInfo));
+                map.putMap(Constant.TARGET, toJSObject(targetInfo));
             }
 
         } catch (Exception e) {

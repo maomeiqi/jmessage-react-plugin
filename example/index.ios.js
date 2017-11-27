@@ -16,8 +16,6 @@ import UpdateMyInfoPage from './app/routes/UpdateMyInfo/index.js';
 import GroupsPage from './app/routes/Groups/index.js';
 import FriendInfoPage from './app/routes/FriendInfo/index.js';
 
-import CardStackStyleInterpolator from 'react-navigation/src/views/CardStackStyleInterpolator';
-
 const ReactJChat = StackNavigator({
 	Launch: { screen: LaunchPage },
 	Home: {
@@ -53,12 +51,5 @@ const ReactJChat = StackNavigator({
     path: 'people/:user'
   }
 });
-
-// ,{
-//   headerMode: 'screen',
-//   transitionConfig:() => ({
-//     screenInterpolator:CardStackStyleInterpolator.forInitial,
-//   })
-// }
 
 AppRegistry.registerComponent('ReactJChat', () => ReactJChat);
