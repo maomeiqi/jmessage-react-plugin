@@ -211,10 +211,10 @@ export default class Chat extends Component {
       JMessage.addReceiveMessageListener(this.receiveMessageCallBack)
     }
     AuroraIController.addMessageListDidLoadListener(this.messageListDidLoadCallback)
-    //this.timer = setTimeout(() => {
-    //  console.log("Sending custom message")
-    //  this.sendCustomMessage();
-    //}, 2000)
+    this.timer = setTimeout(() => {
+      console.log("Sending custom message")
+      this.sendCustomMessage();
+    }, 2000)
   }
 
   componentWillUnmount() {

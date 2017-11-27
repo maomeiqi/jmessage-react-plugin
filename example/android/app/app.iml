@@ -104,19 +104,19 @@
     <orderEntry type="jdk" jdkName="Android API 25 Platform (1)" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="com.google.code.gson:gson:2.8.0@jar" level="project" />
-    <orderEntry type="library" name="cn.jiguang.imui:chatinput-0.4.9" level="project" />
     <orderEntry type="library" name="com.squareup.okhttp3:okhttp-ws:3.4.1@jar" level="project" />
     <orderEntry type="library" name="com.github.w446108264:AndroidEmoji-1.0.0" level="project" />
     <orderEntry type="library" name="com.google.android:flexbox-0.2.5" level="project" />
     <orderEntry type="library" name="com.facebook.fresco:imagepipeline-base-1.0.1" level="project" />
+    <orderEntry type="library" name="cn.jiguang.imui:chatinput-0.5.0" level="project" />
     <orderEntry type="library" name="javax.inject:javax.inject:1@jar" level="project" />
     <orderEntry type="library" name="com.android.support:support-core-ui-25.3.1" level="project" />
     <orderEntry type="library" name="com.android.support:support-compat-25.3.1" level="project" />
     <orderEntry type="library" name="com.parse.bolts:bolts-tasks:1.4.0@jar" level="project" />
-    <orderEntry type="library" name="cn.jiguang.imui:messagelist-0.5.0" level="project" />
     <orderEntry type="library" name="com.google.code.findbugs:jsr305:3.0.0@jar" level="project" />
     <orderEntry type="library" name="com.facebook.react:react-native-0.44.2" level="project" />
     <orderEntry type="library" name="com.squareup.okhttp3:okhttp-urlconnection:3.4.1@jar" level="project" />
+    <orderEntry type="library" name="cn.jiguang.imui:messagelist-0.5.2" level="project" />
     <orderEntry type="library" name="__local_aars__:/Users/caiyg/Desktop/github/jmessage-react-plugin/example/node_modules/jcore-react-native/android/libs/jcore-android-1.1.7.jar:unspecified@jar" level="project" />
     <orderEntry type="library" name="com.facebook.soloader:soloader-0.1.0" level="project" />
     <orderEntry type="library" name="com.android.support:support-core-utils-25.3.1" level="project" />
