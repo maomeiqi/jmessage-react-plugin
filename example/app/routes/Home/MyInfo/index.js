@@ -72,8 +72,6 @@ export default class MyNotificationsScreen extends React.Component {
   }
   componentWillMount() {
     JMessage.getMyInfo((user) => {
-      Alert.alert("RNFS.MainBundlePath", RNFS.MainBundlePath)
-      Alert.alert("user.avatarThumbPath", user.avatarThumbPath)
       this.setState({
         myInfo: user,
       })

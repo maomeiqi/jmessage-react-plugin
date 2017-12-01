@@ -51,7 +51,7 @@ export default class Login extends React.Component {
             Alert.alert('login success')
             navigate('Home')
         }, (error) => {
-            Alert.alert('login success', JSON.stringify(error))
+            Alert.alert('login fail', JSON.stringify(error))
         })
     }
 

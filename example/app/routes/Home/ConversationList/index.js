@@ -181,7 +181,6 @@ export default class ConversationList extends React.Component {
     }
 
     _onPress() {
-        Alert.alert("click", "fasdf")
         JMessage.createConversation({
             type: 'single',
             username: '0002'
@@ -197,7 +196,6 @@ export default class ConversationList extends React.Component {
                     key: conv.target.id
                 }
                 item.conversationType = 'group'
-                Alert.alert('conversaion', JSON.stringify(conv))
             }
             this.setState({})
             Alert.alert('the item', JSON.stringify(item))
@@ -223,7 +221,6 @@ export default class ConversationList extends React.Component {
                     key: conv.target.id
                 }
                 item.conversationType = 'group'
-                Alert.alert('conversaion', JSON.stringify(conv))
             }
             this.reloadConversationList()
             this.props.navigation.navigate('Chat', {
