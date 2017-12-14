@@ -820,6 +820,7 @@ RCT_EXPORT_METHOD(sendFileMessage:(NSDictionary *)param
   if ([param[@"type"] isEqual: @"single"] && param[@"username"] != nil) {
     // send single text message
     JMSGFileContent *content = [[JMSGFileContent alloc] initWithFileData:[NSData dataWithContentsOfFile: mediaPath] fileName: fileName];
+    ((JMSGFileContent *)content).format = [mediaPath pathExtension];
     
     content.uploadHandler = ^(float percent, NSString *msgID) {
       [self.bridge.eventDispatcher sendAppEventWithName:uploadProgressEvent body:@{@"messageId": msgID,
@@ -850,7 +851,7 @@ RCT_EXPORT_METHOD(sendFileMessage:(NSDictionary *)param
     if ([param[@"type"] isEqual: @"group"] && param[@"groupId"] != nil) {
       // send group text message
       JMSGFileContent *content = [[JMSGFileContent alloc] initWithFileData:[NSData dataWithContentsOfFile: mediaPath] fileName: fileName];
-      
+      ((JMSGFileContent *)content).format = [mediaPath pathExtension];
       content.uploadHandler = ^(float percent, NSString *msgID) {
         [self.bridge.eventDispatcher sendAppEventWithName:uploadProgressEvent body:@{@"messageId": msgID,
                                                                                      @"progress": @(percent)}];
@@ -2304,6 +2305,7 @@ RCT_EXPORT_METHOD(createSendMessage:(NSDictionary *)param
 
     content = [[JMSGFileContent alloc] initWithFileData:[NSData dataWithContentsOfFile: mediaPath]
                                                fileName: param[@"fileName"]];
+    ((JMSGFileContent *)content).format = [mediaPath pathExtension];
     
   }
   

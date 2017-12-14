@@ -458,6 +458,7 @@
       dict[@"type"] = @"file";
       JMSGFileContent *fileContent = (JMSGFileContent *) self.content;
       dict[@"fileName"] = [fileContent fileName];
+      dict[@"path"] = [self getOriginMediaFilePath];
       break;
     }
     case kJMSGContentTypeLocation: {
