@@ -89,6 +89,17 @@ JMSG_ASSUME_NONNULL_BEGIN
                                        groupId:(NSString *)groupId;
 
 /*!
+ * @abstract 创建聊天室消息
+ *
+ * @param content 消息内容对象
+ * @param roomId  聊天室ID
+ *
+ * @discussion 不关心会话时的直接创建聊天消息的接口。一般建议使用 JMSGConversation -> createMessageWithContent:
+ */
++ (JMSGMessage *)createChatRoomMessageWithContent:(JMSGAbstractContent *)content
+                                       chatRoomId:(NSString *)roomId;
+
+/*!
  * @abstract 创建@人的群聊消息
  *
  * @param content 消息内容对象

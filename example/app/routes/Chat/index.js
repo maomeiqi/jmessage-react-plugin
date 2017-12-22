@@ -43,12 +43,16 @@ export default class Chat extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      inputViewLayout: { width: window.width, height: 200, },
       menuContainerHeight: 1000,
       isDismissMenuContainer: false,
       shouldExpandMenuContainer: false,
     };
-
+    if (Platform.OS == 'ios') {
+      this.state.inputViewLayout = { width: window.width, height: 86, }
+    } else {
+      this.state.inputViewLayout = { width: window.width, height: 200, }
+    }
+    
     this.updateLayout = this.updateLayout.bind(this);
     this.onTouchMsgList = this.onTouchMsgList.bind(this);
     this.conversation = this.props.navigation.state.params.conversation
@@ -138,7 +142,7 @@ export default class Chat extends Component {
       message.isOutgoing = true
       message.content = '<body bgcolor="#ff3399"><h5>This is a custom message. </h5>\
       <img src="/storage/emulated/0/XhsEmoticonsKeyboard/Emoticons/wxemoticons/icon_040_cover.png"></img></body>'
-      message.contentSize = {'height': 400, 'width': 400}
+      message.contentSize = {'height': 200, 'width': 200}
       message.extras = {"extras": "fdfsf"}
       var user = {
         userId: "1",
@@ -156,6 +160,7 @@ export default class Chat extends Component {
   }
 
   componentDidMount() {
+    this.resetMenu()
     var parames = {
 
       'from': 0,            // 开始的消息下标。
@@ -227,6 +232,31 @@ export default class Chat extends Component {
 
   }
 
+  resetMenu() {
+    if (Platform.OS === "android") {
+      console.log("reset menu, count: " + this.state.lineCount)
+      if (this.lineCount == 1) {
+        this.setState({
+          inputHeight: 120,
+          inputViewLayout: { width: window.width, height: 200 }
+        })
+      } else {
+        this.setState({
+          inputHeight: 80 + this.state.lineCount * 40,
+          inputViewLayout: { width: window.width, height: 160 + 40 * this.state.lineCount }
+        })
+      }
+      this.setState({
+        shouldExpandMenuContainer: false,
+      })
+    } else {
+      this.setState({
+        inputViewLayout: { width: window.width, height: 86 }
+      })
+      AuroraIController.hidenFeatureView(true)
+    }
+  }
+
   updateLayout(layout) {
     this.setState({ inputViewLayout: layout })
   }
@@ -237,14 +267,7 @@ export default class Chat extends Component {
 
   onTouchMsgList() {
     console.log("Touch msg list, hidding soft input and dismiss menu");
-    this.setState({
-      isDismissMenuContainer: true,
-      inputViewLayout: {
-        width: Dimensions.get('window').width,
-        height: 200
-      },
-      shouldExpandMenuContainer: false,
-    });
+    this.resetMenu()
   }
 
   onTouchEditText = () => {
@@ -560,7 +583,6 @@ export default class Chat extends Component {
           sendBubbleTextColor={"#000000"}
           sendBubblePadding={{ left: 10, top: 10, right: 15, bottom: 10 }}
         />
-        }
         <InputView style={this.state.inputViewLayout}
           menuContainerHeight={this.state.menuContainerHeight}
           isDismissMenuContainer={this.state.isDismissMenuContainer}
