@@ -66,6 +66,7 @@ target: UserInfo / GroupInfo    // 聊天对象信息
 
 ```js
 id: string,                     // 消息 id
+serverMessageId: string,     // 消息服务器Id 用于服务器追踪问题
 type: 'text',                   // 消息类型
 from: UserInfo,                 // 消息发送者对象
 target: UserInfo / GroupInfo,   // 消息接收者对象
@@ -80,6 +81,7 @@ extras: object                  // 附带的键值对
 
 ```js
 id: string,                    // 消息 id
+serverMessageId: string,       // 消息服务器Id 用于服务器追踪问题
 type: 'image',                 // 消息类型
 from: UserInfo,                // 消息发送者对象
 target: UserInfo / GroupInfo,  // 消息接收者对象
@@ -91,6 +93,7 @@ thumbPath: string              // 图片的缩略图路径
 
 ```js
 id: string,                     // 消息 id
+serverMessageId: string,        // 消息服务器Id 用于服务器追踪问题
 type: 'voice',                  // 消息类型
 from: UserInfo,                 // 消息发送者对象
 target: UserInfo / GroupInfo,   // 消息接收者对象
@@ -103,6 +106,7 @@ duration: number                // 语音时长，单位秒
 
 ```js
 id: string,                     // 消息 id
+serverMessageId: string,        // 消息服务器Id 用于服务器追踪问题
 type: 'location',               // 消息类型
 from: UserInfo,                 // 消息发送者对象
 target: UserInfo / GroupInfo,   // 消息接收者对象
@@ -119,6 +123,7 @@ scale:number                    // 地图缩放比例
 
 ```js
 id: string,                     // 消息 id
+serverMessageId: string,        // 消息服务器Id 用于服务器追踪问题
 type: 'file',                   // 消息类型
 from: UserInfo,                 // 消息发送者对象
 target: UserInfo / GroupInfo,   // 消息接收者对象
@@ -130,6 +135,7 @@ fileName: string                // 文件名
 
 ```js
 id: string,                     // 消息 id
+serverMessageId: string,        // 消息服务器Id 用于服务器追踪问题
 type: 'custom',                 // 消息类型
 from: UserInfo,                 // 消息发送者对象
 target: UserInfo / GroupInfo,   // 消息接收者对象
