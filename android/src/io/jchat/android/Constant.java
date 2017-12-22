@@ -24,6 +24,7 @@ public class Constant {
     public static final String TYPE_GROUP = "group";
     public static final String TYPE_SINGLE = "single";
     public static final String ID = "id";
+    public static final String SERVER_ID = "serverMessageId";
     public static final String MESSAGE_ID = "messageId";
     public static final String GROUP_ID = "groupId";
     public static final String NAME = "name";
@@ -44,11 +45,11 @@ public class Constant {
     public static final String LIMIT = "limit";
     public static final String CREATE_TIME = "createTime";
     public static final String TEXT = "text";
-    static final String IMAGE = "image";
-    static final String VOICE = "voice";
-    static final String LOCATION = "location";
-    static final String FILE = "file";
-    static final String CUSTOM = "custom";
+    public static final String IMAGE = "image";
+    public static final String VOICE = "voice";
+    public static final String LOCATION = "location";
+    public static final String FILE = "file";
+    public static final String CUSTOM = "custom";
     public static final String EXTRAS = "extras";
     public static final String THUMB_PATH = "thumbPath";
     public static final String PATH = "path";

@@ -5,7 +5,7 @@
     "start": "node node_modules/react-native/local-cli/cli.js start"
   },
   "dependencies": {
-    "aurora-imui-react-native": "^0.5.6",
+    "aurora-imui-react-native": "^0.5.14",
     "jcore-react-native": "^1.2.1",
     "jmessage-react-plugin": "^2.1.0",
     "react": "16.0.0-alpha.12",
