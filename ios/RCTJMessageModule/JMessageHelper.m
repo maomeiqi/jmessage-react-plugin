@@ -338,6 +338,7 @@
   NSMutableDictionary *dict = [NSMutableDictionary new];
   
   dict[@"id"] = self.msgId;
+  dict[@"serverMessageId"] = self.serverMessageId;
   dict[@"from"] = [self.fromUser userToDictionary];
   
   if (self.content.extras != nil) {
