@@ -148,16 +148,19 @@ public class ResultUtils {
                     break;
                 case image:
                     result.putString(Constant.TYPE, Constant.IMAGE);
-                    result.putString(Constant.THUMB_PATH, ((ImageContent) content).getLocalThumbnailPath());
+                    ImageContent imageContent = (ImageContent) content;
+                    result.putString(Constant.THUMB_PATH, imageContent.getLocalThumbnailPath() + "." + imageContent.getFormat());
                     break;
                 case voice:
                     result.putString(Constant.TYPE, Constant.VOICE);
-                    result.putString(Constant.PATH, ((VoiceContent) content).getLocalPath());
+                    VoiceContent voiceContent = (VoiceContent) content;
+                    result.putString(Constant.PATH, voiceContent.getLocalPath() + "." + voiceContent.getFormat());
                     result.putInt(Constant.DURATION, ((VoiceContent) content).getDuration());
                     break;
                 case file:
                     result.putString(Constant.TYPE, Constant.FILE);
-                    result.putString(Constant.FILE_NAME, ((FileContent) content).getFileName());
+                    FileContent fileContent = (FileContent) content;
+                    result.putString(Constant.FILE_NAME, fileContent.getFileName() + "." + fileContent.getFormat());
                     break;
                 case custom:
                     result.putString(Constant.TYPE, Constant.CUSTOM);
