@@ -119,6 +119,7 @@ public class ResultUtils {
         WritableMap result = Arguments.createMap();
         try {
             result.putString(Constant.ID, String.valueOf(msg.getId()));
+            result.putString(Constant.SERVER_ID, String.valueOf(msg.getServerMessageId()));
             result.putMap(Constant.FROM, toJSObject(msg.getFromUser()));
 
             if (msg.getDirect() == MessageDirect.send) {

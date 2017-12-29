@@ -338,6 +338,7 @@
   NSMutableDictionary *dict = [NSMutableDictionary new];
   
   dict[@"id"] = self.msgId;
+  dict[@"serverMessageId"] = self.serverMessageId;
   dict[@"from"] = [self.fromUser userToDictionary];
   
   if (self.content.extras != nil) {
@@ -458,6 +459,7 @@
       dict[@"type"] = @"file";
       JMSGFileContent *fileContent = (JMSGFileContent *) self.content;
       dict[@"fileName"] = [fileContent fileName];
+      dict[@"path"] = [self getOriginMediaFilePath];
       break;
     }
     case kJMSGContentTypeLocation: {
