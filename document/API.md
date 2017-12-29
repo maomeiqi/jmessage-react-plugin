@@ -333,7 +333,7 @@ JMessage.createSendMessage({type: 'single', username: 'username', appKey: 'appke
 - groupId: 对象群组 id。当 `type` 为 'group' 时，`groupId` 为必填。
 
 
-- messageSendingOptions: 消息发送配置参数（只对 Android 生效）。支持的属性：
+- messageSendingOptions: 消息发送配置参数。支持的属性：
   - isShowNotification: 接收方是否针对此次消息发送展示通知栏通知。默认为 `true`。
   - isRetainOffline: 是否让后台在对方不在线时保存这条离线消息，等到对方上线后再推送给对方。默认为 `true`。
   - isCustomNotificationEnabled: 是否开启自定义接收方通知栏功能，设置为 `true` 后可设置下面的 `notificationTitle` 和 `notificationText`。默认未设置。
