@@ -24,7 +24,6 @@ import {
 import IMUI from 'aurora-imui-react-native'
 var InputView = IMUI.ChatInput;
 var MessageListView = IMUI.MessageList;
-var AndroidPtrLayout = IMUI.AndroidPtrLayout;
 const AuroraIController = IMUI.AuroraIMUIController;
 const window = Dimensions.get('window');
 
@@ -33,6 +32,8 @@ import JMessage from 'jmessage-react-plugin';
 import Translations from '../../resource/Translations'
 
 var themsgid = 1
+var from = 0;
+var limit = 10;
 
 export default class Chat extends Component {
 
@@ -42,17 +43,18 @@ export default class Chat extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      menuContainerHeight: 1000,
-      isDismissMenuContainer: false,
-      shouldExpandMenuContainer: false,
-    };
-    if (Platform.OS == 'ios') {
-      this.state.inputViewLayout = { width: window.width, height: 86, }
+    let initHeight;
+    if (Platform.OS == "android") {
+      initHeight = 100
     } else {
-      this.state.inputViewLayout = { width: window.width, height: 200, }
+      initHeight = 86
     }
-    
+    this.state = {
+      inputLayoutHeight: initHeight,
+      messageListLayout: {},
+      inputViewLayout: { width: window.width, height: initHeight, },
+    };
+
     this.updateLayout = this.updateLayout.bind(this);
     this.onTouchMsgList = this.onTouchMsgList.bind(this);
     this.conversation = this.props.navigation.state.params.conversation
@@ -134,7 +136,7 @@ export default class Chat extends Component {
 
   sendCustomMessage = () => {
     var messages = [];
-    for (var i=0; i< 10; i++) {
+    for (var i = 0; i < 10; i++) {
       var message = this.getNormalMessage()
       message.msgType = "custom"
       message.msgId = "10"
@@ -142,8 +144,8 @@ export default class Chat extends Component {
       message.isOutgoing = true
       message.content = '<body bgcolor="#ff3399"><h5>This is a custom message. </h5>\
       <img src="/storage/emulated/0/XhsEmoticonsKeyboard/Emoticons/wxemoticons/icon_040_cover.png"></img></body>'
-      message.contentSize = {'height': 200, 'width': 200}
-      message.extras = {"extras": "fdfsf"}
+      message.contentSize = { 'height': 200, 'width': 200 }
+      message.extras = { "extras": "fdfsf" }
       var user = {
         userId: "1",
         displayName: "",
@@ -154,9 +156,9 @@ export default class Chat extends Component {
       message.fromUser = user
       messages[i] = message;
     }
-    
+
     AuroraIController.appendMessages(messages);
-    
+
   }
 
   componentDidMount() {
@@ -166,7 +168,9 @@ export default class Chat extends Component {
       'from': 0,            // 开始的消息下标。
       'limit': 10            // 要获取的消息数。比如当 from = 0, limit = 10 时，是获取第 0 - 9 条历史消息。
     }
-
+    this.setState({
+      messageListLayout: { flex: 1, margin: 0, width: window.width }
+    })
     if (this.conversation.conversationType === 'single') {
       parames.type = 'single'
       parames.username = this.conversation.key
@@ -184,11 +188,7 @@ export default class Chat extends Component {
           }
           return normalMessage
         })
-        if (Platform.OS == 'ios') {
-          AuroraIController.insertMessagesToTop(auroraMessages)
-        } else {
-          AuroraIController.insertMessagesToTop(auroraMessages)
-        }
+        AuroraIController.insertMessagesToTop(auroraMessages)
       }, (error) => {
         Alert.alert('error!', JSON.stringify(error))
       })
@@ -222,38 +222,30 @@ export default class Chat extends Component {
     }, 2000)
   }
 
+  onInputViewSizeChange = (size) => {
+    console.log("height: " + size.height)
+    if (this.state.inputLayoutHeight != size.height) {
+      this.setState({
+        inputLayoutHeight: size.height,
+        inputViewLayout: { width: size.width, height: size.height }
+      })
+    }
+  }
+
   componentWillUnmount() {
     JMessage.removeReceiveMessageListener(this.receiveMessageCallBack)
     AuroraIController.removeMessageListDidLoadListener(this.messageListDidLoadCallback)
-    if (Platform.OS === 'android') {
-      UIManager.dispatchViewManagerCommand(findNodeHandle(this.refs["PtrLayout"]), 1, null)
-    }
     this.timer && clearTimeout(this.timer);
 
   }
 
   resetMenu() {
     if (Platform.OS === "android") {
-      console.log("reset menu, count: " + this.state.lineCount)
-      if (this.lineCount == 1) {
-        this.setState({
-          inputHeight: 120,
-          inputViewLayout: { width: window.width, height: 200 }
-        })
-      } else {
-        this.setState({
-          inputHeight: 80 + this.state.lineCount * 40,
-          inputViewLayout: { width: window.width, height: 160 + 40 * this.state.lineCount }
-        })
-      }
-      this.setState({
-        shouldExpandMenuContainer: false,
-      })
+      this.refs["ChatInput"].showMenu(false)
     } else {
       this.setState({
         inputViewLayout: { width: window.width, height: 86 }
       })
-      AuroraIController.hidenFeatureView(true)
     }
   }
 
@@ -266,28 +258,30 @@ export default class Chat extends Component {
   }
 
   onTouchMsgList() {
-    console.log("Touch msg list, hidding soft input and dismiss menu");
-    this.resetMenu()
+    AuroraIController.hidenFeatureView(true)
   }
 
   onTouchEditText = () => {
     console.log("scroll to bottom")
     AuroraIController.scrollToBottom(true);
-    if (this.state.shouldExpandMenuContainer) {
-      this.setState({ inputViewLayout: { width: window.width, height: 825, } })
-    }
-
+    // this.refs["ChatInput"].showMenu(false)
+    this.setState({
+      inputViewLayout: { width: window.width, height: this.state.inputLayoutHeight }
+    })
   }
 
   onFullScreen = () => {
+    var navigationBar = 50
     this.setState({
-      inputViewLayout: { width: window.width, height: window.height }
+      messageListLayout: { flex: 0, width: 0, height: 0 },
+      inputViewLayout: { flex:1, width: window.width, height: window.height }
     })
   }
 
   onRecoverScreen = () => {
     this.setState({
-      inputViewLayout: { width: window.width, height: 825 }
+      messageListLayout: { flex: 1, width: window.width, margin: 0 },
+      inputViewLayout: { flex: 0, width: window.width, height: this.state.inputLayoutHeight}
     })
   }
 
@@ -313,7 +307,7 @@ export default class Chat extends Component {
     if (Platform.OS === "android") {
       this.timer = setTimeout(() => {
         console.log("send refresh complete event")
-        this.refs["PtrLayout"].refreshComplete()
+        this.refs["MessageList"].refreshComplete()
       }, 2000);
     }
   }
@@ -475,31 +469,15 @@ export default class Chat extends Component {
   }
 
   onSwitchToMicrophoneMode = () => {
-    if (Platform.OS === "android") {
-      this.updateLayout({ width: window.width, height: 825, })
-    } else {
-      this.updateLayout({ width: window.width, height: 338, })
-    }
-
+    AuroraIController.scrollToBottom(true)
   }
 
   onSwitchToGalleryMode = () => {
-    if (Platform.OS === "android") {
-      this.updateLayout({ width: window.width, height: 825, })
-    } else {
-      this.updateLayout({ width: window.width, height: 338, })
-    }
+    AuroraIController.scrollToBottom(true)
   }
 
   onSwitchToCameraMode = () => {
-    if (Platform.OS == "android") {
-      this.updateLayout({ width: window.width, height: 825 })
-      this.setState({
-        shouldExpandMenuContainer: true
-      })
-    } else {
-      this.updateLayout({ width: window.width, height: 338, })
-    }
+    AuroraIController.scrollToBottom(true)
   }
 
   onShowKeyboard = (keyboard_height) => {
@@ -508,14 +486,7 @@ export default class Chat extends Component {
   }
 
   onSwitchToEmojiMode = () => {
-    if (Platform.OS == "android") {
-      this.updateLayout({ width: window.width, height: 825 })
-      this.setState({
-        shouldExpandMenuContainer: true
-      })
-    } else {
-      this.updateLayout({ width: window.width, height: 338, })
-    }
+    AuroraIController.scrollToBottom(true)
   }
 
   onInitPress() {
@@ -523,53 +494,10 @@ export default class Chat extends Component {
     this.updateAction();
   }
 
-  generateAndroidView() {
+  render() {
     return (
       <View style={styles.container}>
-        <AndroidPtrLayout
-          ref="PtrLayout"
-          onPullToRefresh={this.onPullToRefresh}>
-          <MessageListView style={styles.messageList}
-            ref="MessageList"
-            onAvatarClick={this.onAvatarClick}
-            onMsgClick={this.onMsgClick}
-            onStatusViewClick={this.onStatusViewClick}
-            onTouchMsgList={this.onTouchMsgList}
-            onTapMessageCell={this.onTapMessageCell}
-            onBeginDragMessageList={this.onBeginDragMessageList}
-            avatarSize={{ width: 40, height: 40 }}
-            sendBubbleTextSize={18}
-            sendBubbleTextColor={"#000000"}
-            sendBubblePadding={{ left: 10, top: 10, right: 20, bottom: 10 }}
-          />
-        </AndroidPtrLayout>
-        <InputView style={this.state.inputViewLayout}
-          menuContainerHeight={this.state.menuContainerHeight}
-          isDismissMenuContainer={this.state.isDismissMenuContainer}
-          onSendText={this.onSendText}
-          onTakePicture={this.onTakePicture}
-          onStartRecordVoice={this.onStartRecordVoice}
-          onFinishRecordVoice={this.onFinishRecordVoice}
-          onCancelRecordVoice={this.onCancelRecordVoice}
-          onStartRecordVideo={this.onStartRecordVideo}
-          onFinishRecordVideo={this.onFinishRecordVideo}
-          onSendGalleryFiles={this.onSendGalleryFiles}
-          onSwitchToEmojiMode={this.onSwitchToEmojiMode}
-          onSwitchToMicrophoneMode={this.onSwitchToMicrophoneMode}
-          onSwitchToGalleryMode={this.onSwitchToGalleryMode}
-          onSwitchToCameraMode={this.onSwitchToCameraMode}
-          onTouchEditText={this.onTouchEditText}
-          onFullScreen={this.onFullScreen}
-          onRecoverScreen={this.onRecoverScreen}
-        />
-      </View>
-    )
-  }
-
-  generateIOSView() {
-    return (
-      <View style={styles.container}>
-        <MessageListView style={styles.messageList}
+        <MessageListView style={this.state.messageListLayout}
           ref="MessageList"
           onAvatarClick={this.onAvatarClick}
           onMsgClick={this.onMsgClick}
@@ -584,6 +512,7 @@ export default class Chat extends Component {
           sendBubblePadding={{ left: 10, top: 10, right: 15, bottom: 10 }}
         />
         <InputView style={this.state.inputViewLayout}
+          ref="ChatInput"
           menuContainerHeight={this.state.menuContainerHeight}
           isDismissMenuContainer={this.state.isDismissMenuContainer}
           onSendText={this.onSendText}
@@ -602,19 +531,10 @@ export default class Chat extends Component {
           onTouchEditText={this.onTouchEditText}
           onFullScreen={this.onFullScreen}
           onRecoverScreen={this.onRecoverScreen}
+          onSizeChanged={this.onInputViewSizeChange}
         />
       </View>
-    )
-  }
-
-  render() {
-    let chat;
-    if (Platform.OS === "android") {
-      chat = this.generateAndroidView()
-    } else {
-      chat = this.generateIOSView()
-    }
-    return chat;
+    );
   }
 }
 
@@ -624,12 +544,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
-  },
-  messageList: {
-    flex: 1,
-    marginTop: 0,
-    width: window.width,
-    margin: 0,
   },
   inputView: {
     backgroundColor: 'green',
