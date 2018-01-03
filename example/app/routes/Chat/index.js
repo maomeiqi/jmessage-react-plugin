@@ -24,7 +24,6 @@ import {
 import IMUI from 'aurora-imui-react-native'
 var InputView = IMUI.ChatInput;
 var MessageListView = IMUI.MessageList;
-var AndroidPtrLayout = IMUI.AndroidPtrLayout;
 const AuroraIController = IMUI.AuroraIMUIController;
 const window = Dimensions.get('window');
 
@@ -265,23 +264,24 @@ export default class Chat extends Component {
   onTouchEditText = () => {
     console.log("scroll to bottom")
     AuroraIController.scrollToBottom(true);
-    this.refs["ChatInput"].showMenu(false)
+    // this.refs["ChatInput"].showMenu(false)
     this.setState({
       inputViewLayout: { width: window.width, height: this.state.inputLayoutHeight }
     })
   }
 
   onFullScreen = () => {
+    var navigationBar = 50
     this.setState({
       messageListLayout: { flex: 0, width: 0, height: 0 },
-      inputViewLayout: { width: window.width, height: window.height }
+      inputViewLayout: { flex:1, width: window.width, height: window.height }
     })
   }
 
   onRecoverScreen = () => {
     this.setState({
       messageListLayout: { flex: 1, width: window.width, margin: 0 },
-      inputViewLayout: { width: window.width, height: 825 }
+      inputViewLayout: { flex: 0, width: window.width, height: this.state.inputLayoutHeight}
     })
   }
 
