@@ -15,13 +15,16 @@ react-native link
 #### Android
 
 
-安装完毕后，在 MainApplication 中加上 JMessagePackage 即可。
+安装完毕后，在 MainApplication 中加上 JMessagePackage 即可，JMessagePackage 有一个参数，设置是否弹出 toast。
 ```
+// 如果设置为 true，则不弹出 toast。
+private boolean shutdownToast = false;
+
 @Override
 protected List<ReactPackage> getPackages() {
     return Arrays.<ReactPackage>asList(
             new MainReactPackage(),
-            new JMessageReactPackage(),
+            new JMessageReactPackage(shutdownToast),
     );
 }
 ```
