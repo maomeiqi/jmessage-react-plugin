@@ -55,9 +55,14 @@ export default class Login extends React.Component {
         })
     }
 
+    jumpToRegisterPage = () => {
+        const  { navigate } = this.props.navigation
+        navigate("Register")
+    }
+
     render() {
         return (
-        <View>
+        <View style={{flex: 1, }}>
             <TextInput
                 style={styles.inputView}
                 placeholder = "用户名"
@@ -73,7 +78,12 @@ export default class Login extends React.Component {
                 title="登录"
                 onPress={this.onPress}
                 >
-            </FormButton> 
+            </FormButton>
+            <Button
+                style={{width: 100, height: 20, position: "absolute", left: 0, top: 1000}}
+                onPress={this.jumpToRegisterPage}
+                title="注册">
+            </Button>
         </View>)
     }
 }

@@ -32,10 +32,10 @@ const {
     }
 
     onPress() {
-        JMessage.login({username: this.state.username, password: this.state.password}, () => {
-            Alert.alert('login success')
+        JMessage.register({username: this.state.username, password: this.state.password}, () => {
+            Alert.alert('register succeed')
         }, (error) => {
-            Alert.alert('login success', JSON.stringify(error))
+            Alert.alert('register failed', JSON.stringify(error))
         })
 
     }
