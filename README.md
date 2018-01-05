@@ -14,8 +14,32 @@ react-native link
 
 #### Android
 
+- 配置 AndroidManifest，加入 `meta-data` 部分
+```
+...
+<meta-data android:name="JPUSH_CHANNEL" android:value="${APP_CHANNEL}" />
+<meta-data android:name="JPUSH_APPKEY" android:value="${JPUSH_APPKEY}" />
+...
+```
+- 配置 build.gradle，将下列配置部分替换成自己的。
+```
+defaultConfig {
+        applicationId "你的 application id"
+        minSdkVersion 16
+        targetSdkVersion 22
+        versionCode 1
+        versionName "1.0"
+        ndk {
+            abiFilters "armeabi-v7a", "x86"
+        }
+        manifestPlaceholders = [
+                JPUSH_APPKEY: "你的 appKey",	//在此替换你的APPKey
+                APP_CHANNEL: "developer-default"		//应用渠道号
+        ]
+    }
+```
 
-安装完毕后，在 MainApplication 中加上 JMessagePackage 即可，JMessagePackage 有一个参数，设置是否弹出 toast。
+在 MainApplication 中加上 JMessagePackage 即可，JMessagePackage 有一个参数，设置是否弹出 toast。
 ```
 // 如果设置为 true，则不弹出 toast。
 private boolean shutdownToast = false;
