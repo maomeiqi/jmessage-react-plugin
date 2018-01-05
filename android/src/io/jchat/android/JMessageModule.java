@@ -173,7 +173,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
 
     // 注册
     @ReactMethod
-    public void register(ReadableMap map, final Callback success, final Callback fail) {
+    public void userRegister(ReadableMap map, final Callback success, final Callback fail) {
         mContext = getCurrentActivity();
         String username = map.getString(Constant.USERNAME);
         String password = map.getString(Constant.PASSWORD);

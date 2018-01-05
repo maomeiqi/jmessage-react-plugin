@@ -53,6 +53,7 @@ export default class Chat extends Component {
       inputLayoutHeight: initHeight,
       messageListLayout: {},
       inputViewLayout: { width: window.width, height: initHeight, },
+      menuContainerHeight: 625,
     };
 
     this.updateLayout = this.updateLayout.bind(this);
