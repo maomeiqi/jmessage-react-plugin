@@ -1507,7 +1507,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
             ReadableArray array = map.getArray(Constant.ROOM_IDS);
             Set<Long> idSet = new HashSet<>();
             for (int i=0; i < array.size() -1; i++) {
-                long id = Double.valueOf(array.getDouble(i)).longValue();
+                long id = Long.parseLong(array.getString(i));
                 idSet.add(id);
             }
             ChatRoomManager.getChatRoomInfos(idSet, new RequestCallback<List<ChatRoomInfo>>() {
@@ -1529,8 +1529,8 @@ public class JMessageModule extends ReactContextBaseJavaModule {
      * @param fail 失败回调
      */
     @ReactMethod
-    public void enterChatRoom(long roomId, final Callback success, final Callback fail) {
-        ChatRoomManager.enterChatRoom(roomId, new RequestCallback<Conversation>() {
+    public void enterChatRoom(String roomId, final Callback success, final Callback fail) {
+        ChatRoomManager.enterChatRoom(Long.parseLong(roomId), new RequestCallback<Conversation>() {
             @Override
             public void gotResult(int status, String desc, Conversation conversation) {
                 mJMessageUtils.handleCallbackWithObject(status, desc, success, fail, ResultUtils.toJSObject(conversation));
@@ -1545,8 +1545,8 @@ public class JMessageModule extends ReactContextBaseJavaModule {
      * @param fail 失败回调
      */
     @ReactMethod
-    public void leaveChatRoom(long roomId, final Callback success, final Callback fail) {
-        ChatRoomManager.leaveChatRoom(roomId, new BasicCallback() {
+    public void leaveChatRoom(String roomId, final Callback success, final Callback fail) {
+        ChatRoomManager.leaveChatRoom(Long.parseLong(roomId), new BasicCallback() {
             @Override
             public void gotResult(int i, String s) {
                 mJMessageUtils.handleCallback(i, s, success, fail);
@@ -1569,8 +1569,8 @@ public class JMessageModule extends ReactContextBaseJavaModule {
      * @param roomId 聊天室 id
      */
     @ReactMethod
-    public void deleteChatRoomConversation(long roomId, Callback success) {
-        success.invoke(JMessageClient.deleteChatRoomConversation(roomId));
+    public void deleteChatRoomConversation(String roomId, Callback success) {
+        success.invoke(JMessageClient.deleteChatRoomConversation(Long.parseLong(roomId)));
     }
 
     /**
@@ -1578,8 +1578,8 @@ public class JMessageModule extends ReactContextBaseJavaModule {
      * @param roomId 聊天室 id
      */
     @ReactMethod
-    public void createChatRoomConversation(long roomId, Callback success) {
-        Conversation conversation = Conversation.createChatRoomConversation(roomId);
+    public void createChatRoomConversation(String roomId, Callback success) {
+        Conversation conversation = Conversation.createChatRoomConversation(Long.parseLong(roomId));
         success.invoke(ResultUtils.toJSObject(conversation));
     }
 

@@ -106,7 +106,7 @@ public class ResultUtils {
         WritableMap result = Arguments.createMap();
 
         result.putString(Constant.TYPE, Constant.TYPE_GROUP);
-        result.putDouble(Constant.ID, groupInfo.getGroupID());
+        result.putString(Constant.ID, String.valueOf(groupInfo.getGroupID()));
         result.putString(Constant.NAME, groupInfo.getGroupName());
         result.putString(Constant.DESC, groupInfo.getGroupDescription());
         result.putInt(Constant.LEVEL, groupInfo.getGroupLevel());
@@ -246,7 +246,7 @@ public class ResultUtils {
     public static WritableMap toJSObject(ChatRoomInfo chatRoomInfo, final Callback fail) {
         final WritableMap map = Arguments.createMap();
         try {
-            map.putDouble(Constant.ROOM_ID, chatRoomInfo.getRoomID());
+            map.putString(Constant.ROOM_ID, String.valueOf(chatRoomInfo.getRoomID()));
             map.putString(Constant.ROOM_NAME, chatRoomInfo.getName());
             map.putString(Constant.APP_KEY, chatRoomInfo.getAppkey());
             chatRoomInfo.getOwnerInfo(new GetUserInfoCallback() {

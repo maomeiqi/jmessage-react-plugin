@@ -1009,7 +1009,7 @@ export default class JMessage {
      *  "count": number,  // 获取个数
      * }
      * ChatRoomInfo = {
-     *  "roomId": number,
+     *  "roomId": String,
      *  "roomName": String,
      *  "appKey": String,
      *  "maxMemberCount": number,
@@ -1036,7 +1036,7 @@ export default class JMessage {
 
     /**
      * 查询指定 roomId 聊天室信息
-     * @param {Array} param = [number]
+     * @param {Array} param = [String]
      * @param {function} success = function([{ChatRoomInfo}])
      * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
      */
@@ -1046,7 +1046,7 @@ export default class JMessage {
 
     /**
      * 进入聊天室，进入后才能收到聊天室信息及发言
-     * @param {number} roomId 
+     * @param {String} roomId 
      * @param {function} success = function({conversation})
      * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {} 
      */
@@ -1056,7 +1056,7 @@ export default class JMessage {
 
     /**
      * 离开聊天室
-     * @param {number} roomId 
+     * @param {String} roomId 
      * @param {function} success = function(0)
      * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {} 
      */
@@ -1075,7 +1075,7 @@ export default class JMessage {
 
     /**
      * 删除聊天室会话，同时删除本地相关缓存文件。成功返回 true，失败返回 false
-     * @param {number} roomId 
+     * @param {String} roomId 
      * @param {function} callback = function(bool)
      */
     static deleteChatRoomConversation(roomId, callback) {
@@ -1084,7 +1084,7 @@ export default class JMessage {
 
     /**
      * 创建聊天室会话，如果本地已存在，则不会重新创建，直接返回该会话
-     * @param {number} roomId 
+     * @param {String} roomId 
      * @param {function} callback = function({Conversation})
      */
     static createChatRoomConversation(roomId, callback) {
