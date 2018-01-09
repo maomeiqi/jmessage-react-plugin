@@ -25,9 +25,12 @@ import com.google.gson.jpush.JsonObject;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
+import cn.jpush.im.android.api.ChatRoomManager;
 import cn.jpush.im.android.api.ContactManager;
 import cn.jpush.im.android.api.JMessageClient;
 import cn.jpush.im.android.api.callback.CreateGroupCallback;
@@ -43,6 +46,7 @@ import cn.jpush.im.android.api.callback.GetUserInfoCallback;
 import cn.jpush.im.android.api.callback.GetUserInfoListCallback;
 import cn.jpush.im.android.api.callback.IntegerCallback;
 import cn.jpush.im.android.api.callback.ProgressUpdateCallback;
+import cn.jpush.im.android.api.callback.RequestCallback;
 import cn.jpush.im.android.api.content.CustomContent;
 import cn.jpush.im.android.api.content.FileContent;
 import cn.jpush.im.android.api.content.ImageContent;
@@ -51,6 +55,7 @@ import cn.jpush.im.android.api.content.MessageContent;
 import cn.jpush.im.android.api.content.TextContent;
 import cn.jpush.im.android.api.content.VoiceContent;
 import cn.jpush.im.android.api.enums.ContentType;
+import cn.jpush.im.android.api.event.ChatRoomMessageEvent;
 import cn.jpush.im.android.api.event.ContactNotifyEvent;
 import cn.jpush.im.android.api.event.ConversationRefreshEvent;
 import cn.jpush.im.android.api.event.LoginStateChangeEvent;
@@ -58,6 +63,7 @@ import cn.jpush.im.android.api.event.MessageEvent;
 import cn.jpush.im.android.api.event.MessageRetractEvent;
 import cn.jpush.im.android.api.event.NotificationClickEvent;
 import cn.jpush.im.android.api.event.OfflineMessageEvent;
+import cn.jpush.im.android.api.model.ChatRoomInfo;
 import cn.jpush.im.android.api.model.Conversation;
 import cn.jpush.im.android.api.model.GroupInfo;
 import cn.jpush.im.android.api.model.Message;
@@ -78,6 +84,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
     private static final String RETRACT_MESSAGE_EVENT = "JMessage.MessageRetract"; // 消息撤回事件
     private static final String CONTACT_NOTIFY_EVENT = "JMessage.ContactNotify"; // 收到好友请求消息事件
     private static final String UPLOAD_PROGRESS_EVENT = "JMessage.UploadProgress"; // 上传（图片，文件等）进度事件
+    private static final String RECEIVE_CHAT_ROOM_MSG_EVENT = "JMessage.ReceiveChatRoomMsgEvent"; // 收到聊天室消息事件
     private static final int ERR_CODE_PARAMETER = 1;
     private static final int ERR_CODE_CONVERSATION = 2;
     private static final int ERR_CODE_MESSAGE = 3;
@@ -1382,7 +1389,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
             ReadableMap extraMap = map.getMap(Constant.EXTRAS);
             ReadableMapKeySetIterator iterator = extraMap.keySetIterator();
             JsonObject jsonObject = new JsonObject();
-            while(iterator.hasNextKey()) {
+            while (iterator.hasNextKey()) {
                 String key = iterator.nextKey();
                 jsonObject.addProperty(key, extraMap.getString(key));
             }
@@ -1446,6 +1453,137 @@ public class JMessageModule extends ReactContextBaseJavaModule {
             mJMessageUtils.handleError(fail, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);
         }
     }
+
+    /**
+     * 查询当前应用 AppKey 下的聊天室信息
+     *
+     * @param param   包含起始位置，获取个数
+     * @param success 成功回调
+     * @param fail    失败回调
+     */
+    @ReactMethod
+    public void getChatRoomListByApp(ReadableMap param, final Callback success, final Callback fail) {
+        try {
+            int start = param.getInt("start");
+            int count = param.getInt("count");
+            ChatRoomManager.getChatRoomListByApp(start, count, new RequestCallback<List<ChatRoomInfo>>() {
+                @Override
+                public void gotResult(int status, String desc, List<ChatRoomInfo> chatRoomInfos) {
+                    mJMessageUtils.handleCallbackWithArray(status, desc, success, fail,
+                            ResultUtils.toJSArray(chatRoomInfos, fail));
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            mJMessageUtils.handleError(fail, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);
+        }
+    }
+
+    /**
+     * 获取当前用户所加入的所有聊天室信息
+     *
+     * @param success 成功回调
+     * @param fail    失败回调
+     */
+    @ReactMethod
+    public void getChatRoomListByUser(final Callback success, final Callback fail) {
+        ChatRoomManager.getChatRoomListByUser(new RequestCallback<List<ChatRoomInfo>>() {
+            @Override
+            public void gotResult(int status, String desc, List<ChatRoomInfo> list) {
+                mJMessageUtils.handleCallbackWithArray(status, desc, success, fail, ResultUtils.toJSArray(list, fail));
+            }
+        });
+    }
+
+    /**
+     * 查询指定 roomId 聊天室信息
+     * @param map 包含待查询 roomId
+     * @param success 成功回调
+     * @param fail 失败回调
+     */
+    @ReactMethod
+    public void getChatRoomInfos(ReadableMap map, final Callback success, final Callback fail) {
+        try {
+            ReadableArray array = map.getArray(Constant.ROOM_IDS);
+            Set<Long> idSet = new HashSet<>();
+            for (int i=0; i < array.size() -1; i++) {
+                long id = Double.valueOf(array.getDouble(i)).longValue();
+                idSet.add(id);
+            }
+            ChatRoomManager.getChatRoomInfos(idSet, new RequestCallback<List<ChatRoomInfo>>() {
+                @Override
+                public void gotResult(int status, String desc, List<ChatRoomInfo> list) {
+                    mJMessageUtils.handleCallbackWithArray(status, desc, success, fail, ResultUtils.toJSArray(list, fail));
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            mJMessageUtils.handleError(fail, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);
+        }
+    }
+
+    /**
+     * 进入聊天室，进入后才能收到聊天室信息及发言
+     * @param roomId 聊天室 id
+     * @param success 成功回调
+     * @param fail 失败回调
+     */
+    @ReactMethod
+    public void enterChatRoom(long roomId, final Callback success, final Callback fail) {
+        ChatRoomManager.enterChatRoom(roomId, new RequestCallback<Conversation>() {
+            @Override
+            public void gotResult(int status, String desc, Conversation conversation) {
+                mJMessageUtils.handleCallbackWithObject(status, desc, success, fail, ResultUtils.toJSObject(conversation));
+            }
+        });
+    }
+
+    /**
+     * 离开聊天室
+     * @param roomId 聊天室 id
+     * @param success 成功回调
+     * @param fail 失败回调
+     */
+    @ReactMethod
+    public void leaveChatRoom(long roomId, final Callback success, final Callback fail) {
+        ChatRoomManager.leaveChatRoom(roomId, new BasicCallback() {
+            @Override
+            public void gotResult(int i, String s) {
+                mJMessageUtils.handleCallback(i, s, success, fail);
+            }
+        });
+    }
+
+    /**
+     * 从本地获取用户的聊天室会话列表，没有则返回为空的列表
+     * @param success 成功回调
+     */
+    @ReactMethod
+    public void getChatRoomConversationList(Callback success) {
+        List<Conversation> list = JMessageClient.getChatRoomConversationList();
+        success.invoke(ResultUtils.toJSArray(list));
+    }
+
+    /**
+     * 删除聊天室会话，同时删除本地相关缓存文件。成功返回 true，失败返回 false
+     * @param roomId 聊天室 id
+     */
+    @ReactMethod
+    public void deleteChatRoomConversation(long roomId, Callback success) {
+        success.invoke(JMessageClient.deleteChatRoomConversation(roomId));
+    }
+
+    /**
+     * 创建聊天室会话，如果本地已存在，则不会重新创建，直接返回该会话
+     * @param roomId 聊天室 id
+     */
+    @ReactMethod
+    public void createChatRoomConversation(long roomId, Callback success) {
+        Conversation conversation = Conversation.createChatRoomConversation(roomId);
+        success.invoke(ResultUtils.toJSObject(conversation));
+    }
+
+
 
     public void onEvent(LoginStateChangeEvent event) {
         Log.d(TAG, "登录状态改变事件：event = " + event.toString());
@@ -1575,5 +1713,16 @@ public class JMessageModule extends ReactContextBaseJavaModule {
                 }
             }
         }
+    }
+
+    /**
+     * 聊天室消息事件
+     * @param event {@link ChatRoomMessageEvent}
+     */
+    public void onEventMainThread(ChatRoomMessageEvent event) {
+        List<Message> list = event.getMessages();
+        Log.d(TAG, "收到聊天室消息");
+        getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                .emit(RECEIVE_MSG_EVENT, ResultUtils.toJSArray(list));
     }
 }

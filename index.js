@@ -16,6 +16,7 @@ const messageRetract = "JMessage.MessageRetract" // 消息撤回事件
 const contactNotify = "JMessage.ContactNotify" // 收到好友请求消息事件
 const uploadProgress = "JMessage.UploadProgress" // 收到好友请求消息事件
 const conversationChange = "JMessage.conversationChange" // 会话变更事件
+const chatRoomMsgEvent = "JMessage.ReceiveChatRoomMsgEvent"; // 收到聊天室消息事件
 
 export default class JMessage {
 
@@ -1000,4 +1001,113 @@ export default class JMessage {
         listeners[listener].remove();
         listeners[listener] = null;
     }
+
+    /**
+     * 查询当前 AppKey 下的聊天室信息
+     * @param {object} param = {
+     *  "start": number,  // 起始位置
+     *  "count": number,  // 获取个数
+     * }
+     * ChatRoomInfo = {
+     *  "roomId": number,
+     *  "roomName": String,
+     *  "appKey": String,
+     *  "maxMemberCount": number,
+     *  "totalMemberCount": number,
+     *  "owner": UserInfo,
+     *  "description": String,
+     *  "createTime": number,
+     * }
+     * @param {function} success = function([{chatRoomInfo}]) 
+     * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+     */
+    static getChatRoomListByApp(param, success, error) {
+        JMessageModule.getChatRoomListByApp(param, success, error);
+    }
+
+    /**
+     * 获取当前用户所加入的所有聊天室信息
+     * @param {function} success = function([{ChatRoomInfo}]) 
+     * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+     */
+    static getChatRoomListByUser(success, error) {
+        JMessageModule.getChatRoomListByUser(success, error);
+    }
+
+    /**
+     * 查询指定 roomId 聊天室信息
+     * @param {Array} param = [number]
+     * @param {function} success = function([{ChatRoomInfo}])
+     * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+     */
+    static getChatRoomInfos(param, success, error) {
+        JMessageModule.getChatRoomInfos(param, success, error);
+    }
+
+    /**
+     * 进入聊天室，进入后才能收到聊天室信息及发言
+     * @param {number} roomId 
+     * @param {function} success = function({conversation})
+     * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {} 
+     */
+    static enterChatRoom(roomId, success, error) {
+        JMessageModule.enterChatRoom(roomId, success, error);
+    }
+
+    /**
+     * 离开聊天室
+     * @param {number} roomId 
+     * @param {function} success = function(0)
+     * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {} 
+     */
+    static leaveChatRoom(roomId, success, error) {
+        JMessageModule.leaveChatRoom(roomId, success, error);
+    }
+
+    /**
+     * 从本地获取用户的聊天室会话列表，没有则返回为空的列表
+     * @param {function} callback = function([{Conversation}])
+     * 
+     */
+    static getChatRoomConversationList(callback) {
+        JMessageModule.getChatRoomConversationList(callback);
+    }
+
+    /**
+     * 删除聊天室会话，同时删除本地相关缓存文件。成功返回 true，失败返回 false
+     * @param {number} roomId 
+     * @param {function} callback = function(bool)
+     */
+    static deleteChatRoomConversation(roomId, callback) {
+        JMessageModule.deleteChatRoomConversation(roomId, callback);
+    }
+
+    /**
+     * 创建聊天室会话，如果本地已存在，则不会重新创建，直接返回该会话
+     * @param {number} roomId 
+     * @param {function} callback = function({Conversation})
+     */
+    static createChatRoomConversation(roomId, callback) {
+        JMessageModule.createChatRoomConversation(roomId, callback);
+    }
+
+    /**
+     * 接收聊天室消息
+     * @param {function} listener = function([{Message}])
+     */
+    static addReceiveChatRoomMsgListener(listener) {
+        listeners[listener] = DeviceEventEmitter.addListener(chatRoomMsgEvent,
+            (messages) => {
+                listener(messages);
+            });
+    }
+
+    static removeReceiveChatRoomMsgListener(listener) {
+        if (!listeners[listener]) {
+            return;
+        }
+        listeners[listener].remove();
+        listeners[listener] = null;
+    }
+
 }

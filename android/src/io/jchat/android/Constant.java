@@ -8,6 +8,10 @@ public class Constant {
     public static final String OLD_PWD = "oldPwd";
     public static final String NEW_PWD = "newPwd";
     public static final String APP_KEY = "appKey";
+
+    /**
+     * UserInfo
+     */
     public static final String NICKNAME = "nickname";
     public static final String GENDER = "gender";
     public static final String AVATAR_THUMB_PATH = "avatarThumbPath";
@@ -20,6 +24,10 @@ public class Constant {
     public static final String IS_NO_DISTURB = "isNoDisturb";
     public static final String IS_IN_BLACKLIST = "isInBlackList";
     public static final String IS_FRIEND = "isFriend";
+
+    /**
+     * Conversation
+     */
     public static final String TYPE_USER = "user";
     public static final String TYPE_GROUP = "group";
     public static final String TYPE_SINGLE = "single";
@@ -38,6 +46,10 @@ public class Constant {
     public static final String LATEST_MESSAGE = "latestMessage";
     public static final String UNREAD_COUNT = "unreadCount";
     public static final String CONVERSATION_TYPE = "conversationType";
+
+    /**
+     * Message
+     */
     public static final String TARGET = "target";
     public static final String TYPE = "type";
     static final String MESSAGE_TYPE = "messageType";
@@ -78,4 +90,12 @@ public class Constant {
     static final String RETRACT_MESSAGE = "retractedMessage";
     static final String MESSAGE_ARRAY = "messageArray";
     static final String PROGRESS = "progress";
+    public static final String UNRECEIPT_COUNT = "unreceiptCount";
+    /**
+     * ChatRoom
+     */
+    public static final String ROOM_ID = "roomId";
+    public static final String ROOM_IDS = "roomIds";
+    public static final String ROOM_NAME = "roomName";
+    public static final String TOTAL_MEMBER_COUNT = "totalMemberCount";
 }

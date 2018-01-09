@@ -5,6 +5,7 @@ package io.jchat.android.utils;
 import android.text.TextUtils;
 
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.facebook.react.bridge.WritableArray;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import cn.jpush.im.android.api.JMessageClient;
+import cn.jpush.im.android.api.callback.GetUserInfoCallback;
 import cn.jpush.im.android.api.content.CustomContent;
 import cn.jpush.im.android.api.content.EventNotificationContent;
 import cn.jpush.im.android.api.content.FileContent;
@@ -32,6 +34,7 @@ import cn.jpush.im.android.api.content.TextContent;
 import cn.jpush.im.android.api.content.VoiceContent;
 import cn.jpush.im.android.api.enums.ConversationType;
 import cn.jpush.im.android.api.enums.MessageDirect;
+import cn.jpush.im.android.api.model.ChatRoomInfo;
 import cn.jpush.im.android.api.model.Conversation;
 import cn.jpush.im.android.api.model.GroupInfo;
 import cn.jpush.im.android.api.model.Message;
@@ -140,7 +143,7 @@ public class ResultUtils {
             }
 
             result.putDouble(Constant.CREATE_TIME, msg.getCreateTime());
-
+            result.putInt(Constant.UNRECEIPT_COUNT, msg.getUnreceiptCnt());
             switch (msg.getContentType()) {
                 case text:
                     result.putString(Constant.TYPE, Constant.TEXT);
@@ -240,6 +243,35 @@ public class ResultUtils {
         return map;
     }
 
+    public static WritableMap toJSObject(ChatRoomInfo chatRoomInfo, final Callback fail) {
+        final WritableMap map = Arguments.createMap();
+        try {
+            map.putDouble(Constant.ROOM_ID, chatRoomInfo.getRoomID());
+            map.putString(Constant.ROOM_NAME, chatRoomInfo.getName());
+            map.putString(Constant.APP_KEY, chatRoomInfo.getAppkey());
+            chatRoomInfo.getOwnerInfo(new GetUserInfoCallback() {
+                @Override
+                public void gotResult(int status, String desc, UserInfo userInfo) {
+                    if (status == 0) {
+                        map.putMap(Constant.OWNER, toJSObject(userInfo));
+                    } else {
+                        WritableMap result = Arguments.createMap();
+                        result.putInt(Constant.CODE, status);
+                        result.putString(Constant.DESCRIPTION, desc);
+                        fail.invoke(result);
+                    }
+                }
+            });
+            map.putInt(Constant.MAX_MEMBER_COUNT, chatRoomInfo.getMaxMemberCount());
+            map.putString(Constant.DESCRIPTION, chatRoomInfo.getDescription());
+            map.putInt(Constant.TOTAL_MEMBER_COUNT, chatRoomInfo.getTotalMemberCount());
+            map.putInt(Constant.CREATE_TIME, chatRoomInfo.getCreateTime());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return map;
+    }
+
     public static WritableArray toJSArray(List list) {
         WritableArray array = Arguments.createArray();
 
@@ -260,6 +292,14 @@ public class ResultUtils {
         return array;
     }
 
+    public static WritableArray toJSArray(List<ChatRoomInfo> list, Callback fail) {
+        WritableArray array = Arguments.createArray();
+        for (ChatRoomInfo chatRoomInfo : list) {
+            array.pushMap(toJSObject(chatRoomInfo, fail));
+        }
+        return array;
+    }
+
     public static JSONObject toJSObject(String eventName, JSONObject value) {
         JSONObject result = new JSONObject();
         try {
@@ -270,4 +310,5 @@ public class ResultUtils {
         }
         return result;
     }
+
 }
