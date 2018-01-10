@@ -274,18 +274,19 @@ public class ResultUtils {
 
     public static WritableArray toJSArray(List list) {
         WritableArray array = Arguments.createArray();
-
-        for (Object object : list) {
-            if (object instanceof UserInfo) {
-                array.pushMap(toJSObject((UserInfo) object));
-            } else if (object instanceof GroupInfo) {
-                array.pushMap(toJSObject((GroupInfo) object));
-            } else if (object instanceof Message) {
-                array.pushMap(toJSObject((Message) object));
-            } else if (object instanceof Conversation) {
-                array.pushMap(toJSObject((Conversation) object));
-            } else {
-                array.pushString(object.toString());
+        if (list != null) {
+            for (Object object : list) {
+                if (object instanceof UserInfo) {
+                    array.pushMap(toJSObject((UserInfo) object));
+                } else if (object instanceof GroupInfo) {
+                    array.pushMap(toJSObject((GroupInfo) object));
+                } else if (object instanceof Message) {
+                    array.pushMap(toJSObject((Message) object));
+                } else if (object instanceof Conversation) {
+                    array.pushMap(toJSObject((Conversation) object));
+                } else {
+                    array.pushString(object.toString());
+                }
             }
         }
 
@@ -294,8 +295,10 @@ public class ResultUtils {
 
     public static WritableArray toJSArray(List<ChatRoomInfo> list, Callback fail) {
         WritableArray array = Arguments.createArray();
-        for (ChatRoomInfo chatRoomInfo : list) {
-            array.pushMap(toJSObject(chatRoomInfo, fail));
+        if (null != list) {
+            for (ChatRoomInfo chatRoomInfo : list) {
+                array.pushMap(toJSObject(chatRoomInfo, fail));
+            }
         }
         return array;
     }
