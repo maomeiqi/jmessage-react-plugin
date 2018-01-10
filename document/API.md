@@ -828,27 +828,13 @@ JMessage.enterConversation({ type: 'single', username: 'username', appKey: 'appK
 
 ### exitConversation
 
-**(Android only)** 退出聊天会话。调用后，聊天会话之后的相关消息通知将会被触发。
+**(Android only)** 退出当前聊天会话。调用后，聊天会话之后的相关消息通知将会被触发。
 
 #### 示例
 
 ```js
-JMessage.exitConversation({ type: 'single', username: 'username', appKey: 'appKey' },
-  (conversation) => {
-    // do something.
-
-  }, (error) => {
-    var code = error.code
-    var desc = error.description
- )
+JMessage.exitConversation();
 ```
-
-#### 参数说明
-
-- type: 会话类型。可以为 'single' 或 'group'。
-- username: 对方用户的用户名。当 `type` 为 'single' 时，`username` 为必填。
-- appKey: 对方用户所属应用的 AppKey。如果不填，默认为当前应用。
-- groupId: 对象群组 id。当 `type` 为 'group' 时，`groupId` 为必填。
 
 ### getConversation
 
