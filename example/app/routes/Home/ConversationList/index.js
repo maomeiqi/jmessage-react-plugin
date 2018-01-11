@@ -1,7 +1,7 @@
 'use strict';
 
 import React from 'react';
-import ReactNative from 'react-native';
+import ReactNative, { ScrollView } from 'react-native';
 import JMessage from 'jmessage-react-plugin';
 
 import FormButton from '../../../views/FormButton'
@@ -48,14 +48,17 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
     modalContent: {
-        width: 200,
-        height: 150,
-        justifyContent: 'center',
+        width: 300,
+        height: 300,
+        justifyContent: 'space-between',
         alignItems: 'center',
         backgroundColor: '#ffffff',
     },
     modalButton: {
-
+        margin: 10,
+    },
+    inputStyle: {
+        width: 200
     }
 });
 
@@ -84,11 +87,11 @@ export default class ConversationList extends React.Component {
             tabBarIcon: ({
                 tintColor
             }) => (
-                <Image
+                    <Image
                         source={require('../../../resource/chat-icon.png')}
                         style={[styles.icon, { tintColor: tintColor }]}
                     />
-            ),
+                ),
         }
     };
 
@@ -231,16 +234,32 @@ export default class ConversationList extends React.Component {
         })
     }
 
+    enterChatRoom(params) {
+        JMessage.enterChatRoom(params.roomId, (conversation) => {
+            var chatRoom = {
+                conversationType: 'chatroom',
+                key: conversation.roomId,
+                owner: conversation.owner,
+                totalMemberCount: conversation.totalMemberCount
+            }
+            this.props.navigation.navigate('Chat', {
+                conversation: chatRoom
+            })
+        }, (error) => {
+            console.alert("error, code: " + error.code + ", description: " + error.description)
+        })
+    }
+
     render() {
         this.listView = <FlatList
-        data = {
-            this.state.data
-        }
-        renderItem = {
+            data={
+                this.state.data
+            }
+            renderItem={
                 ({
                     item
                 }) => (
-                    <View>
+                        <View>
                             <TouchableHighlight
                                 style={[styles.conversationContent]}
                                 underlayColor='#dddddd'
@@ -259,10 +278,10 @@ export default class ConversationList extends React.Component {
                                 </View>
                             </TouchableHighlight>
                         </View>
-                )
+                    )
             } >
 
-            </FlatList>
+        </FlatList>
         return (
 
             <View>
@@ -274,6 +293,7 @@ export default class ConversationList extends React.Component {
                         <View
                             style={styles.modalContent}>
                             <TextInput
+                                style={styles.inputStyle}
                                 placeholder="用户名或群聊名称"
                                 onChangeText={(e) => { this.setState({ modalText: e }) }}>
                             </TextInput>
@@ -303,6 +323,22 @@ export default class ConversationList extends React.Component {
                                 }}
                                 style={styles.modalButton}
                                 title='创建群聊' />
+                            <Button
+                                onPress={() => {
+                                    JMessage.createChatRoomConversation("1000", (conversation) => {
+                                        var params = {
+                                            type: conversation.type,
+                                            roomId: conversation.roomId,
+                                            name: conversation.roomName,
+                                            appKey: conversation.appKey,
+                                            owner: conversation.owner,
+                                        }
+                                        this.setState({ isShowModal: false })
+                                        this.enterChatRoom(params)
+                                    })
+                                }}
+                                style={styles.modalButton}
+                                title='创建聊天室' />
 
                             <Button
                                 onPress={() => { this.setState({ isShowModal: false }) }}

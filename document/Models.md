@@ -2,6 +2,7 @@
 
 - [UserInfo](#userinfo)
 - [GroupInfo](#groupinfo)
+- [ChatRoomInfo](#ChatRoomInfo)
 - [Conversation](#conversation)
 - [Message](#message)
   - [TextMessage](#textmessage)
@@ -47,6 +48,22 @@ isNoDisturb: boolean,       // 是否免打扰
 isBlocked: boolean          // 是否屏蔽群消息
 ```
 
+## ChatRoomInfo
+
+```js
+type: 'chatroom',
+roomId: string,             // 聊天室 id
+roomName: string,           // 聊天室名字
+appKey: string,             // 聊天室所属 AppKey
+owner: UserInfo,            // 聊天室拥有者
+maxMemberCount: number,     // 聊天室最大成员数量
+description: string,        // 聊天室描述
+totalMemberCount: number,   // 聊天室当前成员数量
+createTime: number          // 聊天室创建时间，单位 秒
+```
+
+
+
 ## Conversation
 
 - 单聊：如果用户有昵称，`title` 为昵称，否则为 username。
@@ -56,8 +73,8 @@ isBlocked: boolean          // 是否屏蔽群消息
 title: string,                  // 会话标题
 latestMessage: Message,         // 最近的一条消息对象
 unreadCount: number,            // 未读消息数
-conversationType: 'single' / 'group',
-target: UserInfo / GroupInfo    // 聊天对象信息
+conversationType: 'single' / 'group', / 'chatroom'
+target: UserInfo / GroupInfo / ChatRoomInfo  // 聊天对象信息
 ```
 
 ## Message

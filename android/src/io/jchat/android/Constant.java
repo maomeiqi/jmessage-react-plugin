@@ -31,6 +31,7 @@ public class Constant {
     public static final String TYPE_USER = "user";
     public static final String TYPE_GROUP = "group";
     public static final String TYPE_SINGLE = "single";
+    public static final String TYPE_CHAT_ROOM = "chatroom";
     public static final String ID = "id";
     public static final String SERVER_ID = "serverMessageId";
     public static final String MESSAGE_ID = "messageId";

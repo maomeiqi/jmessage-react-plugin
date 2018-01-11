@@ -175,9 +175,12 @@ export default class Chat extends Component {
     if (this.conversation.conversationType === 'single') {
       parames.type = 'single'
       parames.username = this.conversation.key
-    } else {
+    } else if (this.conversation.conversationType === 'group') {
       parames.type = 'group'
       parames.groupId = this.conversation.key
+    } else {
+      parames.type = 'chatroom'
+      parames.roomId = this.conversation.key
     }
     this.messageListDidLoadCallback = () => {
 
@@ -288,6 +291,7 @@ export default class Chat extends Component {
 
   onMsgClick = (message) => {
     console.log(message)
+    alert(JSON.stringify(message))
   }
 
   onStatusViewClick = (message) => {

@@ -341,7 +341,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
     public void sendMessage(ReadableMap map, final Callback success, final Callback fail) {
         try {
             Conversation conversation = mJMessageUtils.getConversation(map);
-            final Message message = conversation.getMessage(map.getInt(Constant.ID));
+            final Message message = conversation.getMessage(Integer.parseInt(map.getString(Constant.ID)));
             if (map.hasKey(Constant.SENDING_OPTIONS)) {
                 MessageSendingOptions options = new MessageSendingOptions();
                 ReadableMap optionMap = map.getMap(Constant.SENDING_OPTIONS);

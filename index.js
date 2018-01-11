@@ -724,7 +724,7 @@ export default class JMessage {
      * 退出会话，和 enterConversation 方法成对使用
      */
     static exitConversation() {
-        if (Platform.OS === 'Android') {
+        if (Platform.OS === 'android') {
             JMessageModule.exitConversation()
         }
     }

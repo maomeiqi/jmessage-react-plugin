@@ -234,6 +234,9 @@ public class ResultUtils {
             } else if (conversation.getType() == ConversationType.group) {
                 GroupInfo targetInfo = (GroupInfo) conversation.getTargetInfo();
                 map.putMap(Constant.TARGET, toJSObject(targetInfo));
+            } else {
+                ChatRoomInfo chatRoomInfo = (ChatRoomInfo) conversation.getTargetInfo();
+                map.putMap(Constant.TARGET, toJSObject(chatRoomInfo, null));
             }
 
         } catch (Exception e) {
@@ -247,6 +250,7 @@ public class ResultUtils {
         final WritableMap map = Arguments.createMap();
         try {
             map.putString(Constant.ROOM_ID, String.valueOf(chatRoomInfo.getRoomID()));
+            map.putString(Constant.TYPE, Constant.TYPE_CHAT_ROOM);
             map.putString(Constant.ROOM_NAME, chatRoomInfo.getName());
             map.putString(Constant.APP_KEY, chatRoomInfo.getAppkey());
             chatRoomInfo.getOwnerInfo(new GetUserInfoCallback() {
@@ -254,7 +258,7 @@ public class ResultUtils {
                 public void gotResult(int status, String desc, UserInfo userInfo) {
                     if (status == 0) {
                         map.putMap(Constant.OWNER, toJSObject(userInfo));
-                    } else {
+                    } else if (fail != null) {
                         WritableMap result = Arguments.createMap();
                         result.putInt(Constant.CODE, status);
                         result.putString(Constant.DESCRIPTION, desc);
