@@ -231,7 +231,8 @@ export default class Chat extends Component {
     if (this.state.inputLayoutHeight != size.height) {
       this.setState({
         inputLayoutHeight: size.height,
-        inputViewLayout: { width: size.width, height: size.height }
+        inputViewLayout: { width: size.width, height: size.height },
+        messageListLayout: { flex:1, width: window.width, margin: 0 }
       })
     }
   }
@@ -246,6 +247,9 @@ export default class Chat extends Component {
   resetMenu() {
     if (Platform.OS === "android") {
       this.refs["ChatInput"].showMenu(false)
+      this.setState({
+        messageListLayout: { flex: 1, width: window.width, margin: 0 },
+      })
     } else {
       this.setState({
         inputViewLayout: { width: window.width, height: 86 }
@@ -267,8 +271,7 @@ export default class Chat extends Component {
 
   onTouchEditText = () => {
     console.log("scroll to bottom")
-    AuroraIController.scrollToBottom(true);
-    // this.refs["ChatInput"].showMenu(false)
+    this.refs["ChatInput"].showMenu(false)
     this.setState({
       inputViewLayout: { width: window.width, height: this.state.inputLayoutHeight }
     })
@@ -347,6 +350,7 @@ export default class Chat extends Component {
   }
 
   onTakePicture = (mediaPath) => {
+    console.log("onTakePicture, path: " + mediaPath)
     var message = this.getNormalMessage()
     message.messageType = "image"
     message.path = mediaPath
@@ -536,7 +540,7 @@ export default class Chat extends Component {
           onTouchEditText={this.onTouchEditText}
           onFullScreen={this.onFullScreen}
           onRecoverScreen={this.onRecoverScreen}
-          onSizeChanged={this.onInputViewSizeChange}
+          onSizeChange={this.onInputViewSizeChange}
         />
       </View>
     );

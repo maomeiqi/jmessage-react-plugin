@@ -104,6 +104,7 @@ from: UserInfo,                // 消息发送者对象
 target: UserInfo / GroupInfo,  // 消息接收者对象
 extras: object,                // 附带的键值对
 thumbPath: string              // 图片的缩略图路径
+localPath: string              // 图片本地路径
 ```
 
 ### VoiceMessage

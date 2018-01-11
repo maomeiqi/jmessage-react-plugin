@@ -65,6 +65,7 @@ public class Constant {
     public static final String CUSTOM = "custom";
     public static final String EXTRAS = "extras";
     public static final String THUMB_PATH = "thumbPath";
+    public static final String LOCAL_PATH = "localPath";
     public static final String PATH = "path";
     public static final String DURATION = "duration";
     public static final String LONGITUDE = "longitude";

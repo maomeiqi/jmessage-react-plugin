@@ -44,8 +44,10 @@ public class JMessageUtils {
             String appKey = "";
             if (map.hasKey(Constant.APP_KEY)) {
                 appKey = map.getString(Constant.APP_KEY);
+                conversation = Conversation.createSingleConversation(username, appKey);
+            } else {
+                conversation = Conversation.createSingleConversation(username);
             }
-            conversation = Conversation.createSingleConversation(username, appKey);
         } else {
             String groupId = map.getString(Constant.GROUP_ID);
             conversation = Conversation.createGroupConversation(Long.parseLong(groupId));
@@ -54,7 +56,7 @@ public class JMessageUtils {
     }
 
     public void sendMessage(ReadableMap map, MessageContent content,
-                                   final Callback success, final Callback fail) {
+                            final Callback success, final Callback fail) {
         if (map.hasKey(Constant.EXTRAS)) {
             content.setExtras(ResultUtils.fromMap(map.getMap(Constant.EXTRAS)));
         }
