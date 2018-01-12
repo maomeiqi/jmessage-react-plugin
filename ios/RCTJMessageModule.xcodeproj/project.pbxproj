@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		6212EB1A1F3C34BB00BDF51A /* RCTJMessageModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 6212EB191F3C34BB00BDF51A /* RCTJMessageModule.m */; };
 		6212EB1B1F3C34BB00BDF51A /* RCTJMessageModule.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6212EB181F3C34BB00BDF51A /* RCTJMessageModule.h */; };
-		623E44691FE245FA00FB7AD8 /* JMessage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 623E44681FE245FA00FB7AD8 /* JMessage.framework */; };
+		626BCF17200888E0006F7C15 /* JMessage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 626BCF16200888E0006F7C15 /* JMessage.framework */; };
 		62D683E21F4469820083CDF6 /* JMessageHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 62D683E11F4469820083CDF6 /* JMessageHelper.m */; };
 /* End PBXBuildFile section */
 
@@ -30,7 +30,7 @@
 		6212EB151F3C34BB00BDF51A /* libRCTJMessageModule.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRCTJMessageModule.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		6212EB181F3C34BB00BDF51A /* RCTJMessageModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RCTJMessageModule.h; sourceTree = "<group>"; };
 		6212EB191F3C34BB00BDF51A /* RCTJMessageModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RCTJMessageModule.m; sourceTree = "<group>"; };
-		623E44681FE245FA00FB7AD8 /* JMessage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = JMessage.framework; sourceTree = "<group>"; };
+		626BCF16200888E0006F7C15 /* JMessage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = JMessage.framework; sourceTree = "<group>"; };
 		62D683E01F4469820083CDF6 /* JMessageHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JMessageHelper.h; sourceTree = "<group>"; };
 		62D683E11F4469820083CDF6 /* JMessageHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JMessageHelper.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -40,7 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				623E44691FE245FA00FB7AD8 /* JMessage.framework in Frameworks */,
+				626BCF17200888E0006F7C15 /* JMessage.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -66,7 +66,7 @@
 		6212EB171F3C34BB00BDF51A /* RCTJMessageModule */ = {
 			isa = PBXGroup;
 			children = (
-				623E44681FE245FA00FB7AD8 /* JMessage.framework */,
+				626BCF16200888E0006F7C15 /* JMessage.framework */,
 				62D683E01F4469820083CDF6 /* JMessageHelper.h */,
 				62D683E11F4469820083CDF6 /* JMessageHelper.m */,
 				6212EB181F3C34BB00BDF51A /* RCTJMessageModule.h */,
@@ -238,6 +238,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/RCTJMessageModule",
+					"$(PROJECT_DIR)",
 				);
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../react-native/React/**";
 				OTHER_LDFLAGS = "-ObjC";
@@ -253,6 +254,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/RCTJMessageModule",
+					"$(PROJECT_DIR)",
 				);
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../react-native/React/**";
 				OTHER_LDFLAGS = "-ObjC";
