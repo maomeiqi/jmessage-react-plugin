@@ -622,6 +622,7 @@ JMSG_ASSUME_NONNULL_BEGIN
  * @param value   待更新的value,不能为null,类型只能为 NSNumber 和 NSString
  * @param key     待更新value对应的key,不能为null
  *
+ * @discussion 如果 message 中没有该 key 对应的 extra 值，则会插入该新值
  */
 - (BOOL)updateMessageExtraValue:(id)value forKey:(NSString *)key;
 

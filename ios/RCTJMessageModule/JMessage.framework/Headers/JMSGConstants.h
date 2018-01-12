@@ -143,7 +143,15 @@ typedef NS_ENUM(NSInteger, JMSGContentType) {
   kJMSGContentTypePrompt = 8,
 };
 
-
+/*!
+ * 提示性消息的类型 - 消息撤回提示、后台自定义消息提示等
+ */
+typedef NS_ENUM(NSInteger, JMSGPromptContentType) {
+  /// 消息撤回提示
+  kJMSGPromptContentTypeRetractMessage = 0,
+  /// 自定义提示
+  kJMSGPromptContentTypeAPPRbag   = 1 << 0,
+};
 
 /*!
  * 消息状态
