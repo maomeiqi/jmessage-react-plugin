@@ -322,6 +322,9 @@ public class JMessageModule extends ReactContextBaseJavaModule {
             } else {
                 content = new CustomContent();
             }
+            if (map.hasKey(Constant.EXTRAS)) {
+                content.setExtras(ResultUtils.fromMap(map.getMap(Constant.EXTRAS)));
+            }
             if (type.equals(Constant.CUSTOM)) {
                 CustomContent customContent = new CustomContent();
                 customContent.setAllValues(ResultUtils.fromMap(map.getMap(Constant.CUSTOM_OBJECT)));
