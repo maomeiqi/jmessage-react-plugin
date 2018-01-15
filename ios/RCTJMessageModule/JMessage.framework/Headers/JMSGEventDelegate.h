@@ -73,7 +73,7 @@
  *
  * @param event 申请入群事件
  *
- * @discussion 申请入群事件相关参数请查看 JMSGApplyJoinGroupEvent 类，在群主审批此事件时需要传递事件的相关参数
+ * @discussion 只有群主和管理员能收到此事件；申请入群事件相关参数请查看 JMSGApplyJoinGroupEvent 类，在群主审批此事件时需要传递事件的相关参数
  *
  * @since 3.4.0
  */
@@ -85,7 +85,7 @@
  *
  * @param event 拒绝入群申请事件
  *
- * @discussion 拒绝的相关描述和原因请查看 JMSGGroupAdminRejectApplicationEvent 类
+ * @discussion 只有申请方和被申请方会收到此事件；拒绝的相关描述和原因请查看 JMSGGroupAdminRejectApplicationEvent 类
  *
  * @since 3.4.0
  */

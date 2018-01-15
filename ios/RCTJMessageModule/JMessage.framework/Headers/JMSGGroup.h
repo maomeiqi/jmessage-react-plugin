@@ -15,21 +15,32 @@
 @class JMSGUser,JMSGApplyJoinGroupEvent;
 
 /*!
- * 群信息类（用于修改群信息、创建群）
+ * @abstract 群信息类（此类仅用于修改群信息、创建群、群信息展示）
+ *
+ * #### 注意：
+ *
+ * 如果想要获取群的相关属性值、调用相关接口，需要通过 gid 获取到 JMSGGroup 对象再使用；
+ *
+ * 本类中可读可写属性表示可以用于群信息修改、创建群传值，只读属性说明是不允许客户端修改的，只做展示；
  */
 @interface JMSGGroupInfo : NSObject
 
+/** 群 id */
+@property(nonatomic, strong, readonly) NSString *JMSG_NONNULL gid;
 /** 群名称 */
-@property(nonatomic, strong) NSString *JMSG_NONNULL name;
+@property(nonatomic, strong, readwrite) NSString *JMSG_NONNULL name;
 /** 群描述 */
-@property(nonatomic, strong) NSString *JMSG_NONNULL desc;
-/** 群头像数据 */
-@property(nonatomic, strong) NSData   *JMSG_NONNULL avatarData;
+@property(nonatomic, strong, readwrite) NSString *JMSG_NONNULL desc;
+/** 群头像数据，此属性只用户修改群信息，切勿从此类拿来此属性来展示 */
+@property(nonatomic, strong, readwrite) NSData   *JMSG_NONNULL avatarData;
+/** 群头像的媒体文件ID */
+@property(nonatomic, strong, readonly) NSString *JMSG_NONNULL avatar;
 /** 群组类型，私有、公开，注意：仅限于创建群组时设置，创建成功之后不允许修改群类型*/
-@property(nonatomic, assign) JMSGGroupType groupType;
+@property(nonatomic, assign, readwrite) JMSGGroupType groupType;
+/** 群组人数上限*/
+@property(nonatomic, strong, readonly) NSString *JMSG_NONNULL maxMemberCount;
 
 @end
-
 
 /*!
  * 群组
@@ -154,6 +165,21 @@ JMSG_ASSUME_NONNULL_BEGIN
  * @discussion 从服务器获取，返回所有设置群消息屏蔽的群组。
  */
 + (void)shieldList:(JMSGCompletionHandler)handler;
+
+/*!
+ * @abstract 分页获取 appkey 下所有公开群信息
+ *
+ * @param appkey    群组所在的 AppKey，不填则默认为当前应用 AppKey
+ * @param start     分页获取的下标，第一页从  index = 0 开始
+ * @param count     每一页的数量，最大值为500
+ * @param handler   结果回调，NSArray<JMSGGroupInfo>
+ *
+ * #### 注意：返回数据中不是 JMSGGroup 类型，而是 JMSGGroupInfo 类型，只能用于展示信息，如果想要调用相关群组 API 接口则需要通过 gid 获取到 JMSGGroup 对象才可以调用
+ */
++ (void)getPublicGroupInfoWithAppKey:(NSString *JMSG_NULLABLE)appkey
+                               start:(NSInteger)start
+                               count:(NSInteger)count
+                   completionHandler:(JMSGCompletionHandler)handler;
 
 /*!
  * @abstract 申请加入群组
