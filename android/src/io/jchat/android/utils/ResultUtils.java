@@ -257,7 +257,7 @@ public class ResultUtils {
                 map.putMap(Constant.TARGET, toJSObject(targetInfo));
             } else {
                 ChatRoomInfo chatRoomInfo = (ChatRoomInfo) conversation.getTargetInfo();
-                map.putMap(Constant.TARGET, toJSObject(chatRoomInfo, null));
+                map.putMap(Constant.TARGET, toJSObject(chatRoomInfo));
             }
 
         } catch (Exception e) {
@@ -267,29 +267,16 @@ public class ResultUtils {
         return map;
     }
 
-    public static WritableMap toJSObject(ChatRoomInfo chatRoomInfo, final Callback fail) {
+    public static WritableMap toJSObject(ChatRoomInfo chatRoomInfo) {
         final WritableMap map = Arguments.createMap();
         try {
             map.putString(Constant.ROOM_ID, String.valueOf(chatRoomInfo.getRoomID()));
             map.putString(Constant.TYPE, Constant.TYPE_CHAT_ROOM);
             map.putString(Constant.ROOM_NAME, chatRoomInfo.getName());
             map.putString(Constant.APP_KEY, chatRoomInfo.getAppkey());
-            chatRoomInfo.getOwnerInfo(new GetUserInfoCallback() {
-                @Override
-                public void gotResult(int status, String desc, UserInfo userInfo) {
-                    if (status == 0) {
-                        map.putMap(Constant.OWNER, toJSObject(userInfo));
-                    } else if (fail != null) {
-                        WritableMap result = Arguments.createMap();
-                        result.putInt(Constant.CODE, status);
-                        result.putString(Constant.DESCRIPTION, desc);
-                        fail.invoke(result);
-                    }
-                }
-            });
             map.putInt(Constant.MAX_MEMBER_COUNT, chatRoomInfo.getMaxMemberCount());
             map.putString(Constant.DESCRIPTION, chatRoomInfo.getDescription());
-            map.putInt(Constant.TOTAL_MEMBER_COUNT, chatRoomInfo.getTotalMemberCount());
+            map.putInt(Constant.MEMBER_COUNT, chatRoomInfo.getTotalMemberCount());
             map.putInt(Constant.CREATE_TIME, chatRoomInfo.getCreateTime());
         } catch (Exception e) {
             e.printStackTrace();
@@ -309,22 +296,14 @@ public class ResultUtils {
                     array.pushMap(toJSObject((Message) object));
                 } else if (object instanceof Conversation) {
                     array.pushMap(toJSObject((Conversation) object));
+                } else if (object instanceof ChatRoomInfo) {
+                    array.pushMap(toJSObject((ChatRoomInfo) object));
                 } else {
                     array.pushString(object.toString());
                 }
             }
         }
 
-        return array;
-    }
-
-    public static WritableArray toJSArray(List<ChatRoomInfo> list, Callback fail) {
-        WritableArray array = Arguments.createArray();
-        if (null != list) {
-            for (ChatRoomInfo chatRoomInfo : list) {
-                array.pushMap(toJSObject(chatRoomInfo, fail));
-            }
-        }
         return array;
     }
 

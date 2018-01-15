@@ -308,7 +308,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
                 content = new ImageContent(new File(path));
             } else if (type.equals(Constant.VOICE)) {
                 String path = map.getString(Constant.PATH);
-                File file = new File(map.getString(path));
+                File file = new File(path);
                 MediaPlayer mediaPlayer = MediaPlayer.create(mContext, Uri.parse(path));
                 int duration = mediaPlayer.getDuration() / 1000;    // Millisecond to second.
                 content = new VoiceContent(file, duration);
@@ -1473,7 +1473,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
                 @Override
                 public void gotResult(int status, String desc, List<ChatRoomInfo> chatRoomInfos) {
                     mJMessageUtils.handleCallbackWithArray(status, desc, success, fail,
-                            ResultUtils.toJSArray(chatRoomInfos, fail));
+                            ResultUtils.toJSArray(chatRoomInfos));
                 }
             });
         } catch (Exception e) {
@@ -1493,7 +1493,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
         ChatRoomManager.getChatRoomListByUser(new RequestCallback<List<ChatRoomInfo>>() {
             @Override
             public void gotResult(int status, String desc, List<ChatRoomInfo> list) {
-                mJMessageUtils.handleCallbackWithArray(status, desc, success, fail, ResultUtils.toJSArray(list, fail));
+                mJMessageUtils.handleCallbackWithArray(status, desc, success, fail, ResultUtils.toJSArray(list));
             }
         });
     }
@@ -1516,7 +1516,36 @@ public class JMessageModule extends ReactContextBaseJavaModule {
             ChatRoomManager.getChatRoomInfos(idSet, new RequestCallback<List<ChatRoomInfo>>() {
                 @Override
                 public void gotResult(int status, String desc, List<ChatRoomInfo> list) {
-                    mJMessageUtils.handleCallbackWithArray(status, desc, success, fail, ResultUtils.toJSArray(list, fail));
+                    mJMessageUtils.handleCallbackWithArray(status, desc, success, fail, ResultUtils.toJSArray(list));
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            mJMessageUtils.handleError(fail, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);
+        }
+    }
+
+    /**
+     * 获取聊天室拥有者 UserInfo
+     * @param roomId 聊天室 id
+     * @param success 成功回调
+     * @param fail 失败回调
+     */
+    @ReactMethod
+    public void getChatRoomOwner(String roomId, final Callback success, final Callback fail) {
+        try {
+            long id = Long.parseLong(roomId);
+            Set<Long> set = new HashSet<>();
+            set.add(id);
+            ChatRoomManager.getChatRoomInfos(set, new RequestCallback<List<ChatRoomInfo>>() {
+                @Override
+                public void gotResult(int status, String desc, List<ChatRoomInfo> list) {
+                    list.get(0).getOwnerInfo(new GetUserInfoCallback() {
+                        @Override
+                        public void gotResult(int status, String desc, UserInfo userInfo) {
+                            mJMessageUtils.handleCallbackWithObject(status, desc, success, fail, ResultUtils.toJSObject(userInfo));
+                        }
+                    });
                 }
             });
         } catch (Exception e) {

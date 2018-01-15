@@ -99,5 +99,5 @@ public class Constant {
     public static final String ROOM_ID = "roomId";
     public static final String ROOM_IDS = "roomIds";
     public static final String ROOM_NAME = "roomName";
-    public static final String TOTAL_MEMBER_COUNT = "totalMemberCount";
+    public static final String MEMBER_COUNT = "memberCount";
 }
