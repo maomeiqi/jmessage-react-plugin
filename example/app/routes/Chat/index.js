@@ -90,6 +90,13 @@ export default class Chat extends Component {
       auroraMsg.msgType = "video"
     }
 
+    if (jmessage.type === 'event') {
+      // auroraMsg.mediaPath = jmessage.path
+      // auroraMsg.duration = jmessage.duration
+      Alert.alert('event' , jmessage.eventType)
+      auroraMsg.text = jmessage.eventType
+    }
+
     var user = {
       userId: "1",
       displayName: "",
