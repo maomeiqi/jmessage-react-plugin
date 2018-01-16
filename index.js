@@ -672,10 +672,11 @@ export default class JMessage {
      * 创建聊天会话。
      *
      * @param {object} params = {
-     *  'type': String,            // 'single' / 'group'
+     *  'type': String,            // 'single' / 'group' / 'chatRoom'
      *  'groupId': String,         // 目标群组 id。
      *  'username': String,        // 目标用户名。
      *  'appKey': String,          // 目标用户所属 AppKey。
+     *  'roomId': String,          // 聊天室 id.
      * }
      * @param {function} success = function (conversation) {} // 以参数形式返回聊天会话对象。
      * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
@@ -688,10 +689,11 @@ export default class JMessage {
      * 删除聊天会话，同时会删除本地聊天记录。
      *
      * @param {object} params = {
-     *  'type': String,            // 'single' / 'group'
+     *  'type': String,            // 'single' / 'group' / 'chatRoom'
      *  'groupId': String,         // 目标群组 id。
      *  'username': String,        // 目标用户名。
      *  'appKey': String,          // 目标用户所属 AppKey。
+     *  'roomId': String,          // 聊天室 id.
      * }
      * @param {function} success = function () {}
      * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
@@ -731,9 +733,10 @@ export default class JMessage {
 
     /**
      * @param {object} params = {
-     *  'type': String,            // 'single' / 'group'
+     *  'type': String,            // 'single' / 'group' / 'chatRoom'
      *  'groupId': String,         // 目标群组 id。
      *  'username': String,        // 目标用户名。
+     *  'roomId': String,          // 聊天室 id.
      *  'appKey': String,          // 目标用户所属 AppKey。
      * }
      * @param {function} success = function (conversation) {} // 以参数形式返回聊天会话对象。
@@ -1045,8 +1048,18 @@ export default class JMessage {
     }
 
     /**
+     * 查询指定 roomId 聊天室的所有者
+     * @param {object} param = {roomId: String}
+     * @param {function} success = function({userInfo})
+     * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+     */
+    static getChatRoomOwner(param, success, error) {
+        JMessageModule.getChatRoomOwner(param, success, error);
+    }
+
+    /**
      * 进入聊天室，进入后才能收到聊天室信息及发言
-     * @param {String} roomId 
+     * @param {object} param = {roomId: String} 
      * @param {function} success = function({conversation})
      * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {} 
      */
@@ -1056,7 +1069,7 @@ export default class JMessage {
 
     /**
      * 离开聊天室
-     * @param {String} roomId 
+     * @param {object} param = {roomId: String} 
      * @param {function} success = function(0)
      * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {} 
      */
@@ -1071,24 +1084,6 @@ export default class JMessage {
      */
     static getChatRoomConversationList(callback) {
         JMessageModule.getChatRoomConversationList(callback);
-    }
-
-    /**
-     * 删除聊天室会话，同时删除本地相关缓存文件。成功返回 true，失败返回 false
-     * @param {String} roomId 
-     * @param {function} callback = function(bool)
-     */
-    static deleteChatRoomConversation(roomId, callback) {
-        JMessageModule.deleteChatRoomConversation(roomId, callback);
-    }
-
-    /**
-     * 创建聊天室会话，如果本地已存在，则不会重新创建，直接返回该会话
-     * @param {String} roomId 
-     * @param {function} callback = function({Conversation})
-     */
-    static createChatRoomConversation(roomId, callback) {
-        JMessageModule.createChatRoomConversation(roomId, callback);
     }
 
     /**
