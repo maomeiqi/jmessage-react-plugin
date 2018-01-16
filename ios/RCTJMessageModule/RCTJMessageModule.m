@@ -62,17 +62,21 @@ RCT_EXPORT_MODULE();
   [[NSNotificationCenter defaultCenter] removeObserver:self]; 
   
   NSNotificationCenter *defaultCenter = [NSNotificationCenter defaultCenter];
-  // have
   [defaultCenter addObserver:self
                     selector:@selector(didReceiveJMessageMessage:)
                         name:kJJMessageReceiveMessage
                       object:nil];
   
   [defaultCenter addObserver:self
+                    selector:@selector(didReceiveJMessageChatRoomMessage:)
+                        name:kJJMessageReceiveChatRoomMessage
+                      object:nil];
+  
+  [defaultCenter addObserver:self
                     selector:@selector(conversationChanged:)
                         name:kJJMessageConversationChanged
                       object:nil];
-  // have
+  
   [defaultCenter addObserver:self
                     selector:@selector(didSendMessage:)
                         name:kJJMessageSendMessageRespone
@@ -82,7 +86,7 @@ RCT_EXPORT_MODULE();
 //                    selector:@selector(unreadChanged:)
 //                        name:kJJMessageUnreadChanged
 //                      object:nil];
-  // have
+  
   [defaultCenter addObserver:self
                     selector:@selector(loginStateChanged:)
                         name:kJJMessageLoginStateChanged
@@ -398,6 +402,11 @@ RCT_EXPORT_METHOD(setDebugMode:(NSDictionary *)param) {
 - (void)didReceiveJMessageMessage:(NSNotification *)notification {
   [self.bridge.eventDispatcher sendAppEventWithName:receiveMsgEvent body:notification.object];
 }
+
+- (void)didReceiveJMessageChatRoomMessage:(NSNotification *)notification {
+  [self.bridge.eventDispatcher sendAppEventWithName:receiveChatRoomMsgEvent body:notification.object];
+}
+
 
 - (void)conversationChanged:(NSNotification *)notification {
   [self.bridge.eventDispatcher sendAppEventWithName:conversationChangeEvent body:notification.object];
@@ -2413,6 +2422,36 @@ RCT_EXPORT_METHOD(getChatRoomConversationList:(NSDictionary *)param
       return [conversation conversationToDictionary];
     }];
     successCallback(@[conversationDicArr]);
+  }];
+}
+
+RCT_EXPORT_METHOD(getChatRoomOwner:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallBack:(RCTResponseSenderBlock)failCallback) {
+  if (!param[@"roomId"]) {
+    failCallback(@[[self getParamError]]);
+    return;
+  }
+  
+  [JMSGChatRoom getChatRoomInfosWithRoomIds:@[param[@"roomId"]] completionHandler:^(id resultObject, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+      return;
+    }
+    NSArray *chatRoomArr = resultObject;
+    if (chatRoomArr == nil || chatRoomArr.count == 0) {
+      failCallback(@[[self getErrorWithLog:@"cann't found chat room from this roomId!"]]);
+      return;
+    }
+    JMSGChatRoom *chatRoom = chatRoomArr[0];
+    [chatRoom getChatRoomOwnerInfo:^(id resultObject, NSError *error) {
+      if (error) {
+        failCallback(@[[error errorToDictionary]]);
+        return;
+      }
+      JMSGUser *user = resultObject;
+      successCallback(@[[user userToDictionary]]);
+    }];
   }];
 }
 

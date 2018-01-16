@@ -18,6 +18,7 @@
 
 
 #define receiveMsgEvent @"JMessage.ReceiveMsgEvent" // 接收到消息事件
+#define receiveChatRoomMsgEvent @"JMessage.ReceiveChatRoomMsgEvent" // 接收到消息事件
 #define conversationChangeEvent @"JMessage.conversationChange" // 会话变更事件
 #define loginStateChangedEvent @"JMessage.LoginStateChanged" //
 #define clickMessageNotificationEvent @"JMessage.ClickMessageNotification" // 点击推送 Android Only

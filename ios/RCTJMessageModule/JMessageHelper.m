@@ -78,6 +78,16 @@
   [[NSNotificationCenter defaultCenter] postNotificationName:kJJMessageReceiveMessage object:dict];
 }
 
+- (void)onReceiveChatRoomConversation:(JMSGConversation *)conversation messages:(NSArray<__kindof JMSGMessage *> *)messages {
+
+  NSArray *msgDicArr = [messages mapObjectsUsingBlock:^id(id obj, NSUInteger idx) {
+    JMSGMessage *msg = obj;
+    return [msg messageToDictionary];
+  }];
+  
+  [[NSNotificationCenter defaultCenter] postNotificationName:kJJMessageReceiveChatRoomMessage object:msgDicArr];
+}
+
 - (void)onReceiveNotificationEvent:(JMSGNotificationEvent *)event {
   switch (event.eventType) {
     case kJMSGEventNotificationLoginKicked:
