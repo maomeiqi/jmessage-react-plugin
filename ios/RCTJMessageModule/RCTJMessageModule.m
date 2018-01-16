@@ -2227,4 +2227,194 @@ RCT_EXPORT_METHOD(setConversationExtras:(NSDictionary *)param
   }];
 }
 
+
+
+/**
+ * 查询当前 AppKey 下的聊天室信息
+ * @param {object} param = {
+ *  "start": number,  // 起始位置
+ *  "count": number,  // 获取个数
+ * }
+ * ChatRoomInfo = {
+ *  "roomId": String,
+ *  "roomName": String,
+ *  "appKey": String,
+ *  "maxMemberCount": number,
+ *  "totalMemberCount": number,
+ *  "owner": UserInfo,
+ *  "description": String,
+ *  "createTime": number,
+ * }
+ * @param {function} success = function([{chatRoomInfo}])
+ * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+ */
+//static getChatRoomListByApp(param, success, error) {
+RCT_EXPORT_METHOD(getChatRoomListByApp:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallBack:(RCTResponseSenderBlock)failCallback) {
+  NSNumber *start = nil;
+  NSNumber *count = nil;
+  if (!param[@"start"]) {
+    start = param[@"start"];
+    return;
+  }
+  
+  if (!param[@"count"]) {
+    count = param[@"count"];
+    return;
+  }
+  
+  NSString *appKey = nil;
+  if (param[@"appKey"]) {
+    appKey = param[@"appKey"];
+  } else {
+    appKey = [JMessageHelper shareInstance].JMessageAppKey;
+  }
+  
+  [JMSGChatRoom getChatRoomListWithAppKey:appKey start:[start integerValue] count:[count integerValue] completionHandler:^(id resultObject, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+      return;
+    }
+    NSArray *chatRoomArr = resultObject;
+    NSArray *chatRoomDicArr = [chatRoomArr mapObjectsUsingBlock:^id(id obj, NSUInteger idx) {
+      JMSGChatRoom *chatRoom = obj;
+      return [chatRoom chatRoomToDictionary];
+    }];
+    
+    successCallback(@[chatRoomDicArr]);
+  }];
+}
+
+/**
+ * 获取当前用户所加入的所有聊天室信息
+ * @param {function} success = function([{ChatRoomInfo}])
+ * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+ */
+//static getChatRoomListByUser(success, error) {
+RCT_EXPORT_METHOD(getChatRoomListByUser:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallBack:(RCTResponseSenderBlock)failCallback) {
+  [JMSGChatRoom getMyChatRoomListCompletionHandler:^(id resultObject, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+      return;
+    }
+    
+    NSArray *chatRoomArr = resultObject;
+    NSArray *chatRoomDicArr = [chatRoomArr mapObjectsUsingBlock:^id(id obj, NSUInteger idx) {
+      JMSGChatRoom *chatRoom = obj;
+      return [chatRoom chatRoomToDictionary];
+    }];
+    successCallback(@[chatRoomDicArr]);
+  }];
+
+}
+
+/**
+ * 查询指定 roomId 聊天室信息
+ * @param {Array} param = [String]
+ * @param {function} success = function([{ChatRoomInfo}])
+ * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+ */
+//static getChatRoomInfos(param, success, error) {
+RCT_EXPORT_METHOD(getChatRoomInfos:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallBack:(RCTResponseSenderBlock)failCallback) {
+  if (!param[@"roomIds"]) {
+    failCallback(@[[self getParamError]]);
+    return;
+  }
+  
+  [JMSGChatRoom getChatRoomInfosWithRoomIds:param[@"roomIds"] completionHandler:^(id resultObject, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+      return;
+    }
+    
+    NSArray *chatRoomArr = resultObject;
+    NSArray *chatRoomDicArr = [chatRoomArr mapObjectsUsingBlock:^id(id obj, NSUInteger idx) {
+      JMSGChatRoom *chatRoom = obj;
+      return [chatRoom chatRoomToDictionary];
+    }];
+    
+    successCallback(@[chatRoomDicArr]);
+  }];
+}
+
+/**
+ * 进入聊天室，进入后才能收到聊天室信息及发言
+ * @param {String} roomId
+ * @param {function} success = function({conversation})
+ * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+ */
+//static enterChatRoom(roomId, success, error) {
+RCT_EXPORT_METHOD(enterChatRoom:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallBack:(RCTResponseSenderBlock)failCallback) {
+  if (!param[@"roomId"]) {
+    failCallback(@[[self getParamError]]);
+    return;
+  }
+  
+  [JMSGChatRoom enterChatRoomWithRoomId:param[@"roomId"] completionHandler:^(id resultObject, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+      return;
+    }
+    
+    JMSGConversation *conversation = resultObject;
+    successCallback(@[[conversation conversationToDictionary]]);
+  }];
+}
+
+/**
+ * 离开聊天室
+ * @param {String} roomId
+ * @param {function} success = function(0)
+ * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+ */
+//static leaveChatRoom(roomId, success, error) {
+RCT_EXPORT_METHOD(leaveChatRoom:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallBack:(RCTResponseSenderBlock)failCallback) {
+  if (!param[@"roomId"]) {
+    failCallback(@[[self getParamError]]);
+    return;
+  }
+  
+  [JMSGChatRoom leaveChatRoomWithRoomId:param[@"roomId"] completionHandler:^(id resultObject, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+      return;
+    }
+    successCallback(@[]);
+  }];
+}
+
+/**
+ * 从本地获取用户的聊天室会话列表，没有则返回为空的列表
+ * @param {function} callback = function([{Conversation}])
+ *
+ */
+//static getChatRoomConversationList(callback) {
+RCT_EXPORT_METHOD(getChatRoomConversationList:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallBack:(RCTResponseSenderBlock)failCallback) {
+  [JMSGConversation allChatRoomConversation:^(id resultObject, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+      return;
+    }
+    
+    NSArray *conversationArr = resultObject;
+    NSArray *conversationDicArr = [conversationArr mapObjectsUsingBlock:^id(id obj, NSUInteger idx) {
+      JMSGConversation *conversation = obj;
+      return [conversation conversationToDictionary];
+    }];
+    successCallback(@[conversationDicArr]);
+  }];
+}
+
+
 @end
