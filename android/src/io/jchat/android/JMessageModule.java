@@ -1130,9 +1130,12 @@ public class JMessageModule extends ReactContextBaseJavaModule {
                 String username = map.getString(Constant.USERNAME);
                 String appKey = map.hasKey(Constant.APP_KEY) ? map.getString(Constant.APP_KEY) : "";
                 JMessageClient.deleteSingleConversation(username, appKey);
-            } else {
+            } else if (type.equals(Constant.TYPE_GROUP)) {
                 long groupId = Long.parseLong(map.getString(Constant.GROUP_ID));
                 JMessageClient.deleteGroupConversation(groupId);
+            } else {
+                String roomId = map.getString(Constant.ROOM_ID);
+                JMessageClient.deleteChatRoomConversation(Long.parseLong(roomId));
             }
             mJMessageUtils.handleCallback(0, "", success, fail);
         } catch (Exception e) {

@@ -48,9 +48,12 @@ public class JMessageUtils {
             } else {
                 conversation = Conversation.createSingleConversation(username);
             }
-        } else {
+        } else if (type.equals(Constant.TYPE_GROUP)) {
             String groupId = map.getString(Constant.GROUP_ID);
             conversation = Conversation.createGroupConversation(Long.parseLong(groupId));
+        } else {
+            String roomId = map.getString(Constant.ROOM_ID);
+            conversation = Conversation.createChatRoomConversation(Long.parseLong(roomId));
         }
         return conversation;
     }
