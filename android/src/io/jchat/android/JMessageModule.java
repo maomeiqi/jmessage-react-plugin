@@ -311,7 +311,8 @@ public class JMessageModule extends ReactContextBaseJavaModule {
                 File file = new File(path);
                 MediaPlayer mediaPlayer = MediaPlayer.create(mContext, Uri.parse(path));
                 int duration = mediaPlayer.getDuration() / 1000;    // Millisecond to second.
-                content = new VoiceContent(file, duration);
+                content = new VoiceContent(file,
+                        duration);
                 mediaPlayer.release();
             } else if (type.equals(Constant.LOCATION)) {
                 double latitude = map.getDouble(Constant.LATITUDE);
@@ -1527,14 +1528,14 @@ public class JMessageModule extends ReactContextBaseJavaModule {
 
     /**
      * 获取聊天室拥有者 UserInfo
-     * @param roomId 聊天室 id
+     * @param map 包含聊天室 id
      * @param success 成功回调
      * @param fail 失败回调
      */
     @ReactMethod
-    public void getChatRoomOwner(String roomId, final Callback success, final Callback fail) {
+    public void getChatRoomOwner(ReadableMap map, final Callback success, final Callback fail) {
         try {
-            long id = Long.parseLong(roomId);
+            long id = Long.parseLong(map.getString(Constant.ROOM_ID));
             Set<Long> set = new HashSet<>();
             set.add(id);
             ChatRoomManager.getChatRoomInfos(set, new RequestCallback<List<ChatRoomInfo>>() {
@@ -1556,13 +1557,13 @@ public class JMessageModule extends ReactContextBaseJavaModule {
 
     /**
      * 进入聊天室，进入后才能收到聊天室信息及发言
-     * @param roomId 聊天室 id
+     * @param map 包含聊天室 id
      * @param success 成功回调
      * @param fail 失败回调
      */
     @ReactMethod
-    public void enterChatRoom(String roomId, final Callback success, final Callback fail) {
-        ChatRoomManager.enterChatRoom(Long.parseLong(roomId), new RequestCallback<Conversation>() {
+    public void enterChatRoom(ReadableMap map, final Callback success, final Callback fail) {
+        ChatRoomManager.enterChatRoom(Long.parseLong(map.getString(Constant.ROOM_ID)), new RequestCallback<Conversation>() {
             @Override
             public void gotResult(int status, String desc, Conversation conversation) {
                 mJMessageUtils.handleCallbackWithObject(status, desc, success, fail, ResultUtils.toJSObject(conversation));
@@ -1572,13 +1573,13 @@ public class JMessageModule extends ReactContextBaseJavaModule {
 
     /**
      * 离开聊天室
-     * @param roomId 聊天室 id
+     * @param map 包含聊天室 id
      * @param success 成功回调
      * @param fail 失败回调
      */
     @ReactMethod
-    public void leaveChatRoom(String roomId, final Callback success, final Callback fail) {
-        ChatRoomManager.leaveChatRoom(Long.parseLong(roomId), new BasicCallback() {
+    public void leaveChatRoom(ReadableMap map, final Callback success, final Callback fail) {
+        ChatRoomManager.leaveChatRoom(Long.parseLong(map.getString(Constant.ROOM_ID)), new BasicCallback() {
             @Override
             public void gotResult(int i, String s) {
                 mJMessageUtils.handleCallback(i, s, success, fail);
