@@ -506,3 +506,31 @@
 }
 
 @end
+
+@implementation JMSGChatRoom (JMessage)
+- (NSMutableDictionary *)chatRoomToDictionary {
+  NSMutableDictionary *dict = @{}.mutableCopy;
+  dict[@"type"] = @"chatroom";
+  dict[@"roomId"] = self.roomID;
+  dict[@"roomName"] = self.name;
+  dict[@"appKey"] = self.appkey;
+  dict[@"description"] = self.description;
+  dict[@"createTime"] = self.ctime;
+  dict[@"maxMemberCount"] = @([self.maxMemberCount integerValue]);
+  dict[@"memberCount"] = @(self.totalMemberCount);
+  
+  return dict;
+}
+@end
+
+
+@implementation NSArray (JMessage)
+
+- (NSArray *)mapObjectsUsingBlock:(id (^)(id obj, NSUInteger idx))block {
+  NSMutableArray *result = [NSMutableArray arrayWithCapacity:[self count]];
+  [self enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+    [result addObject:block(obj, idx)];
+  }];
+  return result;
+}
+@end

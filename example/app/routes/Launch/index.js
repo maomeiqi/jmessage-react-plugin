@@ -21,7 +21,7 @@ const {
     componentWillMount() {
         const { navigate } = this.props.navigation;
         var params = {
-              'appkey': "4f7aef34fb361292c566a1cd",
+              'appkey': "a1703c14b186a68a66ef86c1",
               'isOpenMessageRoaming': false,
               'isProduction': false,
               'channel': ""

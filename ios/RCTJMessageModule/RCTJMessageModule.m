@@ -25,6 +25,9 @@
 #import "JMessageHelper.h"
 #import <JMessage/JMessage.h>
 #import <AVFoundation/AVFoundation.h>
+
+typedef void (^JMSGConversationCallback)(JMSGConversation *conversation,NSError *error);
+
 @interface RCTJMessageModule ()<JMessageDelegate, JMSGEventDelegate, UIApplicationDelegate>
 
 @property(strong,nonatomic)NSMutableDictionary *SendMsgCallbackDic;//{@"msgid": @"", @"RCTJMessageModule": @[successCallback, failCallback]}
@@ -110,6 +113,220 @@ RCT_EXPORT_MODULE();
                     selector:@selector(onSyncRoamingMessage:)
                         name:kJJMessageSyncRoamingMessage
                       object:nil];
+}
+
+- (void)getConversationWithDictionary:(NSDictionary *)param callback:(JMSGConversationCallback)callback {
+  if (param[@"type"] == nil) {
+    NSError *error = [NSError errorWithDomain:@"param error!" code: 1 userInfo: nil];
+    callback(nil,error);
+    return;
+  }
+  
+  NSString *appKey = nil;
+  if (param[@"appKey"]) {
+    appKey = param[@"appKey"];
+  } else {
+    appKey = [JMessageHelper shareInstance].JMessageAppKey;
+  }
+  JMSGConversationType conversationType = [self convertStringToConvsersationType:param[@"type"]];
+  switch (conversationType) {
+    case kJMSGConversationTypeSingle:{
+      [JMSGConversation createSingleConversationWithUsername:param[@"username"]
+                                                      appKey:appKey
+                                           completionHandler:^(id resultObject, NSError *error) {
+                                             if (error) {
+                                               callback(nil, error);
+                                               return;
+                                             }
+                                             
+                                             JMSGConversation *conversation = resultObject;
+                                             callback(conversation,nil);
+                                           }];
+      break;
+    }
+    case kJMSGConversationTypeGroup:{
+      [JMSGConversation createGroupConversationWithGroupId:param[@"groupId"] completionHandler:^(id resultObject, NSError *error) {
+        if (error) {
+          callback(nil, error);
+          return;
+        }
+        
+        JMSGConversation *conversation = resultObject;
+        callback(conversation,nil);
+      }];
+      break;
+    }
+    case kJMSGConversationTypeChatRoom:{
+      [JMSGConversation createChatRoomConversationWithRoomId:param[@"roomId"] completionHandler:^(id resultObject, NSError *error) {
+        if (error) {
+          callback(nil, error);
+          return;
+        }
+        
+        JMSGConversation *conversation = resultObject;
+        callback(conversation,nil);
+      }];
+      break;
+    }
+  }
+}
+
+- (JMSGMessage *)createMessageWithDictionary:(NSDictionary *)param type:(JMSGContentType)type {
+  
+  if (param[@"type"] == nil) {
+    return nil;
+  }
+  
+  NSString *appKey = nil;
+  if (param[@"appKey"]) {
+    appKey = param[@"appKey"];
+  } else {
+    appKey = [JMessageHelper shareInstance].JMessageAppKey;
+  }
+  
+  JMSGOptionalContent *messageSendingOptions = nil;
+  if (param[@"messageSendingOptions"] && [param[@"messageSendingOptions"] isKindOfClass: [NSDictionary class]]) {
+    messageSendingOptions = [self convertDicToJMSGOptionalContent:param[@"messageSendingOptions"]];
+  }
+  
+  JMSGMessage *message = nil;
+  JMSGAbstractContent *content = nil;
+  switch (type) {
+    case kJMSGContentTypeText:{
+      content = [[JMSGTextContent alloc] initWithText:param[@"text"]];
+      break;
+    }
+    case kJMSGContentTypeImage:{
+      NSString *mediaPath = param[@"path"];
+      if([[NSFileManager defaultManager] fileExistsAtPath: mediaPath]){
+        mediaPath = mediaPath;
+      } else {
+        return nil;
+      }
+      content = [[JMSGImageContent alloc] initWithImageData: [NSData dataWithContentsOfFile: mediaPath]];
+      
+      break;
+    }
+    case kJMSGContentTypeVoice:{
+      NSString *mediaPath = param[@"path"];
+      double duration = 0;
+      if([[NSFileManager defaultManager] fileExistsAtPath: mediaPath]){
+        mediaPath = mediaPath;
+        
+        NSError *error = nil;
+        AVAudioPlayer *avAudioPlayer = [[AVAudioPlayer alloc] initWithData:[NSData dataWithContentsOfFile:mediaPath] error: &error];
+        if (error) {
+          return nil;
+        }
+        
+        duration = avAudioPlayer.duration;
+        avAudioPlayer = nil;
+        
+      } else {
+        
+        return nil;
+      }
+      content = [[JMSGVoiceContent alloc] initWithVoiceData:[NSData dataWithContentsOfFile: mediaPath] voiceDuration:@(duration)];
+      break;
+    }
+    case kJMSGContentTypeLocation:{
+      content = [[JMSGLocationContent alloc] initWithLatitude:param[@"latitude"] longitude:param[@"longitude"] scale:param[@"scale"] address: param[@"address"]];
+      break;
+    }
+    case kJMSGContentTypeFile:{
+      NSString *mediaPath = param[@"path"];
+      if([[NSFileManager defaultManager] fileExistsAtPath: mediaPath]){
+        mediaPath = mediaPath;
+      } else {
+        return nil;
+      }
+      
+      NSString *fileName = @"";
+      if (param[@"fileName"]) {
+        fileName = param[@"fileName"];
+      }
+      
+      content = [[JMSGFileContent alloc] initWithFileData:[NSData dataWithContentsOfFile: mediaPath] fileName: fileName];
+      break;
+    }
+    case kJMSGContentTypeCustom:{
+      content = [[JMSGCustomContent alloc] initWithCustomDictionary: param[@"customObject"]];
+      break;
+    }
+      
+    default:
+      return nil;
+  }
+  
+  JMSGConversationType targetType = [self convertStringToConvsersationType:param[@"type"]];
+  
+  switch (targetType) {
+    case kJMSGConversationTypeSingle:{
+      message = [JMSGMessage createSingleMessageWithContent:content username:param[@"username"]];
+      break;
+    }
+    case kJMSGConversationTypeGroup:{
+      message = [JMSGMessage createGroupMessageWithContent:content groupId:param[@"groupId"]];
+      break;
+    }
+      
+    case kJMSGConversationTypeChatRoom:{
+      message = [JMSGMessage createChatRoomMessageWithContent:content chatRoomId:param[@"roomId"]];
+      break;
+    }
+  }
+  
+  if (message) {
+    if (param[@"extras"] && [param[@"extras"] isKindOfClass: [NSDictionary class]]) {
+      NSDictionary *extras = param[@"extras"];
+      for (NSString *key in extras.allKeys) {
+        [message.content addStringExtra:extras[key] forKey:key];
+      }
+    }
+    return message;
+  } else {
+    return nil;
+  }
+}
+
+- (JMSGContentType)convertStringToContentType:(NSString *)str {
+  if ([str isEqualToString:@"text"]) {
+    return kJMSGContentTypeText;
+  }
+  
+  if ([str isEqualToString:@"image"]) {
+    return kJMSGContentTypeImage;
+  }
+  
+  if ([str isEqualToString:@"voice"]) {
+    return kJMSGContentTypeVoice;
+  }
+  
+  if ([str isEqualToString:@"location"]) {
+    return kJMSGContentTypeLocation;
+  }
+  
+  if ([str isEqualToString:@"file"]) {
+    return kJMSGContentTypeFile;
+  }
+  
+  if ([str isEqualToString:@"custom"]) {
+    return kJMSGContentTypeCustom;
+  }
+  
+  return kJMSGContentTypeUnknown;
+}
+
+- (JMSGConversationType)convertStringToConvsersationType:(NSString *)str {
+  if ([str isEqualToString:@"group"]) {
+    return kJMSGConversationTypeGroup;
+  }
+  
+  if ([str isEqualToString:@"chatroom"]) {
+    return kJMSGConversationTypeChatRoom;
+  }
+  
+  return kJMSGConversationTypeSingle;
 }
 
 - (NSDictionary *)getParamError {
@@ -394,493 +611,197 @@ RCT_EXPORT_METHOD(sendTextMessage:(NSDictionary *)param
                   successCallback:(RCTResponseSenderBlock)successCallback
                   failCallback:(RCTResponseSenderBlock)failCallback) {
   
-  if (param[@"type"] == nil) {
-
-    failCallback(@[[self getParamError]]);
-    return;}
-  
-  if (param[@"text"] == nil) {
-    failCallback(@[[self getParamError]]);
-    return;
-  }
-  
-  NSString *appKey = nil;
-  if (param[@"appKey"]) {
-    appKey = param[@"appKey"];
-  } else {
-    appKey = [JMessageHelper shareInstance].JMessageAppKey;
-  }
-  
   JMSGOptionalContent *messageSendingOptions = nil;
   if (param[@"messageSendingOptions"] && [param[@"messageSendingOptions"] isKindOfClass: [NSDictionary class]]) {
     messageSendingOptions = [self convertDicToJMSGOptionalContent:param[@"messageSendingOptions"]];
   }
   
-  if ([param[@"type"] isEqual: @"single"] && param[@"username"] != nil) {
-    JMSGTextContent *content = [[JMSGTextContent alloc] initWithText:param[@"text"]];
-    JMSGMessage *message = [JMSGMessage createSingleMessageWithContent:content username: param[@"username"]];
-    if (param[@"extras"] && [param[@"extras"] isKindOfClass: [NSDictionary class]]) {
-      NSDictionary *extras = param[@"extras"];
-      for (NSString *key in extras.allKeys) {
-        [message.content addStringExtra:extras[key] forKey:key];
-      }
-    }
-    
-    [JMSGConversation createSingleConversationWithUsername:param[@"username"]
-                                                    appKey:appKey
-                                         completionHandler:^(id resultObject, NSError *error) {
-                                           if (error) {
-                                             failCallback(@[[error errorToDictionary]]);
-                                             return;
-                                           }
-                                           
-                                           JMSGConversation *conversation = resultObject;
-                                           self.SendMsgCallbackDic[message.msgId] = @[successCallback,failCallback];
-                                           if (messageSendingOptions) {
-                                             [conversation sendMessage:message optionalContent:messageSendingOptions];
-                                           } else {
-                                             [conversation sendMessage: message];
-                                           }
-                                         }];
-    
-  } else if ([param[@"type"] isEqual: @"group"] && param[@"groupId"] != nil) {
-    JMSGTextContent *content = [[JMSGTextContent alloc] initWithText:param[@"text"]];
-    JMSGMessage *message = [JMSGMessage createGroupMessageWithContent: content groupId: param[@"groupId"]];
-    if (param[@"extras"] && [param[@"extras"] isKindOfClass: [NSDictionary class]]) {
-      NSDictionary *extras = param[@"extras"];
-      for (NSString *key in extras.allKeys) {
-        [message.content addStringExtra:extras[key] forKey:key];
-      }
-    }
-    
-    self.SendMsgCallbackDic[message.msgId] = @[successCallback, failCallback];
-    if (messageSendingOptions) {
-      [JMSGMessage sendMessage:message optionalContent:messageSendingOptions];
-    } else {
-      [JMSGMessage sendMessage:message];
-    }
-    
-  } else {
-    failCallback(@[[self getParamError]]);
+  JMSGMessage *message = [self createMessageWithDictionary:param type:kJMSGContentTypeText];
+  
+  if (!message) {
+    NSError *error = [NSError errorWithDomain:@"cannot create message, check your params!" code:1 userInfo:nil];
+    failCallback(@[[error errorToDictionary]]);
+    return;
   }
+  
+  [self getConversationWithDictionary:param callback:^(JMSGConversation *conversation, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+      return;
+    }
+    
+    self.SendMsgCallbackDic[message.msgId] = @[successCallback,failCallback];
+    if (messageSendingOptions) {
+      [conversation sendMessage:message optionalContent:messageSendingOptions];
+    } else {
+      [conversation sendMessage:message];
+    }
+  }];
+  
 }
 
 RCT_EXPORT_METHOD(sendImageMessage:(NSDictionary *)param
                   successCallback:(RCTResponseSenderBlock)successCallback
                   failCallback:(RCTResponseSenderBlock)failCallback) {
   
-  if (param[@"type"] == nil) {
-    failCallback(@[[self getParamError]]);
-    return;
-  }
-  
-  if (param[@"path"] == nil) {
-    failCallback(@[[self getParamError]]);
-    return;
-  }
-  
-  NSString *mediaPath = param[@"path"];
-  if([[NSFileManager defaultManager] fileExistsAtPath: mediaPath]){
-    mediaPath = mediaPath;
-  } else {
-    failCallback(@[[self getMediafileError]]);
-    return;
-  }
-  
-  NSString *appKey = nil;
-  if (param[@"appKey"]) {
-    appKey = param[@"appKey"];
-  } else {
-    appKey = [JMessageHelper shareInstance].JMessageAppKey;
-  }
-  
   JMSGOptionalContent *messageSendingOptions = nil;
   if (param[@"messageSendingOptions"] && [param[@"messageSendingOptions"] isKindOfClass: [NSDictionary class]]) {
     messageSendingOptions = [self convertDicToJMSGOptionalContent:param[@"messageSendingOptions"]];
   }
   
-  if ([param[@"type"] isEqual: @"single"] && param[@"username"] != nil) {
-    JMSGImageContent *content = [[JMSGImageContent alloc] initWithImageData: [NSData dataWithContentsOfFile: mediaPath]];
-    content.format = [mediaPath pathExtension];
-    content.uploadHandler = ^(float percent, NSString *msgID) {
-      [self.bridge.eventDispatcher sendAppEventWithName:uploadProgressEvent body:@{@"messageId": msgID,
-                                                                                   @"progress": @(percent)}];
-    };
-    
-    JMSGMessage *message = [JMSGMessage createSingleMessageWithContent:content username: param[@"username"]];
-    if (param[@"extras"] && [param[@"extras"] isKindOfClass: [NSDictionary class]]) {
-      NSDictionary *extras = param[@"extras"];
-      for (NSString *key in extras.allKeys) {
-        [message.content addStringExtra:extras[key] forKey:key];
-      }
+  JMSGMessage *message = [self createMessageWithDictionary:param type:kJMSGContentTypeImage];
+  
+  if (!message) {
+    NSError *error = [NSError errorWithDomain:@"cannot create message, check your params!" code:1 userInfo:nil];
+    failCallback(@[[error errorToDictionary]]);
+    return;
+  }
+  
+  [self getConversationWithDictionary:param callback:^(JMSGConversation *conversation, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+      return;
     }
-    [JMSGConversation createSingleConversationWithUsername:param[@"username"]
-                                                    appKey:appKey
-                                         completionHandler:^(id resultObject, NSError *error) {
-                                           if (error) {
-                                             failCallback(@[[error errorToDictionary]]);
-                                             return;
-                                           }
-                                           JMSGConversation *conversation = resultObject;
-                                           self.SendMsgCallbackDic[message.msgId] = @[successCallback,failCallback];
-                                           if (messageSendingOptions) {
-                                             [conversation sendMessage:message optionalContent:messageSendingOptions];
-                                           } else {
-                                             [conversation sendMessage: message];
-                                           }
-                                         }];
     
-  } else if ([param[@"type"] isEqual: @"group"] && param[@"groupId"] != nil) {
-    JMSGImageContent *content = [[JMSGImageContent alloc] initWithImageData: [NSData dataWithContentsOfFile: mediaPath]];
-    content.format = [mediaPath pathExtension];
-    content.uploadHandler = ^(float percent, NSString *msgID) {
-      
-      [self.bridge.eventDispatcher sendAppEventWithName:uploadProgressEvent body:@{@"messageId": msgID,
-                                                                                   @"progress": @(percent)}];
-    };
-    
-    JMSGMessage *message = [JMSGMessage createGroupMessageWithContent: content groupId: param[@"groupId"]];
-    if (param[@"extras"] && [param[@"extras"] isKindOfClass: [NSDictionary class]]) {
-      NSDictionary *extras = param[@"extras"];
-      for (NSString *key in extras.allKeys) {
-        [message.content addStringExtra:extras[key] forKey:key];
-      }
-    }
     self.SendMsgCallbackDic[message.msgId] = @[successCallback,failCallback];
     if (messageSendingOptions) {
-      [JMSGMessage sendMessage:message optionalContent:messageSendingOptions];
+      [conversation sendMessage:message optionalContent:messageSendingOptions];
     } else {
-      [JMSGMessage sendMessage:message];
+      [conversation sendMessage:message];
     }
-  } else {
-    failCallback(@[[self getParamError]]);
-  }
+  }];
 }
 
 RCT_EXPORT_METHOD(sendVoiceMessage:(NSDictionary *)param
                   successCallback:(RCTResponseSenderBlock)successCallback
                   failCallback:(RCTResponseSenderBlock)failCallback) {
-  if (param[@"type"] == nil) {
-    failCallback(@[[self getParamError]]);
-    return;
-  }
-  
-  if (param[@"path"] == nil) {
-    failCallback(@[[self getParamError]]);
-    return;
-  }
-  
-  NSString *mediaPath = param[@"path"];
-  double duration = 0;
-  if([[NSFileManager defaultManager] fileExistsAtPath: mediaPath]) {
-    mediaPath = mediaPath;
-    
-    NSError *error = nil;
-    AVAudioPlayer *avAudioPlayer = [[AVAudioPlayer alloc] initWithData:[NSData dataWithContentsOfFile:mediaPath] error: &error];
-    if (error) {
-      failCallback(@[[self getMediafileError]]);
-    }
-    
-    duration = avAudioPlayer.duration;
-    avAudioPlayer = nil;
-    
-  } else {
-    failCallback(@[[self getMediafileError]]);
-    return;
-  }
-  
-  NSString *appKey = nil;
-  if (param[@"appKey"]) {
-    appKey = param[@"appKey"];
-  } else {
-    appKey = [JMessageHelper shareInstance].JMessageAppKey;
-  }
   
   JMSGOptionalContent *messageSendingOptions = nil;
   if (param[@"messageSendingOptions"] && [param[@"messageSendingOptions"] isKindOfClass: [NSDictionary class]]) {
     messageSendingOptions = [self convertDicToJMSGOptionalContent:param[@"messageSendingOptions"]];
   }
   
-  if ([param[@"type"] isEqual: @"single"] && param[@"username"] != nil) {
-    // send single text message
-    JMSGVoiceContent *content = [[JMSGVoiceContent alloc] initWithVoiceData:[NSData dataWithContentsOfFile: mediaPath] voiceDuration:@(duration)];
-    JMSGMessage *message = [JMSGMessage createSingleMessageWithContent:content username: param[@"username"]];
-    if (param[@"extras"] && [param[@"extras"] isKindOfClass: [NSDictionary class]]) {
-      NSDictionary *extras = param[@"extras"];
-      for (NSString *key in extras.allKeys) {
-        [message.content addStringExtra:extras[key] forKey:key];
-      }
-    }
-    [JMSGConversation createSingleConversationWithUsername:param[@"username"] appKey:appKey completionHandler:^(id resultObject, NSError *error) {
-      if (error) {
-        failCallback(@[[error errorToDictionary]]);
-        return;
-      }
-      JMSGConversation *conversation = resultObject;
-      self.SendMsgCallbackDic[message.msgId] = @[successCallback, failCallback];
-      if (messageSendingOptions) {
-        [conversation sendMessage:message optionalContent:messageSendingOptions];
-      } else {
-        [conversation sendMessage: message];
-      }
-    }];
-  } else {
-    if ([param[@"type"] isEqual: @"group"] && param[@"groupId"] != nil) {
-      // send group text message
-      JMSGVoiceContent *content = [[JMSGVoiceContent alloc] initWithVoiceData:[NSData dataWithContentsOfFile: mediaPath] voiceDuration:@(duration)];
-      JMSGMessage *message = [JMSGMessage createGroupMessageWithContent: content groupId: param[@"groupId"]];
-      if (param[@"extras"] && [param[@"extras"] isKindOfClass: [NSDictionary class]]) {
-        NSDictionary *extras = param[@"extras"];
-        for (NSString *key in extras.allKeys) {
-          [message.content addStringExtra:extras[key] forKey:key];
-        }
-      }
-      self.SendMsgCallbackDic[message.msgId] = @[successCallback, failCallback];
-      if (messageSendingOptions) {
-        [JMSGMessage sendMessage:message optionalContent:messageSendingOptions];
-      } else {
-        [JMSGMessage sendMessage:message];
-      }
-    } else {
-      failCallback(@[[self getParamError]]);
-    }
+  JMSGMessage *message = [self createMessageWithDictionary:param type:kJMSGContentTypeVoice];
+  
+  if (!message) {
+    NSError *error = [NSError errorWithDomain:@"cannot create message, check your params!" code:1 userInfo:nil];
+    failCallback(@[[error errorToDictionary]]);
+    return;
   }
+  
+  [self getConversationWithDictionary:param callback:^(JMSGConversation *conversation, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+      return;
+    }
+    
+    self.SendMsgCallbackDic[message.msgId] = @[successCallback,failCallback];
+    if (messageSendingOptions) {
+      [conversation sendMessage:message optionalContent:messageSendingOptions];
+    } else {
+      [conversation sendMessage:message];
+    }
+  }];
 }
 
 RCT_EXPORT_METHOD(sendCustomMessage:(NSDictionary *)param
                   successCallback:(RCTResponseSenderBlock)successCallback
                   failCallback:(RCTResponseSenderBlock)failCallback) {
-  if (param[@"type"] == nil) {
-    failCallback(@[[self getParamError]]);
-    return;}
-  
-  if (param[@"customObject"] == nil || ![param[@"customObject"] isKindOfClass:[NSDictionary class]]) {
-    failCallback(@[[self getParamError]]);
-    return;
-  }
-  
-  NSString *appKey = nil;
-  if (param[@"appKey"]) {
-    appKey = param[@"appKey"];
-  } else {
-    appKey = [JMessageHelper shareInstance].JMessageAppKey;
-  }
   
   JMSGOptionalContent *messageSendingOptions = nil;
   if (param[@"messageSendingOptions"] && [param[@"messageSendingOptions"] isKindOfClass: [NSDictionary class]]) {
     messageSendingOptions = [self convertDicToJMSGOptionalContent:param[@"messageSendingOptions"]];
   }
   
-  if ([param[@"type"] isEqual: @"single"] && param[@"username"] != nil) {
-    
-    // send single text message
-    JMSGCustomContent *content = [[JMSGCustomContent alloc] initWithCustomDictionary: param[@"customObject"]];
-    JMSGMessage *message = [JMSGMessage createSingleMessageWithContent:content username: param[@"username"]];
-    
-    [JMSGConversation createSingleConversationWithUsername:param[@"username"] appKey:appKey completionHandler:^(id resultObject, NSError *error) {
-      if (error) {
-        failCallback(@[[error errorToDictionary]]);
-        return;
-      }
-      
-      JMSGConversation *conversation = resultObject;
-      self.SendMsgCallbackDic[message.msgId] = @[successCallback, failCallback];
-      if (messageSendingOptions) {
-        [conversation sendMessage:message optionalContent:messageSendingOptions];
-      } else {
-        [conversation sendMessage: message];
-      }
-    }];
-  } else {
-    if ([param[@"type"] isEqual: @"group"] && param[@"groupId"] != nil) {
-      // send group text message
-      JMSGCustomContent *content = [[JMSGCustomContent alloc] initWithCustomDictionary: param[@"customObject"]];
-      JMSGMessage *message = [JMSGMessage createGroupMessageWithContent: content groupId: param[@"groupId"]];
-      
-      self.SendMsgCallbackDic[message.msgId] = @[successCallback, failCallback];
-      if (messageSendingOptions) {
-        [JMSGMessage sendMessage:message optionalContent:messageSendingOptions];
-      } else {
-        [JMSGMessage sendMessage:message];
-      }
-    } else {
-      failCallback(@[[self getParamError]]);
-    }
+  JMSGMessage *message = [self createMessageWithDictionary:param type:kJMSGContentTypeCustom];
+  
+  if (!message) {
+    NSError *error = [NSError errorWithDomain:@"cannot create message, check your params!" code:1 userInfo:nil];
+    failCallback(@[[error errorToDictionary]]);
+    return;
   }
+  
+  [self getConversationWithDictionary:param callback:^(JMSGConversation *conversation, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+      return;
+    }
+    
+    self.SendMsgCallbackDic[message.msgId] = @[successCallback,failCallback];
+    if (messageSendingOptions) {
+      [conversation sendMessage:message optionalContent:messageSendingOptions];
+    } else {
+      [conversation sendMessage:message];
+    }
+  }];
 }
 
 RCT_EXPORT_METHOD(sendLocationMessage:(NSDictionary *)param
                   successCallback:(RCTResponseSenderBlock)successCallback
                   failCallback:(RCTResponseSenderBlock)failCallback) {
-//  NSDictionary * param = [command argumentAtIndex:0];
-  
-  if (param[@"type"] == nil ||
-      param[@"latitude"] == nil ||
-      param[@"longitude"] == nil ||
-      param[@"scale"] == nil ||
-      param[@"address"] == nil) {
-    failCallback(@[]);
-    return;
-  }
-  
-  NSString *appKey = nil;
-  if (param[@"appKey"]) {
-    appKey = param[@"appKey"];
-  } else {
-    appKey = [JMessageHelper shareInstance].JMessageAppKey;
-  }
-  
   JMSGOptionalContent *messageSendingOptions = nil;
   if (param[@"messageSendingOptions"] && [param[@"messageSendingOptions"] isKindOfClass: [NSDictionary class]]) {
     messageSendingOptions = [self convertDicToJMSGOptionalContent:param[@"messageSendingOptions"]];
   }
   
-  if ([param[@"type"] isEqual: @"single"] && param[@"username"] != nil) {
-    JMSGLocationContent *content = [[JMSGLocationContent alloc] initWithLatitude:param[@"latitude"] longitude:param[@"longitude"] scale:param[@"scale"] address: param[@"address"]];
-    JMSGMessage *message = [JMSGMessage createSingleMessageWithContent:content username: param[@"username"]];
-    if (param[@"extras"] && [param[@"extras"] isKindOfClass: [NSDictionary class]]) {
-      NSDictionary *extras = param[@"extras"];
-      for (NSString *key in extras.allKeys) {
-        [message.content addStringExtra:extras[key] forKey:key];
-      }
-    }
-    [JMSGConversation createSingleConversationWithUsername:param[@"username"] appKey:appKey completionHandler:^(id resultObject, NSError *error) {
-      if (error) {
-        failCallback(@[[error errorToDictionary]]);
-        return;
-      }
-      
-      JMSGConversation *conversation = resultObject;
-      self.SendMsgCallbackDic[message.msgId] = @[successCallback, failCallback];
-      if (messageSendingOptions) {
-        [conversation sendMessage:message optionalContent:messageSendingOptions];
-      } else {
-        [conversation sendMessage: message];
-      }
-    }];
-  } else {
-    if ([param[@"type"] isEqual: @"group"] && param[@"groupId"] != nil) {
-      JMSGLocationContent *content = [[JMSGLocationContent alloc] initWithLatitude:param[@"latitude"]
-                                                                         longitude:param[@"longitude"]
-                                                                             scale:param[@"scale"]
-                                                                           address:param[@"address"]];
-      JMSGMessage *message = [JMSGMessage createGroupMessageWithContent: content groupId:param[@"groupId"]];
-      if (param[@"extras"] && [param[@"extras"] isKindOfClass: [NSDictionary class]]) {
-        NSDictionary *extras = param[@"extras"];
-        for (NSString *key in extras.allKeys) {
-          [message.content addStringExtra:extras[key] forKey:key];
-        }
-      }
-      
-      self.SendMsgCallbackDic[message.msgId] = @[successCallback, failCallback];
-      if (messageSendingOptions) {
-        [JMSGMessage sendMessage:message optionalContent:messageSendingOptions];
-      } else {
-        [JMSGMessage sendMessage:message];
-      }
-    } else {
-      failCallback(@[[self getParamError]]);
-    }
+  JMSGMessage *message = [self createMessageWithDictionary:param type:kJMSGContentTypeLocation];
+  
+  if (!message) {
+    NSError *error = [NSError errorWithDomain:@"cannot create message, check your params!" code:1 userInfo:nil];
+    failCallback(@[[error errorToDictionary]]);
+    return;
   }
+  
+  [self getConversationWithDictionary:param callback:^(JMSGConversation *conversation, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+      return;
+    }
+    
+    self.SendMsgCallbackDic[message.msgId] = @[successCallback,failCallback];
+    if (messageSendingOptions) {
+      [conversation sendMessage:message optionalContent:messageSendingOptions];
+    } else {
+      [conversation sendMessage:message];
+    }
+  }];
 }
 
 RCT_EXPORT_METHOD(sendFileMessage:(NSDictionary *)param
                   successCallback:(RCTResponseSenderBlock)successCallback
                   failCallback:(RCTResponseSenderBlock)failCallback) {
-  
-  if (param[@"type"] == nil ||
-      param[@"path"] == nil) {
-    failCallback(@[[self getParamError]]);
-    return;
-  }
-  NSString *fileName = @"";
-  if (param[@"fileName"]) {
-    fileName = param[@"fileName"];
-  }
-  NSString *mediaPath = param[@"path"];
-  if([[NSFileManager defaultManager] fileExistsAtPath: mediaPath]){
-    mediaPath = mediaPath;
-  } else {
-    failCallback(@[[self getMediafileError]]);
-    return;
-  }
-  
-  NSString *appKey = nil;
-  if (param[@"appKey"]) {
-    appKey = param[@"appKey"];
-  } else {
-    appKey = [JMessageHelper shareInstance].JMessageAppKey;
-  }
-  
   JMSGOptionalContent *messageSendingOptions = nil;
   if (param[@"messageSendingOptions"] && [param[@"messageSendingOptions"] isKindOfClass: [NSDictionary class]]) {
     messageSendingOptions = [self convertDicToJMSGOptionalContent:param[@"messageSendingOptions"]];
   }
   
-  if ([param[@"type"] isEqual: @"single"] && param[@"username"] != nil) {
-    // send single text message
-    JMSGFileContent *content = [[JMSGFileContent alloc] initWithFileData:[NSData dataWithContentsOfFile: mediaPath] fileName: fileName];
-    ((JMSGFileContent *)content).format = [mediaPath pathExtension];
-    
-    content.uploadHandler = ^(float percent, NSString *msgID) {
-      [self.bridge.eventDispatcher sendAppEventWithName:uploadProgressEvent body:@{@"messageId": msgID,
-                                                                                   @"progress": @(percent)}];
-    };
-    
-    JMSGMessage *message = [JMSGMessage createSingleMessageWithContent:content username: param[@"username"]];
-    if (param[@"extras"] && [param[@"extras"] isKindOfClass: [NSDictionary class]]) {
-      NSDictionary *extras = param[@"extras"];
-      for (NSString *key in extras.allKeys) {
-        [message.content addStringExtra:extras[key] forKey:key];
-      }
-    }
-    [JMSGConversation createSingleConversationWithUsername:param[@"username"] appKey:appKey completionHandler:^(id resultObject, NSError *error) {
-      if (error) {
-        failCallback(@[[error errorToDictionary]]);
-        return;
-      }
-      JMSGConversation *conversation = resultObject;
-      self.SendMsgCallbackDic[message.msgId] = @[successCallback, failCallback];
-      if (messageSendingOptions) {
-        [conversation sendMessage:message optionalContent:messageSendingOptions];
-      } else {
-        [conversation sendMessage: message];
-      }
-    }];
-  } else {
-    if ([param[@"type"] isEqual: @"group"] && param[@"groupId"] != nil) {
-      // send group text message
-      JMSGFileContent *content = [[JMSGFileContent alloc] initWithFileData:[NSData dataWithContentsOfFile: mediaPath] fileName: fileName];
-      ((JMSGFileContent *)content).format = [mediaPath pathExtension];
-      content.uploadHandler = ^(float percent, NSString *msgID) {
-        [self.bridge.eventDispatcher sendAppEventWithName:uploadProgressEvent body:@{@"messageId": msgID,
-                                                                                     @"progress": @(percent)}];
-      };
-      
-      JMSGMessage *message = [JMSGMessage createGroupMessageWithContent: content groupId: param[@"groupId"]];
-      if (param[@"extras"] && [param[@"extras"] isKindOfClass: [NSDictionary class]]) {
-        NSDictionary *extras = param[@"extras"];
-        for (NSString *key in extras.allKeys) {
-          [message.content addStringExtra:extras[key] forKey:key];
-        }
-      }
-      
-      self.SendMsgCallbackDic[message.msgId] = @[successCallback, failCallback];
-      if (messageSendingOptions) {
-        [JMSGMessage sendMessage:message optionalContent:messageSendingOptions];
-      } else {
-        [JMSGMessage sendMessage:message];
-      }
-    } else {
-      failCallback(@[[self getParamError]]);
-    }
+  JMSGMessage *message = [self createMessageWithDictionary:param type:kJMSGContentTypeFile];
+  
+  if (!message) {
+    NSError *error = [NSError errorWithDomain:@"cannot create message, check your params!" code:1 userInfo:nil];
+    failCallback(@[[error errorToDictionary]]);
+    return;
   }
+  
+  [self getConversationWithDictionary:param callback:^(JMSGConversation *conversation, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+      return;
+    }
+    
+    self.SendMsgCallbackDic[message.msgId] = @[successCallback,failCallback];
+    if (messageSendingOptions) {
+      [conversation sendMessage:message optionalContent:messageSendingOptions];
+    } else {
+      [conversation sendMessage:message];
+    }
+  }];
 }
 
 RCT_EXPORT_METHOD(getHistoryMessages:(NSDictionary *)param
                   successCallback:(RCTResponseSenderBlock)successCallback
                   failCallback:(RCTResponseSenderBlock)failCallback) {
-//  NSDictionary * param = [command argumentAtIndex:0];
+
   if (param[@"type"] == nil ||
       param[@"from"] == nil ||
       param[@"limit"] == nil) {
@@ -888,52 +809,20 @@ RCT_EXPORT_METHOD(getHistoryMessages:(NSDictionary *)param
     return;
   }
   
-  NSString *appKey = nil;
-  if (param[@"appKey"]) {
-    appKey = param[@"appKey"];
-  } else {
-    appKey = [JMessageHelper shareInstance].JMessageAppKey;
-  }
-  
-  if ([param[@"type"] isEqual: @"single"] && param[@"username"] != nil) {
-    [JMSGConversation createSingleConversationWithUsername:param[@"username"] appKey:appKey completionHandler:^(id resultObject, NSError *error) {
-      if (error) {
-        failCallback(@[[error errorToDictionary]]);
-        return;
-      }
-      
-      JMSGConversation *conversation = resultObject;
-      
-      NSArray *messageList = [conversation messageArrayFromNewestWithOffset:param[@"from"] limit:param[@"limit"]];
-      NSMutableArray *messageDicList = @[].mutableCopy;
-      for (JMSGMessage *message in messageList) {
-        [messageDicList addObject:[message messageToDictionary]];
-      }
-      successCallback(@[messageDicList]);
-    }];
-  } else {
-    if ([param[@"type"] isEqual: @"group"] && param[@"groupId"] != nil) {
-      [JMSGConversation createGroupConversationWithGroupId:param[@"groupId"] completionHandler:^(id resultObject, NSError *error) {
-        if (error) {
-          failCallback(@[[error errorToDictionary]]);
-          return;
-        }
-        
-        JMSGConversation *conversation = resultObject;
-        NSArray *messageList = [conversation messageArrayFromNewestWithOffset:param[@"from"] limit:param[@"limit"]];
-        NSMutableArray *messageDicList = @[].mutableCopy;
-        for (JMSGMessage *message in messageList) {
-          [messageDicList addObject:[message messageToDictionary]];
-        }
-        successCallback(@[messageDicList]);
-      }];
-      
-    } else {
-      failCallback(@[[self getParamError]]);
+  [self getConversationWithDictionary:param callback:^(JMSGConversation *conversation, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
       return;
     }
-  }
-  
+    
+    NSArray *messageArr = [conversation messageArrayFromNewestWithOffset:param[@"from"] limit:param[@"limit"]];
+    NSArray *messageDicArr = [messageArr mapObjectsUsingBlock:^id(id obj, NSUInteger idx) {
+      JMSGMessage *message = obj;
+      return [message messageToDictionary];
+    }];
+
+    successCallback(@[messageDicArr]);
+  }];
 }
 
 RCT_EXPORT_METHOD(sendInvitationRequest:(NSDictionary *)param
@@ -1656,76 +1545,37 @@ RCT_EXPORT_METHOD(downloadOriginalImage:(NSDictionary *)param
       return;
     }
   }
-  
-  if ([param[@"type"] isEqual: @"single"]) {
-    [JMSGConversation createSingleConversationWithUsername:param[@"username"] appKey:appKey completionHandler:^(id resultObject, NSError *error) {
-      if (error) {
-        failCallback(@[[error errorToDictionary]]);
-        return;
-      }
-      JMSGConversation *conversation = resultObject;
-      JMSGMessage *message = [conversation messageWithMessageId:param[@"messageId"]];
-      if (message == nil) {
-        failCallback(@[[self getErrorWithLog:@"cann't find this message"]]);
-        return;
-      }
-      
-      if (message.contentType != kJMSGContentTypeImage) {
-        failCallback(@[[self getErrorWithLog:@"It is not voice message"]]);
-        return;
-      } else {
-        JMSGImageContent *content = (JMSGImageContent *) message.content;
-        [content largeImageDataWithProgress:^(float percent, NSString *msgId) {
-          
-        } completionHandler:^(NSData *data, NSString *objectId, NSError *error) {
-          if (error) {
-            failCallback(@[[error errorToDictionary]]);
-            return;
-          }
-          
-          JMSGMediaAbstractContent *mediaContent = (JMSGMediaAbstractContent *) message.content;
-          successCallback(@[@{@"messageId": message.msgId,
-                              @"filePath": [mediaContent originMediaLocalPath]}]);
-        }];
-      }
-    }];
-  } else {
-    [JMSGGroup groupInfoWithGroupId:param[@"groupId"] completionHandler:^(id resultObject, NSError *error) {
-      if (error) {
-        failCallback(@[[error errorToDictionary]]);
-        return;
-      }
-      
-      JMSGGroup *group = resultObject;
-      [JMSGConversation createGroupConversationWithGroupId:group.gid completionHandler:^(id resultObject, NSError *error) {
-        JMSGConversation *conversation = resultObject;
-        JMSGMessage *message = [conversation messageWithMessageId:param[@"messageId"]];
+  [self getConversationWithDictionary:param callback:^(JMSGConversation *conversation, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+      return;
+    }
+    
+    JMSGMessage *message = [conversation messageWithMessageId:param[@"messageId"]];
+    if (message == nil) {
+      failCallback(@[[self getErrorWithLog:@"cann't find this message"]]);
+      return;
+    }
+    
+    if (message.contentType != kJMSGContentTypeImage) {
+      failCallback(@[[self getErrorWithLog:@"It is not voice message"]]);
+      return;
+    } else {
+      JMSGImageContent *content = (JMSGImageContent *) message.content;
+      [content largeImageDataWithProgress:^(float percent, NSString *msgId) {
         
-        if (message == nil) {
-          failCallback(@[[self getErrorWithLog:@"cann't find this message"]]);
+      } completionHandler:^(NSData *data, NSString *objectId, NSError *error) {
+        if (error) {
+          failCallback(@[[error errorToDictionary]]);
           return;
         }
         
-        if (message.contentType != kJMSGContentTypeVoice) {
-          failCallback(@[[self getErrorWithLog:@"It is not image message"]]);
-          return;
-        } else {
-          JMSGImageContent *content = (JMSGImageContent *) message.content;
-          [content largeImageDataWithProgress:^(float percent, NSString *msgId) {
-            
-          } completionHandler:^(NSData *data, NSString *objectId, NSError *error) {
-            if (error) {
-              failCallback(@[[error errorToDictionary]]);
-              return;
-            }
-            JMSGMediaAbstractContent *mediaContent = (JMSGMediaAbstractContent *) message.content;
-            successCallback(@[@{@"messageId": message.msgId,
-                                @"filePath": [mediaContent originMediaLocalPath]}]);
-          }];
-        }
+        JMSGMediaAbstractContent *mediaContent = (JMSGMediaAbstractContent *) message.content;
+        successCallback(@[@{@"messageId": message.msgId,
+                            @"filePath": [mediaContent originMediaLocalPath]}]);
       }];
-    }];
-  }
+    }
+  }];
 }
 
 RCT_EXPORT_METHOD(downloadVoiceFile:(NSDictionary *)param
@@ -1754,76 +1604,36 @@ RCT_EXPORT_METHOD(downloadVoiceFile:(NSDictionary *)param
       return;
     }
   }
-  
-  if ([param[@"type"] isEqual: @"single"]) {
-    [JMSGConversation createSingleConversationWithUsername:param[@"username"]
-                                                    appKey:appKey
-                                         completionHandler:^(id resultObject, NSError *error) {
-                                           if (error) {
-                                             failCallback(@[[error errorToDictionary]]);
-                                             return;
-                                           }
-                                           JMSGConversation *conversation = resultObject;
-                                           JMSGMessage *message = [conversation messageWithMessageId:param[@"messageId"]];
-                                           
-                                           if (message == nil) {
-                                             failCallback(@[[self getErrorWithLog:@"cann't find this message"]]);
-                                             return;
-                                           }
-                                           
-                                           if (message.contentType != kJMSGContentTypeVoice) {
-                                             failCallback(@[[self getErrorWithLog:@"It is not image message"]]);
-                                             return;
-                                           } else {
-                                             JMSGVoiceContent *content = (JMSGVoiceContent *) message.content;
-                                             [content voiceData:^(NSData *data, NSString *objectId, NSError *error) {
-                                               if (error) {
-                                                 failCallback(@[[error errorToDictionary]]);
-                                                 return;
-                                               }
-                                               
-                                               JMSGMediaAbstractContent *mediaContent = (JMSGMediaAbstractContent *) message.content;
-                                               failCallback(@[@{@"messageId": message.msgId,
-                                                                @"filePath": [mediaContent originMediaLocalPath]}]);
-                                             }];
-                                           }
-                                         }];
-  } else {
-    [JMSGGroup groupInfoWithGroupId:param[@"groupId"] completionHandler:^(id resultObject, NSError *error) {
-      if (error) {
-        failCallback(@[[error errorToDictionary]]);
-        return;
-      }
-      
-      JMSGGroup *group = resultObject;
-      [JMSGConversation createGroupConversationWithGroupId:group.gid completionHandler:^(id resultObject, NSError *error) {
-        JMSGConversation *conversation = resultObject;
-        JMSGMessage *message = [conversation messageWithMessageId:param[@"messageId"]];
-        
-        if (message == nil) {
-          failCallback(@[[self getErrorWithLog:@"cann't find this message"]]);
+  [self getConversationWithDictionary:param callback:^(JMSGConversation *conversation, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+      return;
+    }
+    
+    JMSGMessage *message = [conversation messageWithMessageId:param[@"messageId"]];
+    
+    if (message == nil) {
+      failCallback(@[[self getErrorWithLog:@"cann't find this message"]]);
+      return;
+    }
+    
+    if (message.contentType != kJMSGContentTypeVoice) {
+      failCallback(@[[self getErrorWithLog:@"It is not image message"]]);
+      return;
+    } else {
+      JMSGVoiceContent *content = (JMSGVoiceContent *) message.content;
+      [content voiceData:^(NSData *data, NSString *objectId, NSError *error) {
+        if (error) {
+          failCallback(@[[error errorToDictionary]]);
           return;
         }
         
-        if (message.contentType != kJMSGContentTypeVoice) {
-          failCallback(@[[self getErrorWithLog:@"It is not voice message"]]);
-          return;
-        } else {
-          JMSGVoiceContent *content = (JMSGVoiceContent *) message.content;
-          [content voiceData:^(NSData *data, NSString *objectId, NSError *error) {
-            if (error) {
-              failCallback(@[[error errorToDictionary]]);
-              return;
-            }
-            
-            JMSGMediaAbstractContent *mediaContent = (JMSGMediaAbstractContent *)message.content;
-            successCallback(@[@{@"messageId": message.msgId,
-                                @"filePath": [mediaContent originMediaLocalPath]}]);
-          }];
-        }
+        JMSGMediaAbstractContent *mediaContent = (JMSGMediaAbstractContent *) message.content;
+        failCallback(@[@{@"messageId": message.msgId,
+                         @"filePath": [mediaContent originMediaLocalPath]}]);
       }];
-    }];
-  }
+    }
+  }];
 }
 
 RCT_EXPORT_METHOD(downloadFile:(NSDictionary *)param
@@ -1853,125 +1663,49 @@ RCT_EXPORT_METHOD(downloadFile:(NSDictionary *)param
     }
   }
   
-  if ([param[@"type"] isEqual: @"single"]) {
-    [JMSGConversation createSingleConversationWithUsername:param[@"username"] appKey:appKey completionHandler:^(id resultObject, NSError *error) {
-      if (error) {
-        failCallback(@[[error errorToDictionary]]);
-        return;
-      }
-      JMSGConversation *conversation = resultObject;
-      JMSGMessage *message = [conversation messageWithMessageId:param[@"messageId"]];
-      
-      if (message == nil) {
-        failCallback(@[[self getErrorWithLog:@"cann't find this message"]]);
-        return;
-      }
-      
-      if (message.contentType != kJMSGContentTypeFile) {
-        failCallback(@[[self getErrorWithLog:@"It is not file message"]]);
-        return;
-      } else {
-        JMSGFileContent *content = (JMSGFileContent *) message.content;
-        [content fileData:^(NSData *data, NSString *objectId, NSError *error) {
-          if (error) {
-            failCallback(@[[error errorToDictionary]]);
-            return;
-          }
-          JMSGFileContent *fileContent = (JMSGFileContent *) message.content;
-          successCallback(@[@{@"messageId": message.msgId,
-                              @"filePath":[fileContent originMediaLocalPath]}]);
-        }];
-      }
-    }];
-  } else {
-    [JMSGGroup groupInfoWithGroupId:param[@"groupId"] completionHandler:^(id resultObject, NSError *error) {
-      if (error) {
-        failCallback(@[[error errorToDictionary]]);
-        return;
-      }
-      
-      JMSGGroup *group = (JMSGGroup *) resultObject;
-      [JMSGConversation createGroupConversationWithGroupId:group.gid completionHandler:^(id resultObject, NSError *error) {
-        JMSGConversation *conversation = resultObject;
-        JMSGMessage *message = [conversation messageWithMessageId:param[@"messageId"]];
-        
-        if (message == nil) {
-          failCallback(@[[self getErrorWithLog:@"Can't find the message"]]);
+  [self getConversationWithDictionary:param callback:^(JMSGConversation *conversation, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+      return;
+    }
+    
+    JMSGMessage *message = [conversation messageWithMessageId:param[@"messageId"]];
+    
+    if (message == nil) {
+      failCallback(@[[self getErrorWithLog:@"cann't find this message"]]);
+      return;
+    }
+    
+    if (message.contentType != kJMSGContentTypeFile) {
+      failCallback(@[[self getErrorWithLog:@"It is not file message"]]);
+      return;
+    } else {
+      JMSGFileContent *content = (JMSGFileContent *) message.content;
+      [content fileData:^(NSData *data, NSString *objectId, NSError *error) {
+        if (error) {
+          failCallback(@[[error errorToDictionary]]);
           return;
         }
-        
-        if (message.contentType != kJMSGContentTypeFile) {
-          failCallback(@[[self getErrorWithLog:@"It is not a file message"]]);
-          return;
-          
-        } else {
-          JMSGFileContent *content = (JMSGFileContent *) message.content;
-          [content fileData:^(NSData *data, NSString *objectId, NSError *error) {
-            if (error) {
-              
-              failCallback(@[[error errorToDictionary]]);
-              return;
-            }
-            JMSGFileContent *fileContent = (JMSGFileContent *) message.content;
-            successCallback(@[@{@"messageId": message.msgId,
-                                @"filePath":[fileContent originMediaLocalPath]}]);
-          }];
-        }
+        JMSGFileContent *fileContent = (JMSGFileContent *) message.content;
+        successCallback(@[@{@"messageId": message.msgId,
+                            @"filePath":[fileContent originMediaLocalPath]}]);
       }];
-    }];
-  }
+    }
+  }];
 }
 
 RCT_EXPORT_METHOD(createConversation:(NSDictionary *)param
                   successCallback:(RCTResponseSenderBlock)successCallback
                   failCallback:(RCTResponseSenderBlock)failCallback) {
   
-  if (param[@"type"] == nil) {
-    failCallback(@[[self getParamError]]);
-    return;
-  }
-  
-  if ([param[@"type"] isEqual: @"single"] && param[@"username"] != nil) {
-    
-  } else {
-    if ([param[@"type"] isEqual: @"group"] && param[@"groupId"] != nil) {
-      
-    } else {
-      failCallback(@[[self getParamError]]);
+  [self getConversationWithDictionary:param callback:^(JMSGConversation *conversation, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
       return;
     }
-  }
-  
-  NSString *appKey = nil;
-  if (param[@"appKey"]) {
-    appKey = param[@"appKey"];
-  } else {
-    appKey = [JMessageHelper shareInstance].JMessageAppKey;
-  }
-  
-  if ([param[@"type"] isEqualToString:@"single"]) {
     
-    [JMSGConversation createSingleConversationWithUsername:param[@"username"]
-                                                    appKey:appKey
-                                         completionHandler:^(id resultObject, NSError *error) {
-                                           if (error) {
-                                             failCallback(@[[error errorToDictionary]]);
-                                             return;
-                                           }
-                                           JMSGConversation *conversation = resultObject;
-                                           successCallback(@[[conversation conversationToDictionary]]);
-                                         }];
-  } else {
-    [JMSGConversation createGroupConversationWithGroupId:param[@"groupId"] completionHandler:^(id resultObject, NSError *error) {
-      if (error) {
-        failCallback(@[[error errorToDictionary]]);
-        return;
-      }
-      JMSGConversation *conversation = resultObject;
-      successCallback(@[[conversation conversationToDictionary]]);
-    }];
-  }
-  
+    successCallback(@[[conversation conversationToDictionary]]);
+  }];
 }
 
 RCT_EXPORT_METHOD(deleteConversation:(NSDictionary *)param
@@ -2000,64 +1734,36 @@ RCT_EXPORT_METHOD(deleteConversation:(NSDictionary *)param
   } else {
     appKey = [JMessageHelper shareInstance].JMessageAppKey;
   }
-  
-  if ([param[@"type"] isEqualToString:@"single"]) {
-    [JMSGConversation deleteSingleConversationWithUsername:param[@"username"] appKey:appKey];
-  } else {
-    [JMSGConversation deleteGroupConversationWithGroupId:param[@"groupId"]];
+  JMSGConversationType type =  [self convertStringToConvsersationType:param[@"type"]];
+  switch (type) {
+    case kJMSGConversationTypeSingle: {
+      [JMSGConversation deleteSingleConversationWithUsername:param[@"username"] appKey:appKey];
+      break;
+    }
+    case kJMSGConversationTypeGroup: {
+      [JMSGConversation deleteGroupConversationWithGroupId:param[@"groupId"]];
+      break;
+    }
+    case kJMSGConversationTypeChatRoom: {
+      [JMSGConversation deleteChatRoomConversationWithRoomId:param[@"roomId"]];
+      break;
+    }
   }
+
   successCallback(@[]);
 }
 
 RCT_EXPORT_METHOD(getConversation:(NSDictionary *)param
                   successCallback:(RCTResponseSenderBlock)successCallback
                   failCallback:(RCTResponseSenderBlock)failCallback) {
-  
-  if (param[@"type"] == nil) {
-    failCallback(@[[self getParamError]]);
-    return;
-  }
-  
-  if ([param[@"type"] isEqual: @"single"] && param[@"username"] != nil) {
-    
-  } else {
-    if ([param[@"type"] isEqual: @"group"] && param[@"groupId"] != nil) {
-      
-    } else {
-      failCallback(@[[self getParamError]]);
-      return;
-    }
-  }
-  
-  NSString *appKey = nil;
-  if (param[@"appKey"]) {
-    appKey = param[@"appKey"];
-  } else {
-    appKey = [JMessageHelper shareInstance].JMessageAppKey;
-  }
-  
-  if ([param[@"type"] isEqualToString:@"single"]) {
-    [JMSGConversation createSingleConversationWithUsername:param[@"username"]
-                                                    appKey:appKey
-                                         completionHandler:^(id resultObject, NSError *error) {
-                                           if (error) {
-                                             failCallback(@[[error errorToDictionary]]);
-                                             return;
-                                           }
-                                           JMSGConversation *conversation = resultObject;
-                                           successCallback(@[[conversation conversationToDictionary]]);
-                                         }];
-  } else {
-    [JMSGConversation createGroupConversationWithGroupId:param[@"groupId"]
-                                       completionHandler:^(id resultObject, NSError *error) {
-                                         if (error) {
-                                           failCallback(@[[error errorToDictionary]]);
-                                           return;
-                                         }
-                                         JMSGConversation *conversation = resultObject;
-                                         successCallback(@[[conversation conversationToDictionary]]);
-                                       }];
-  }
+
+  [self getConversationWithDictionary:param callback:^(JMSGConversation *conversation, NSError *error) {
+     if (error) {
+       failCallback(@[[error errorToDictionary]]);
+       return;
+     }
+    successCallback(@[[conversation conversationToDictionary]]);
+  }];
 }
 
 RCT_EXPORT_METHOD(getConversations:(RCTResponseSenderBlock)successCallback
@@ -2084,163 +1790,50 @@ RCT_EXPORT_METHOD(getConversations:(RCTResponseSenderBlock)successCallback
 RCT_EXPORT_METHOD(resetUnreadMessageCount:(NSDictionary *)param
                   successCallback:(RCTResponseSenderBlock)successCallback
                   failCallback:(RCTResponseSenderBlock)failCallback) {
-  
-  if (param[@"type"] == nil) {
-    failCallback(@[[self getParamError]]);
-    return;
-  }
-  
-  if ([param[@"type"] isEqual: @"single"] && param[@"username"] != nil) {
-    
-  } else {
-    if ([param[@"type"] isEqual: @"group"] && param[@"groupId"] != nil) {
-      
-    } else {
-      failCallback(@[[self getParamError]]);
+  [self getConversationWithDictionary:param callback:^(JMSGConversation *conversation, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
       return;
     }
-  }
-  
-  NSString *appKey = nil;
-  if (param[@"appKey"]) {
-    appKey = param[@"appKey"];
-  } else {
-    appKey = [JMessageHelper shareInstance].JMessageAppKey;
-  }
-  
-  if ([param[@"type"] isEqualToString:@"single"]) {
-    [JMSGConversation createSingleConversationWithUsername:param[@"username"]
-                                                    appKey:appKey
-                                         completionHandler:^(id resultObject, NSError *error) {
-                                           if (error) {
-                                             failCallback(@[[error errorToDictionary]]);
-                                             return;
-                                           }
-                                           JMSGConversation *conversation = resultObject;
-                                           [conversation clearUnreadCount];
-                                           successCallback(@[]);
-                                         }];
-    
-  } else {
-    [JMSGConversation createGroupConversationWithGroupId:param[@"groupId"]
-                                       completionHandler:^(id resultObject, NSError *error) {
-                                         if (error) {
-                                           failCallback(@[[error errorToDictionary]]);
-                                           return;
-                                         }
-                                         JMSGConversation *conversation = resultObject;
-                                         [conversation clearUnreadCount];
-                                         successCallback(@[]);
-                                       }];
-  }
+    [conversation clearUnreadCount];
+    successCallback(@[]);
+  }];
 }
 
 RCT_EXPORT_METHOD(retractMessage:(NSDictionary *)param
                   successCallback:(RCTResponseSenderBlock)successCallback
                   failCallback:(RCTResponseSenderBlock)failCallback) {
   
-  if (param[@"type"] == nil) {
-    failCallback(@[[self getParamError]]);
-    return;}
-  
-  if (param[@"messageId"] == nil) {
-    failCallback(@[[self getParamError]]);
-    return;
-  }
-  
-  NSString *appKey = nil;
-  if (param[@"appKey"]) {
-    appKey = param[@"appKey"];
-  } else {
-    appKey = [JMessageHelper shareInstance].JMessageAppKey;
-  }
-  
-  if ([param[@"type"] isEqual: @"single"] && param[@"username"] != nil) {
-    // send single text message
-    [JMSGConversation createSingleConversationWithUsername:param[@"username"]
-                                                    appKey:appKey
-                                         completionHandler:^(id resultObject, NSError *error) {
-                                           if (error) {
-                                             failCallback(@[[error errorToDictionary]]);
-                                             return;
-                                           }
-                                           
-                                           JMSGConversation *conversation = resultObject;
-                                           JMSGMessage *message = [conversation messageWithMessageId:param[@"messageId"]];
-                                           if (message == nil) {
-                                             
-                                             failCallback(@[[self getErrorWithLog:@"cann't found this message"]]);
-                                             return;
-                                           }
-                                           
-                                           [conversation retractMessage:message completionHandler:^(id resultObject, NSError *error) {
-                                             if (error) {
-                                               failCallback(@[[error errorToDictionary]]);
-                                               return;
-                                             }
-                                             
-                                             successCallback(@[]);
-                                           }];
-                                         }];
-    
-  } else {
-    if ([param[@"type"] isEqual: @"group"] && param[@"groupId"] != nil) {
-      // send group text message
-      [JMSGConversation createGroupConversationWithGroupId:param[@"groupId"]
-                                         completionHandler:^(id resultObject, NSError *error) {
-                                           
-                                           if (error) {
-                                             failCallback(@[[error errorToDictionary]]);
-                                             return;
-                                           }
-                                           
-                                           JMSGConversation *conversation = resultObject;
-                                           JMSGMessage *message = [conversation messageWithMessageId:param[@"messageId"]];
-                                           if (message == nil) {
-                                             failCallback(@[[self getErrorWithLog:@"cann't found this message"]]);
-                                             return;
-                                           }
-                                           
-                                           [conversation retractMessage:message completionHandler:^(id resultObject, NSError *error) {
-                                             if (error) {
-                                               failCallback(@[[error errorToDictionary]]);
-                                               return;
-                                             }
-                                             
-                                             successCallback(@[]);
-                                           }];
-                                         }];
-    } else {
-      failCallback(@[[self getParamError]]);
+  [self getConversationWithDictionary:param callback:^(JMSGConversation *conversation, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+      return;
     }
-  }
+    
+    JMSGMessage *message = [conversation messageWithMessageId:param[@"messageId"]];
+    if (message == nil) {
+      failCallback(@[[self getErrorWithLog:@"cann't found this message"]]);
+      return;
+    }
+    
+    [conversation retractMessage:message completionHandler:^(id resultObject, NSError *error) {
+      if (error) {
+        failCallback(@[[error errorToDictionary]]);
+        return;
+      }
+      
+      successCallback(@[]);
+    }];
+  }];
 }
 
 RCT_EXPORT_METHOD(createSendMessage:(NSDictionary *)param
                   callback:(RCTResponseSenderBlock)callback) {
-  /**
-   *  {object} params = {
-   *  'type': String,                                // 'single' / 'group'
-   *  'messageType': String,                         // 'text', 'image', 'voice', 'location', 'file', 'custom'
-   *  'groupId': String,                             // 当 type = group 时，groupId 不能为空
-   *  'username': String,                            // 当 type = single 时，username 不能为空
-   *  'appKey': String,                              // 当 type = single 时，用于指定对象所属应用的 appKey。如果为空，默认为当前应用。
-   *  'text': String,                                // Optional 消息内容
-   *  'path': String                                 // Optional 资源路径
-   *  'fileName': String,                            // Optional 文件名
-   *  'latitude': Number,                            // Optional 纬度信息
-   *  'longitude': Number,                           // Optional 经度信息
-   *  'scale': Number,                               // Optional 地图缩放比例
-   *  'address': String,                             // Optional 详细地址信息
-   *  'customObject': {'key1': 'value1'}  // Optional. Optional 自定义键值对
-   *  'extras': Object,                              // Optional. 自定义键值对 = {'key1': 'value1'}
-   * }
-   */
+
   if (!param[@"type"]) {
     callback(@[]);
     return;
   }
-  
   
   NSString *mediaPath = @"";
   if ([param[@"messageType"] isEqualToString:@"image"] ||
@@ -2320,34 +1913,21 @@ RCT_EXPORT_METHOD(createSendMessage:(NSDictionary *)param
     appKey = [JMessageHelper shareInstance].JMessageAppKey;
   }
   
-  if ([param[@"type"] isEqual: @"single"] && param[@"username"] != nil) {
-      [JMSGConversation createSingleConversationWithUsername:param[@"username"] appKey:appKey completionHandler:^(id resultObject, NSError *error) {
-        if (error) {
-          callback(@[[error errorToDictionary]]);
-          return;
-        }
-        JMSGConversation *conversation = resultObject;
-        JMSGMessage *message = [conversation createMessageWithContent:content];
-        
-        callback(@[[message messageToDictionary]]);
-      }];
-  } else {
-      [JMSGConversation createGroupConversationWithGroupId:param[@"groupId"] completionHandler:^(id resultObject, NSError *error) {
-        if (error) {
-          callback(@[[error errorToDictionary]]);
-          return;
-        }
-        JMSGConversation *conversation = resultObject;
-        JMSGMessage *message = [conversation createMessageWithContent:content];
-        if (param[@"extras"] && [param[@"extras"] isKindOfClass: [NSDictionary class]]) {
-          NSDictionary *extras = param[@"extras"];
-          for (NSString *key in extras.allKeys) {
-            [message.content addStringExtra:extras[key] forKey:key];
-          }
-        }
-        callback(@[[message messageToDictionary]]);
-      }];
-  }
+  [self getConversationWithDictionary:param callback:^(JMSGConversation *conversation, NSError *error) {
+    if (error) {
+      callback(@[[error errorToDictionary]]);
+      return;
+    }
+    
+    JMSGMessage *message = [conversation createMessageWithContent:content];
+    if (param[@"extras"] && [param[@"extras"] isKindOfClass: [NSDictionary class]]) {
+      NSDictionary *extras = param[@"extras"];
+      for (NSString *key in extras.allKeys) {
+        [message.content addStringExtra:extras[key] forKey:key];
+      }
+    }
+    callback(@[[message messageToDictionary]]);
+  }];
 }
 
 RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)param
@@ -2361,70 +1941,36 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)param
     appKey = [JMessageHelper shareInstance].JMessageAppKey;
   }
   
-  if ([param[@"type"] isEqual: @"single"] && param[@"username"] != nil) {
-    [JMSGConversation createSingleConversationWithUsername:param[@"username"] appKey:appKey completionHandler:^(id resultObject, NSError *error) {
-      if (error) {
-        failCallback(@[[error errorToDictionary]]);
-        return;
-      }
-      
-      JMSGConversation *conversation = resultObject;
-      JMSGMessage *message = [conversation messageWithMessageId: param[@"id"]];
-      
-      if ([message.content isKindOfClass:[JMSGMediaAbstractContent class]]) {
-        JMSGMediaAbstractContent *content = (JMSGMediaAbstractContent *)message.content;
-        content.uploadHandler = ^(float percent, NSString *msgID) {
-
+  [self getConversationWithDictionary:param callback:^(JMSGConversation *conversation, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+      return;
+    }
+    
+    JMSGMessage *message = [conversation messageWithMessageId: param[@"id"]];
+    
+    if ([message.content isKindOfClass:[JMSGMediaAbstractContent class]]) {
+      JMSGMediaAbstractContent *content = (JMSGMediaAbstractContent *)message.content;
+      content.uploadHandler = ^(float percent, NSString *msgID) {
+        
         [self.bridge.eventDispatcher sendAppEventWithName:uploadProgressEvent body:@{@"messageId": msgID,
-                                                                                       @"progress": @(percent)}];
-        };
-      }
-      
-      JMSGOptionalContent *messageSendingOptions = nil;
-      if (param[@"messageSendingOptions"] && [param[@"messageSendingOptions"] isKindOfClass: [NSDictionary class]]) {
-        messageSendingOptions = [self convertDicToJMSGOptionalContent:param[@"messageSendingOptions"]];
-      }
-      
-      self.SendMsgCallbackDic[message.msgId] = @[successCallback,failCallback];
-      
-      if (messageSendingOptions) {
-        [conversation sendMessage:message optionalContent:messageSendingOptions];
-      } else {
-        [conversation sendMessage:message];
-      }
-    }];
-  } else {
-    [JMSGConversation createGroupConversationWithGroupId:param[@"groupId"] completionHandler:^(id resultObject, NSError *error) {
-      if (error) {
-        failCallback(@[[error errorToDictionary]]);
-        return;
-      }
-
-      JMSGConversation *conversation = resultObject;
-      JMSGMessage *message = [conversation messageWithMessageId: param[@"id"]];
-      
-      if ([message.content isKindOfClass:[JMSGMediaAbstractContent class]]) {
-        JMSGMediaAbstractContent *content = (JMSGMediaAbstractContent *)message.content;
-        content.uploadHandler = ^(float percent, NSString *msgID) {
-          [self.bridge.eventDispatcher sendAppEventWithName:uploadProgressEvent body:@{@"messageId": msgID,
-                                                                                       @"progress": @(percent)}];
-        };
-      }
-      
-      JMSGOptionalContent *messageSendingOptions = nil;
-      if (param[@"messageSendingOptions"] && [param[@"messageSendingOptions"] isKindOfClass: [NSDictionary class]]) {
-        messageSendingOptions = [self convertDicToJMSGOptionalContent:param[@"messageSendingOptions"]];
-      }
-      
-      self.SendMsgCallbackDic[message.msgId] = @[successCallback,failCallback];
-      if (messageSendingOptions) {
-        [conversation sendMessage:message optionalContent:messageSendingOptions];
-      } else {
-        [conversation sendMessage:message];
-      }
-      
-    }];
-  }
+                                                                                     @"progress": @(percent)}];
+      };
+    }
+    
+    JMSGOptionalContent *messageSendingOptions = nil;
+    if (param[@"messageSendingOptions"] && [param[@"messageSendingOptions"] isKindOfClass: [NSDictionary class]]) {
+      messageSendingOptions = [self convertDicToJMSGOptionalContent:param[@"messageSendingOptions"]];
+    }
+    
+    self.SendMsgCallbackDic[message.msgId] = @[successCallback,failCallback];
+    
+    if (messageSendingOptions) {
+      [conversation sendMessage:message optionalContent:messageSendingOptions];
+    } else {
+      [conversation sendMessage:message];
+    }
+  }];
 }
 
 RCT_EXPORT_METHOD(forwardMessage:(NSDictionary *)param
@@ -2438,137 +1984,72 @@ RCT_EXPORT_METHOD(forwardMessage:(NSDictionary *)param
     appKey = [JMessageHelper shareInstance].JMessageAppKey;
   }
   
-  if ([param[@"type"] isEqual: @"single"] && param[@"username"] != nil) {
-    [JMSGConversation createSingleConversationWithUsername:param[@"username"] appKey:appKey completionHandler:^(id resultObject, NSError *error) {
-      if (error) {
-        failCallback(@[[error errorToDictionary]]);
-        return;
-      }
-      
-      JMSGConversation *conversation = resultObject;
-      JMSGMessage *message = [conversation messageWithMessageId: param[@"id"]];
-      
-      if ([message.content isKindOfClass:[JMSGMediaAbstractContent class]]) {
-        JMSGMediaAbstractContent *content = (JMSGMediaAbstractContent *)message.content;
-        content.uploadHandler = ^(float percent, NSString *msgID) {
-          
-          [self.bridge.eventDispatcher sendAppEventWithName:uploadProgressEvent body:@{@"messageId": msgID,
-                                                                                       @"progress": @(percent)}];
-        };
-      }
-      
-      JMSGOptionalContent *messageSendingOptions = nil;
-      if (param[@"messageSendingOptions"] && [param[@"messageSendingOptions"] isKindOfClass: [NSDictionary class]]) {
-        messageSendingOptions = [self convertDicToJMSGOptionalContent:param[@"messageSendingOptions"]];
-      }
-      
-      NSDictionary *target = nil;
-      if (param[@"target"]) {
-         target = param[@""];
-      } else {
-        failCallback(@[[self getParamError]]);
-        return;
-      }
-      
-      if ([target[@"type"] isEqualToString:@"group"]) {
-        [JMSGGroup groupInfoWithGroupId:target[@"id"] completionHandler:^(id resultObject, NSError *error) {
-          if (error) {
-            failCallback(@[[error errorToDictionary]]);
-            return ;
-          }
-          JMSGGroup *group = resultObject;
-          [JMSGMessage forwardMessage:message target:group optionalContent:messageSendingOptions];
-        }];
-      } else {
-        NSString *targetAppkey = nil;
-        if (target[@"appKey"]) {
-          targetAppkey = target[@"appKey"];
+  [self getConversationWithDictionary:param callback:^(JMSGConversation *conversation, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+      return;
+    }
+    
+    JMSGMessage *message = [conversation messageWithMessageId: param[@"id"]];
+    
+    if ([message.content isKindOfClass:[JMSGMediaAbstractContent class]]) {
+      JMSGMediaAbstractContent *content = (JMSGMediaAbstractContent *)message.content;
+      content.uploadHandler = ^(float percent, NSString *msgID) {
+        
+        [self.bridge.eventDispatcher sendAppEventWithName:uploadProgressEvent body:@{@"messageId": msgID,
+                                                                                     @"progress": @(percent)}];
+      };
+    }
+    
+    JMSGOptionalContent *messageSendingOptions = nil;
+    if (param[@"messageSendingOptions"] && [param[@"messageSendingOptions"] isKindOfClass: [NSDictionary class]]) {
+      messageSendingOptions = [self convertDicToJMSGOptionalContent:param[@"messageSendingOptions"]];
+    }
+    
+    NSDictionary *target = nil;
+    if (param[@"target"]) {
+      target = param[@""];
+    } else {
+      failCallback(@[[self getParamError]]);
+      return;
+    }
+    
+    if ([target[@"type"] isEqualToString:@"chatRoom"]) {
+      failCallback(@[[self getErrorWithLog:@"cann't forward message to chat room"]]);
+      return;
+    }
+    
+    if ([target[@"type"] isEqualToString:@"group"]) {
+      [JMSGGroup groupInfoWithGroupId:target[@"id"] completionHandler:^(id resultObject, NSError *error) {
+        if (error) {
+          failCallback(@[[error errorToDictionary]]);
+          return ;
         }
-        [JMSGUser userInfoArrayWithUsernameArray:@[target[@"user"]] appKey:targetAppkey completionHandler:^(id resultObject, NSError *error) {
-          if (error) {
-            failCallback(@[[error errorToDictionary]]);
-            return ;
-          }
-          
-          NSArray *userArr = resultObject;
-          if (userArr.count < 1) {
-            failCallback(@[[self getErrorWithLog:@"cann't find user by usernaem"]]);
-          } else {
-            JMSGUser *user = resultObject[0];
-            [JMSGMessage forwardMessage:message target:user optionalContent:messageSendingOptions];
-          }
-        }];
+        JMSGGroup *group = resultObject;
+        [JMSGMessage forwardMessage:message target:group optionalContent:messageSendingOptions];
+      }];
+    } else {
+      NSString *targetAppkey = nil;
+      if (target[@"appKey"]) {
+        targetAppkey = target[@"appKey"];
       }
-      
-    }];
-  } else {
-    [JMSGConversation createGroupConversationWithGroupId:param[@"groupId"] completionHandler:^(id resultObject, NSError *error) {
-      if (error) {
-        failCallback(@[[error errorToDictionary]]);
-        return;
-      }
-      
-      JMSGConversation *conversation = resultObject;
-      JMSGMessage *message = [conversation messageWithMessageId: param[@"id"]];
-      
-      if ([message.content isKindOfClass:[JMSGMediaAbstractContent class]]) {
-        JMSGMediaAbstractContent *content = (JMSGMediaAbstractContent *)message.content;
-        content.uploadHandler = ^(float percent, NSString *msgID) {
-          [self.bridge.eventDispatcher sendAppEventWithName:uploadProgressEvent body:@{@"messageId": msgID,
-                                                                                       @"progress": @(percent)}];
-        };
-      }
-      
-      JMSGOptionalContent *messageSendingOptions = nil;
-      if (param[@"messageSendingOptions"] && [param[@"messageSendingOptions"] isKindOfClass: [NSDictionary class]]) {
-        messageSendingOptions = [self convertDicToJMSGOptionalContent:param[@"messageSendingOptions"]];
-      }
-      
-      NSDictionary *target = nil;
-      if (param[@"target"]) {
-        target = param[@""];
-      } else {
-        failCallback(@[[self getParamError]]);
-        return;
-      }
-      
-      if ([target[@"type"] isEqualToString:@"group"]) {
-        [JMSGGroup groupInfoWithGroupId:target[@"id"] completionHandler:^(id resultObject, NSError *error) {
-          if (error) {
-            failCallback(@[[error errorToDictionary]]);
-            return ;
-          }
-          JMSGGroup *group = resultObject;
-          [JMSGMessage forwardMessage:message target:group optionalContent:messageSendingOptions];
-        }];
-      } else {
-        NSString *targetAppkey = nil;
-        if (target[@"appKey"]) {
-          targetAppkey = target[@"appKey"];
+      [JMSGUser userInfoArrayWithUsernameArray:@[target[@"user"]] appKey:targetAppkey completionHandler:^(id resultObject, NSError *error) {
+        if (error) {
+          failCallback(@[[error errorToDictionary]]);
+          return ;
         }
-        [JMSGUser userInfoArrayWithUsernameArray:@[target[@"user"]] appKey:targetAppkey completionHandler:^(id resultObject, NSError *error) {
-          if (error) {
-            failCallback(@[[error errorToDictionary]]);
-            return ;
-          }
-          
-          NSArray *userArr = resultObject;
-          if (userArr.count < 1) {
-            failCallback(@[[self getErrorWithLog:@"cann't find user by usernaem"]]);
-          } else {
-            JMSGUser *user = resultObject[0];
-            [JMSGMessage forwardMessage:message target:user optionalContent:messageSendingOptions];
-          }
-        }];
-      }
-//      if (messageSendingOptions) {
-//        [conversation sendMessage:message optionalContent:messageSendingOptions];
-//      } else {
-//        [conversation sendMessage:message];
-//      }
-      
-    }];
-  }
+
+        NSArray *userArr = resultObject;
+        if (userArr.count < 1) {
+          failCallback(@[[self getErrorWithLog:@"cann't find user by usernaem"]]);
+        } else {
+          JMSGUser *user = resultObject[0];
+          [JMSGMessage forwardMessage:message target:user optionalContent:messageSendingOptions];
+        }
+      }];
+    }
+  }];
+  
 }
 
 RCT_EXPORT_METHOD(blockGroupMessage:(NSDictionary *)param
@@ -2732,15 +2213,55 @@ RCT_EXPORT_METHOD(setConversationExtras:(NSDictionary *)param
     return;
   }
   
-  if ([param[@"type"] isEqual: @"single"] && param[@"username"] != nil) {
-    
-  } else {
-    if ([param[@"type"] isEqual: @"group"] && param[@"groupId"] != nil) {
-      
-    } else {
-      failCallback(@[[self getParamError]]);
+  [self getConversationWithDictionary:param callback:^(JMSGConversation *conversation, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
       return;
     }
+    
+    NSDictionary *extras = param[@"extras"];
+    for (NSString *key in extras) {
+      [conversation setExtraValue:extras[key] forKey:key];
+    }
+    successCallback(@[[conversation conversationToDictionary]]);
+  }];
+}
+
+
+
+/**
+ * 查询当前 AppKey 下的聊天室信息
+ * @param {object} param = {
+ *  "start": number,  // 起始位置
+ *  "count": number,  // 获取个数
+ * }
+ * ChatRoomInfo = {
+ *  "roomId": String,
+ *  "roomName": String,
+ *  "appKey": String,
+ *  "maxMemberCount": number,
+ *  "totalMemberCount": number,
+ *  "owner": UserInfo,
+ *  "description": String,
+ *  "createTime": number,
+ * }
+ * @param {function} success = function([{chatRoomInfo}])
+ * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+ */
+//static getChatRoomListByApp(param, success, error) {
+RCT_EXPORT_METHOD(getChatRoomListByApp:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallBack:(RCTResponseSenderBlock)failCallback) {
+  NSNumber *start = nil;
+  NSNumber *count = nil;
+  if (!param[@"start"]) {
+    start = param[@"start"];
+    return;
+  }
+  
+  if (!param[@"count"]) {
+    count = param[@"count"];
+    return;
   }
   
   NSString *appKey = nil;
@@ -2750,35 +2271,150 @@ RCT_EXPORT_METHOD(setConversationExtras:(NSDictionary *)param
     appKey = [JMessageHelper shareInstance].JMessageAppKey;
   }
   
-  if ([param[@"type"] isEqualToString:@"single"]) {
-    [JMSGConversation createSingleConversationWithUsername:param[@"username"]
-                                                    appKey:appKey
-                                         completionHandler:^(id resultObject, NSError *error) {
-                                           if (error) {
-                                             failCallback(@[[error errorToDictionary]]);
-                                             return;
-                                           }
-                                           JMSGConversation *conversation = resultObject;
-                                           NSDictionary *extras = param[@"extras"];
-                                           for (NSString *key in extras) {
-                                             [conversation setExtraValue:extras[key] forKey:key];
-                                           }
-                                           successCallback(@[[conversation conversationToDictionary]]);
-                                         }];
-  } else {
-    [JMSGConversation createGroupConversationWithGroupId:param[@"groupId"] completionHandler:^(id resultObject, NSError *error) {
-      if (error) {
-        failCallback(@[[error errorToDictionary]]);
-        return;
-      }
-      JMSGConversation *conversation = resultObject;
-      NSDictionary *extras = param[@"extras"];
-      for (NSString *key in extras) {
-        [conversation setExtraValue:extras[key] forKey:key];
-      }
-      successCallback(@[[conversation conversationToDictionary]]);
+  [JMSGChatRoom getChatRoomListWithAppKey:appKey start:[start integerValue] count:[count integerValue] completionHandler:^(id resultObject, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+      return;
+    }
+    NSArray *chatRoomArr = resultObject;
+    NSArray *chatRoomDicArr = [chatRoomArr mapObjectsUsingBlock:^id(id obj, NSUInteger idx) {
+      JMSGChatRoom *chatRoom = obj;
+      return [chatRoom chatRoomToDictionary];
     }];
-  }
+    
+    successCallback(@[chatRoomDicArr]);
+  }];
 }
+
+/**
+ * 获取当前用户所加入的所有聊天室信息
+ * @param {function} success = function([{ChatRoomInfo}])
+ * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+ */
+//static getChatRoomListByUser(success, error) {
+RCT_EXPORT_METHOD(getChatRoomListByUser:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallBack:(RCTResponseSenderBlock)failCallback) {
+  [JMSGChatRoom getMyChatRoomListCompletionHandler:^(id resultObject, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+      return;
+    }
+    
+    NSArray *chatRoomArr = resultObject;
+    NSArray *chatRoomDicArr = [chatRoomArr mapObjectsUsingBlock:^id(id obj, NSUInteger idx) {
+      JMSGChatRoom *chatRoom = obj;
+      return [chatRoom chatRoomToDictionary];
+    }];
+    successCallback(@[chatRoomDicArr]);
+  }];
+
+}
+
+/**
+ * 查询指定 roomId 聊天室信息
+ * @param {Array} param = [String]
+ * @param {function} success = function([{ChatRoomInfo}])
+ * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+ */
+//static getChatRoomInfos(param, success, error) {
+RCT_EXPORT_METHOD(getChatRoomInfos:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallBack:(RCTResponseSenderBlock)failCallback) {
+  if (!param[@"roomIds"]) {
+    failCallback(@[[self getParamError]]);
+    return;
+  }
+  
+  [JMSGChatRoom getChatRoomInfosWithRoomIds:param[@"roomIds"] completionHandler:^(id resultObject, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+      return;
+    }
+    
+    NSArray *chatRoomArr = resultObject;
+    NSArray *chatRoomDicArr = [chatRoomArr mapObjectsUsingBlock:^id(id obj, NSUInteger idx) {
+      JMSGChatRoom *chatRoom = obj;
+      return [chatRoom chatRoomToDictionary];
+    }];
+    
+    successCallback(@[chatRoomDicArr]);
+  }];
+}
+
+/**
+ * 进入聊天室，进入后才能收到聊天室信息及发言
+ * @param {String} roomId
+ * @param {function} success = function({conversation})
+ * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+ */
+//static enterChatRoom(roomId, success, error) {
+RCT_EXPORT_METHOD(enterChatRoom:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallBack:(RCTResponseSenderBlock)failCallback) {
+  if (!param[@"roomId"]) {
+    failCallback(@[[self getParamError]]);
+    return;
+  }
+  
+  [JMSGChatRoom enterChatRoomWithRoomId:param[@"roomId"] completionHandler:^(id resultObject, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+      return;
+    }
+    
+    JMSGConversation *conversation = resultObject;
+    successCallback(@[[conversation conversationToDictionary]]);
+  }];
+}
+
+/**
+ * 离开聊天室
+ * @param {String} roomId
+ * @param {function} success = function(0)
+ * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+ */
+//static leaveChatRoom(roomId, success, error) {
+RCT_EXPORT_METHOD(leaveChatRoom:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallBack:(RCTResponseSenderBlock)failCallback) {
+  if (!param[@"roomId"]) {
+    failCallback(@[[self getParamError]]);
+    return;
+  }
+  
+  [JMSGChatRoom leaveChatRoomWithRoomId:param[@"roomId"] completionHandler:^(id resultObject, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+      return;
+    }
+    successCallback(@[]);
+  }];
+}
+
+/**
+ * 从本地获取用户的聊天室会话列表，没有则返回为空的列表
+ * @param {function} callback = function([{Conversation}])
+ *
+ */
+//static getChatRoomConversationList(callback) {
+RCT_EXPORT_METHOD(getChatRoomConversationList:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallBack:(RCTResponseSenderBlock)failCallback) {
+  [JMSGConversation allChatRoomConversation:^(id resultObject, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+      return;
+    }
+    
+    NSArray *conversationArr = resultObject;
+    NSArray *conversationDicArr = [conversationArr mapObjectsUsingBlock:^id(id obj, NSUInteger idx) {
+      JMSGConversation *conversation = obj;
+      return [conversation conversationToDictionary];
+    }];
+    successCallback(@[conversationDicArr]);
+  }];
+}
+
 
 @end
