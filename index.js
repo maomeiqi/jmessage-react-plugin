@@ -1087,24 +1087,6 @@ export default class JMessage {
     }
 
     /**
-     * 删除聊天室会话，同时删除本地相关缓存文件。成功返回 true，失败返回 false
-     * @param {String} roomId 
-     * @param {function} callback = function(bool)
-     */
-    static deleteChatRoomConversation(roomId, callback) {
-        JMessageModule.deleteChatRoomConversation(roomId, callback);
-    }
-
-    /**
-     * 创建聊天室会话，如果本地已存在，则不会重新创建，直接返回该会话
-     * @param {String} roomId 
-     * @param {function} callback = function({Conversation})
-     */
-    static createChatRoomConversation(roomId, callback) {
-        JMessageModule.createChatRoomConversation(roomId, callback);
-    }
-
-    /**
      * 接收聊天室消息
      * @param {function} listener = function([{Message}])
      */
