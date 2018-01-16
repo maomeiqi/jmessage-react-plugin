@@ -1036,7 +1036,7 @@ export default class JMessage {
 
     /**
      * 查询指定 roomId 聊天室信息
-     * @param {Array} param = [String]
+     * @param {object} param = {roomIds: [String]}
      * @param {function} success = function([{ChatRoomInfo}])
      * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
      */

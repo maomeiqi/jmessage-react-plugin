@@ -122,6 +122,10 @@ export default class ConversationList extends React.Component {
         JMessage.setDebugMode({
             enable: true
         });
+        JMessage.addReceiveMessageListener((message) => {
+            //TODO sort conversation list or create conversation, send message to Chat.
+
+        })
     }
     componentWillMount() {
         this.reloadConversationList()

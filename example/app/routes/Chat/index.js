@@ -197,33 +197,33 @@ export default class Chat extends Component {
         Alert.alert('error!', JSON.stringify(error))
       })
 
-      this.receiveMessageCallBack = (message) => {
+      // this.receiveMessageCallBack = (message) => {
 
-        if (this.conversation.conversationType === 'single') {
-          if (message.target.type === 'user') {
-            if (message.from.username === this.conversation.key) {
-              var msg = this.convertJMessageToAuroraMsg(message)
-              AuroraIController.appendMessages([msg])
-            }
-            Alert.alert('message.target.username', message.target.username)
-            Alert.alert('this.conversation.key', this.conversation.key)
-          }
-        } else {
-          if (message.target.type === 'group') {
-            if (message.from.id === this.conversation.key) {
-              var msg = this.convertJMessageToAuroraMsg(message)
-              AuroraIController.appendMessages([msg])
-            }
-          }
-        }
-      }
-      JMessage.addReceiveMessageListener(this.receiveMessageCallBack)
+      //   if (this.conversation.conversationType === 'single') {
+      //     if (message.target.type === 'user') {
+      //       if (message.from.username === this.conversation.key) {
+      //         var msg = this.convertJMessageToAuroraMsg(message)
+      //         AuroraIController.appendMessages([msg])
+      //       }
+      //       Alert.alert('message.target.username', message.target.username)
+      //       Alert.alert('this.conversation.key', this.conversation.key)
+      //     }
+      //   } else {
+      //     if (message.target.type === 'group') {
+      //       if (message.from.id === this.conversation.key) {
+      //         var msg = this.convertJMessageToAuroraMsg(message)
+      //         AuroraIController.appendMessages([msg])
+      //       }
+      //     }
+      //   }
+      // }
+      // JMessage.addReceiveMessageListener(this.receiveMessageCallBack)
     }
     AuroraIController.addMessageListDidLoadListener(this.messageListDidLoadCallback)
-    this.timer = setTimeout(() => {
-      console.log("Sending custom message")
-      this.sendCustomMessage();
-    }, 2000)
+    // this.timer = setTimeout(() => {
+    //   console.log("Sending custom message")
+    //   this.sendCustomMessage();
+    // }, 2000)
   }
 
   onInputViewSizeChange = (size) => {
