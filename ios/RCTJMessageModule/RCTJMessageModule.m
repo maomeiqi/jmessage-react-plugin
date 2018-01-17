@@ -830,6 +830,11 @@ RCT_EXPORT_METHOD(getHistoryMessages:(NSDictionary *)param
       return [message messageToDictionary];
     }];
 
+    if (!messageArr) {
+      successCallback(@[@[]]);
+      return;
+    }
+    
     successCallback(@[messageDicArr]);
   }];
 }
