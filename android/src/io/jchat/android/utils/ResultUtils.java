@@ -2,9 +2,12 @@ package io.jchat.android.utils;
 
 
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.text.TextUtils;
 
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.facebook.react.bridge.WritableArray;
@@ -16,12 +19,17 @@ import com.google.gson.jpush.JsonParser;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import cn.jpush.im.android.api.JMessageClient;
+import cn.jpush.im.android.api.callback.GetUserInfoCallback;
 import cn.jpush.im.android.api.content.CustomContent;
 import cn.jpush.im.android.api.content.EventNotificationContent;
 import cn.jpush.im.android.api.content.FileContent;
@@ -32,6 +40,7 @@ import cn.jpush.im.android.api.content.TextContent;
 import cn.jpush.im.android.api.content.VoiceContent;
 import cn.jpush.im.android.api.enums.ConversationType;
 import cn.jpush.im.android.api.enums.MessageDirect;
+import cn.jpush.im.android.api.model.ChatRoomInfo;
 import cn.jpush.im.android.api.model.Conversation;
 import cn.jpush.im.android.api.model.GroupInfo;
 import cn.jpush.im.android.api.model.Message;
@@ -103,7 +112,7 @@ public class ResultUtils {
         WritableMap result = Arguments.createMap();
 
         result.putString(Constant.TYPE, Constant.TYPE_GROUP);
-        result.putDouble(Constant.ID, groupInfo.getGroupID());
+        result.putString(Constant.ID, String.valueOf(groupInfo.getGroupID()));
         result.putString(Constant.NAME, groupInfo.getGroupName());
         result.putString(Constant.DESC, groupInfo.getGroupDescription());
         result.putInt(Constant.LEVEL, groupInfo.getGroupLevel());
@@ -127,6 +136,8 @@ public class ResultUtils {
                     result.putMap(Constant.TARGET, toJSObject((UserInfo) msg.getTargetInfo()));
                 } else if (msg.getTargetType() == ConversationType.group) {
                     result.putMap(Constant.TARGET, toJSObject((GroupInfo) msg.getTargetInfo()));
+                } else {
+                    result.putMap(Constant.TARGET, toJSObject((ChatRoomInfo) msg.getTargetInfo()));
                 }
 
             } else {
@@ -140,7 +151,7 @@ public class ResultUtils {
             }
 
             result.putDouble(Constant.CREATE_TIME, msg.getCreateTime());
-
+            result.putInt(Constant.UNRECEIPT_COUNT, msg.getUnreceiptCnt());
             switch (msg.getContentType()) {
                 case text:
                     result.putString(Constant.TYPE, Constant.TEXT);
@@ -149,7 +160,22 @@ public class ResultUtils {
                 case image:
                     result.putString(Constant.TYPE, Constant.IMAGE);
                     ImageContent imageContent = (ImageContent) content;
-                    result.putString(Constant.THUMB_PATH, imageContent.getLocalThumbnailPath() + "." + imageContent.getFormat());
+                    // jmessage did not add file extension, so save to local.
+                    File file = new File(imageContent.getLocalThumbnailPath() + ".png");
+                    FileOutputStream fos = new FileOutputStream(file);
+                    BitmapFactory.Options opts = new BitmapFactory.Options();
+                    opts.inJustDecodeBounds = false;
+                    opts.inSampleSize = 1;
+                    Bitmap bitmap = BitmapFactory.decodeFile(imageContent.getLocalThumbnailPath(), opts);
+                    try {
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+                        fos.flush();
+                        fos.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    result.putString(Constant.THUMB_PATH, file.getAbsolutePath());
+                    result.putString(Constant.LOCAL_PATH, imageContent.getLocalPath());
                     break;
                 case voice:
                     result.putString(Constant.TYPE, Constant.VOICE);
@@ -231,6 +257,9 @@ public class ResultUtils {
             } else if (conversation.getType() == ConversationType.group) {
                 GroupInfo targetInfo = (GroupInfo) conversation.getTargetInfo();
                 map.putMap(Constant.TARGET, toJSObject(targetInfo));
+            } else {
+                ChatRoomInfo chatRoomInfo = (ChatRoomInfo) conversation.getTargetInfo();
+                map.putMap(Constant.TARGET, toJSObject(chatRoomInfo));
             }
 
         } catch (Exception e) {
@@ -240,20 +269,40 @@ public class ResultUtils {
         return map;
     }
 
+    public static WritableMap toJSObject(ChatRoomInfo chatRoomInfo) {
+        final WritableMap map = Arguments.createMap();
+        try {
+            map.putString(Constant.ROOM_ID, String.valueOf(chatRoomInfo.getRoomID()));
+            map.putString(Constant.TYPE, Constant.TYPE_CHAT_ROOM);
+            map.putString(Constant.ROOM_NAME, chatRoomInfo.getName());
+            map.putString(Constant.APP_KEY, chatRoomInfo.getAppkey());
+            map.putInt(Constant.MAX_MEMBER_COUNT, chatRoomInfo.getMaxMemberCount());
+            map.putString(Constant.DESCRIPTION, chatRoomInfo.getDescription());
+            map.putInt(Constant.MEMBER_COUNT, chatRoomInfo.getTotalMemberCount());
+            map.putInt(Constant.CREATE_TIME, chatRoomInfo.getCreateTime());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return map;
+    }
+
     public static WritableArray toJSArray(List list) {
         WritableArray array = Arguments.createArray();
-
-        for (Object object : list) {
-            if (object instanceof UserInfo) {
-                array.pushMap(toJSObject((UserInfo) object));
-            } else if (object instanceof GroupInfo) {
-                array.pushMap(toJSObject((GroupInfo) object));
-            } else if (object instanceof Message) {
-                array.pushMap(toJSObject((Message) object));
-            } else if (object instanceof Conversation) {
-                array.pushMap(toJSObject((Conversation) object));
-            } else {
-                array.pushString(object.toString());
+        if (list != null) {
+            for (Object object : list) {
+                if (object instanceof UserInfo) {
+                    array.pushMap(toJSObject((UserInfo) object));
+                } else if (object instanceof GroupInfo) {
+                    array.pushMap(toJSObject((GroupInfo) object));
+                } else if (object instanceof Message) {
+                    array.pushMap(toJSObject((Message) object));
+                } else if (object instanceof Conversation) {
+                    array.pushMap(toJSObject((Conversation) object));
+                } else if (object instanceof ChatRoomInfo) {
+                    array.pushMap(toJSObject((ChatRoomInfo) object));
+                } else {
+                    array.pushString(object.toString());
+                }
             }
         }
 
@@ -270,4 +319,5 @@ public class ResultUtils {
         }
         return result;
     }
+
 }

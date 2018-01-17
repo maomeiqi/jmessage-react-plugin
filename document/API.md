@@ -42,10 +42,28 @@ import JMessage from 'jmessage-react-plugin';
   - [getConversation](#getconversation)
   - [getConversations](#getconversations)
   - [resetUnreadMessageCount](#resetunreadmessagecount)
+- [聊天室](#聊天室)
+  - [getChatRoomListByApp](#getchatroomlistbyapp)
+  - [getChatRoomListByUser](#getchatroomlistbyuser)
+  - [getChatRoomInfos](#getchatroominfos)
+  - [getChatRoomOwner](#getchatroomowner)
+  - [enterChatRoom](#enterchatroom)
+  - [leaveChatRoom](#leavechatroom)
+  - [getChatRoomConversationList](#getchatroomconversationlist)
+- [好友](#好友)
+  - [sendInvitationRequest](#sendinvitationrequest)
+  - [acceptInvitation](#acceptInvitation)
+  - [declineInvitation](#declineinvitation)
+  - [getFriends](#getfriends)
+  - [removeFromFriendList](#removefromfriendlist)
+  - [updateFriendNoteName](#updatefriendnotename)
+  - [updateFriendNoteText](#updatefriendnotetext)
 - [事件监听]()
   - [消息事件](#addreceivemessagelistener)
     - [addReceiveMessageListener](#addreceivemessagelistener)
     - [removeReceiveMessageListener](#addreceivemessagelistener)
+    - [*addReceiveChatRoomMsgListener]()
+    - [*removeReceiveChatRoomMsgListener]()
   - [离线消息](#addsyncofflinemessagelistener)
     - [addSyncOfflineMessageListener](#addsyncofflinemessagelistener)
     - [removeSyncOfflineMessageListener](#addsyncofflinemessagelistener)
@@ -828,27 +846,13 @@ JMessage.enterConversation({ type: 'single', username: 'username', appKey: 'appK
 
 ### exitConversation
 
-**(Android only)** 退出聊天会话。调用后，聊天会话之后的相关消息通知将会被触发。
+**(Android only)** 退出当前聊天会话。调用后，聊天会话之后的相关消息通知将会被触发。
 
 #### 示例
 
 ```js
-JMessage.exitConversation({ type: 'single', username: 'username', appKey: 'appKey' },
-  (conversation) => {
-    // do something.
-
-  }, (error) => {
-    var code = error.code
-    var desc = error.description
- )
+JMessage.exitConversation();
 ```
-
-#### 参数说明
-
-- type: 会话类型。可以为 'single' 或 'group'。
-- username: 对方用户的用户名。当 `type` 为 'single' 时，`username` 为必填。
-- appKey: 对方用户所属应用的 AppKey。如果不填，默认为当前应用。
-- groupId: 对象群组 id。当 `type` 为 'group' 时，`groupId` 为必填。
 
 ### getConversation
 
@@ -898,7 +902,7 @@ JMessage.getConversations((conArr) => { // conArr: 会话数组。
 
 ```js
 JMessage.resetUnreadMessageCount({ type: 'single', username: 'username', appKey: 'appKey' },
-  (conversation) => {
+  (conversation) => { 
     // do something.
 
   }, (error) => {
@@ -913,6 +917,148 @@ JMessage.resetUnreadMessageCount({ type: 'single', username: 'username', appKey:
 - username: 对方用户的用户名。当 `type` 为 'single' 时，`username` 为必填。
 - appKey: 对方用户所属应用的 AppKey。如果不填，默认为当前应用。
 - groupId: 对象群组 id。当 `type` 为 'group' 时，`groupId` 为必填。
+
+
+## 聊天室
+
+### getChatRoomListByApp
+
+查询当前 AppKey 下的聊天室信息。
+
+#### 示例
+
+```js
+JMessage.getChatRoomListByApp({ start: 0, count: 5, reason: '请求添加好友'},
+  (chatRoomList) => { // chatRoomList 为所有聊天室信息
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+
+- start: 起始位置。
+- count: 获得个数。
+
+### getChatRoomListByUser
+
+获取当前用户（登录用户）所加入的所有聊天室信息。
+
+#### 示例
+
+```js
+JMessage.getChatRoomListByUser((chatRoomList) => { // chatRoomList 为当前用户加入的所有聊天室列表
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+### getChatRoomInfos
+
+查询指定 roomId 聊天室信息。
+
+#### 示例
+
+```js
+JMessage.getChatRoomInfos({ roomIds: ['Example_RoomId_1'，'Example_RoomId_2']},
+  (chatRoomList) => { // chatRoomList 为指定的聊天室列表
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+
+- roomIds：需要获取聊天室详情的聊天室 id 列表。
+
+### getChatRoomOwner
+
+查询指定 roomId 聊天室的所有者。
+
+#### 示例
+
+```js
+JMessage.getChatRoomOwner({ roomId: 'Example_RoomId_1'},
+  (userInfo) => { // userInfo 为该聊天室的所有者
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+
+- roomId：需要获取聊天室所有者的聊天室 id。
+
+### enterChatRoom
+
+进入聊天室，进入后才能收到聊天室信息及发言。
+
+#### 示例
+
+```js
+JMessage.enterChatRoom({ roomId: 'Example_RoomId_1'},
+  (conversation) => { // 进入聊天室，会自动创建并返回该聊天室会话信息。
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+
+- roomId：要进入的聊天室的 id。
+
+### leaveChatRoom
+
+离开指定聊天室。
+
+#### 示例
+
+```js
+JMessage.leaveChatRoom({ roomId: 'Example_RoomId_1'},
+  () => {
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+
+- roomId：要离开的聊天室的 id。
+
+### getChatRoomConversationList
+
+从本地获取用户的聊天室会话列表，没有则返回为空的列表。
+
+#### 示例
+
+```js
+JMessage.getChatRoomConversationList( (conversationList) => { // conversationList 为聊天室会话信息。
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
 
 
 ## 好友

@@ -54,10 +54,10 @@ extern NSString *const kJMSGServiceErrorNotification;                 // 错误�
 @interface JMessage : NSObject
 
 /*! JMessage SDK 版本号。用于展示 SDK 的版本信息 */
-#define JMESSAGE_VERSION @"3.4.0"
+#define JMESSAGE_VERSION @"3.4.1"
 
 /*! JMessage SDK 构建ID. 每次构建都会增加 */
-#define JMESSAGE_BUILD 199
+#define JMESSAGE_BUILD 205
 
 /*! API Version - int for program logic. SDK API 有变更时会增加 */
 extern NSInteger const JMESSAGE_API_VERSION;

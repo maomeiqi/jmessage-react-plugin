@@ -1285,6 +1285,7 @@
 					"-framework",
 					"\"JMessage\"",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.huminios.jpushTest;
 				PRODUCT_NAME = JMessageDemo;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -1318,6 +1319,7 @@
 					"-framework",
 					"\"JMessage\"",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.huminios.jpushTest;
 				PRODUCT_NAME = JMessageDemo;
 				VERSIONING_SYSTEM = "apple-generic";
 			};

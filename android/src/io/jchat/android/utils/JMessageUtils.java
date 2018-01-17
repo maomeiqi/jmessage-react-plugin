@@ -44,17 +44,22 @@ public class JMessageUtils {
             String appKey = "";
             if (map.hasKey(Constant.APP_KEY)) {
                 appKey = map.getString(Constant.APP_KEY);
+                conversation = Conversation.createSingleConversation(username, appKey);
+            } else {
+                conversation = Conversation.createSingleConversation(username);
             }
-            conversation = Conversation.createSingleConversation(username, appKey);
-        } else {
+        } else if (type.equals(Constant.TYPE_GROUP)) {
             String groupId = map.getString(Constant.GROUP_ID);
             conversation = Conversation.createGroupConversation(Long.parseLong(groupId));
+        } else {
+            String roomId = map.getString(Constant.ROOM_ID);
+            conversation = Conversation.createChatRoomConversation(Long.parseLong(roomId));
         }
         return conversation;
     }
 
     public void sendMessage(ReadableMap map, MessageContent content,
-                                   final Callback success, final Callback fail) {
+                            final Callback success, final Callback fail) {
         if (map.hasKey(Constant.EXTRAS)) {
             content.setExtras(ResultUtils.fromMap(map.getMap(Constant.EXTRAS)));
         }

@@ -10,6 +10,7 @@
 #import <JMessage/JMessage.h>
 
 #define kJJMessageReceiveMessage     @"kJJMessageReceiveMessage"
+#define kJJMessageReceiveChatRoomMessage     @"kJJMessageReceiveChatRoomMessage"
 #define kJJMessageSendMessageRespone @"kJJMessageSendMessageRespone"
 
 //Conversation 回调
@@ -42,6 +43,9 @@
 @end
 
 
+@interface NSArray (JMessage)
+- (NSArray *)mapObjectsUsingBlock:(id (^)(id obj, NSUInteger idx))block;
+@end
 
 @interface NSDictionary (JMessage)
 -(NSString*)toJsonString;
@@ -69,4 +73,8 @@
 
 @interface NSError (JMessage)
 - (NSDictionary *)errorToDictionary;
+@end
+
+@interface JMSGChatRoom (JMessage)
+- (NSMutableDictionary *)chatRoomToDictionary;
 @end

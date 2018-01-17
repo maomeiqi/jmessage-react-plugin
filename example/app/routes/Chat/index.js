@@ -90,6 +90,13 @@ export default class Chat extends Component {
       auroraMsg.msgType = "video"
     }
 
+    if (jmessage.type === 'event') {
+      // auroraMsg.mediaPath = jmessage.path
+      // auroraMsg.duration = jmessage.duration
+      Alert.alert('event' , jmessage.eventType)
+      auroraMsg.text = jmessage.eventType
+    }
+
     var user = {
       userId: "1",
       displayName: "",
@@ -175,9 +182,12 @@ export default class Chat extends Component {
     if (this.conversation.conversationType === 'single') {
       parames.type = 'single'
       parames.username = this.conversation.key
-    } else {
+    } else if (this.conversation.conversationType === 'group') {
       parames.type = 'group'
       parames.groupId = this.conversation.key
+    } else {
+      parames.type = 'chatroom'
+      parames.roomId = this.conversation.key
     }
     this.messageListDidLoadCallback = () => {
 
@@ -205,9 +215,16 @@ export default class Chat extends Component {
             Alert.alert('message.target.username', message.target.username)
             Alert.alert('this.conversation.key', this.conversation.key)
           }
-        } else {
+        } else if (this.conversation.conversationType === 'group') {
           if (message.target.type === 'group') {
             if (message.from.id === this.conversation.key) {
+              var msg = this.convertJMessageToAuroraMsg(message)
+              AuroraIController.appendMessages([msg])
+            }
+          }
+        } else {
+          if (message.target.type === 'chatroom') {
+            if (message.target.roomId === this.conversation.key) {
               var msg = this.convertJMessageToAuroraMsg(message)
               AuroraIController.appendMessages([msg])
             }
@@ -217,10 +234,10 @@ export default class Chat extends Component {
       JMessage.addReceiveMessageListener(this.receiveMessageCallBack)
     }
     AuroraIController.addMessageListDidLoadListener(this.messageListDidLoadCallback)
-    this.timer = setTimeout(() => {
-      console.log("Sending custom message")
-      this.sendCustomMessage();
-    }, 2000)
+    // this.timer = setTimeout(() => {
+    //   console.log("Sending custom message")
+    //   this.sendCustomMessage();
+    // }, 2000)
   }
 
   onInputViewSizeChange = (size) => {
@@ -228,7 +245,8 @@ export default class Chat extends Component {
     if (this.state.inputLayoutHeight != size.height) {
       this.setState({
         inputLayoutHeight: size.height,
-        inputViewLayout: { width: size.width, height: size.height }
+        inputViewLayout: { width: size.width, height: size.height },
+        messageListLayout: { flex: 1, width: window.width, margin: 0 }
       })
     }
   }
@@ -243,6 +261,9 @@ export default class Chat extends Component {
   resetMenu() {
     if (Platform.OS === "android") {
       this.refs["ChatInput"].showMenu(false)
+      this.setState({
+        messageListLayout: { flex: 1, width: window.width, margin: 0 },
+      })
     } else {
       this.setState({
         inputViewLayout: { width: window.width, height: 86 }
@@ -264,8 +285,7 @@ export default class Chat extends Component {
 
   onTouchEditText = () => {
     console.log("scroll to bottom")
-    AuroraIController.scrollToBottom(true);
-    // this.refs["ChatInput"].showMenu(false)
+    this.refs["ChatInput"].showMenu(false)
     this.setState({
       inputViewLayout: { width: window.width, height: this.state.inputLayoutHeight }
     })
@@ -275,19 +295,20 @@ export default class Chat extends Component {
     var navigationBar = 50
     this.setState({
       messageListLayout: { flex: 0, width: 0, height: 0 },
-      inputViewLayout: { flex:1, width: window.width, height: window.height }
+      inputViewLayout: { flex: 1, width: window.width, height: window.height }
     })
   }
 
   onRecoverScreen = () => {
     this.setState({
       messageListLayout: { flex: 1, width: window.width, margin: 0 },
-      inputViewLayout: { flex: 0, width: window.width, height: this.state.inputLayoutHeight}
+      inputViewLayout: { flex: 0, width: window.width, height: this.state.inputLayoutHeight }
     })
   }
 
   onMsgClick = (message) => {
     console.log(message)
+    alert(JSON.stringify(message))
   }
 
   onStatusViewClick = (message) => {
@@ -343,6 +364,7 @@ export default class Chat extends Component {
   }
 
   onTakePicture = (mediaPath) => {
+    console.log("onTakePicture, path: " + mediaPath)
     var message = this.getNormalMessage()
     message.messageType = "image"
     message.path = mediaPath
@@ -532,7 +554,7 @@ export default class Chat extends Component {
           onTouchEditText={this.onTouchEditText}
           onFullScreen={this.onFullScreen}
           onRecoverScreen={this.onRecoverScreen}
-          onSizeChanged={this.onInputViewSizeChange}
+          onSizeChange={this.onInputViewSizeChange}
         />
       </View>
     );
