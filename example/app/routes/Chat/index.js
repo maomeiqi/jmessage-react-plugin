@@ -197,27 +197,34 @@ export default class Chat extends Component {
         Alert.alert('error!', JSON.stringify(error))
       })
 
-      // this.receiveMessageCallBack = (message) => {
+      this.receiveMessageCallBack = (message) => {
 
-      //   if (this.conversation.conversationType === 'single') {
-      //     if (message.target.type === 'user') {
-      //       if (message.from.username === this.conversation.key) {
-      //         var msg = this.convertJMessageToAuroraMsg(message)
-      //         AuroraIController.appendMessages([msg])
-      //       }
-      //       Alert.alert('message.target.username', message.target.username)
-      //       Alert.alert('this.conversation.key', this.conversation.key)
-      //     }
-      //   } else {
-      //     if (message.target.type === 'group') {
-      //       if (message.from.id === this.conversation.key) {
-      //         var msg = this.convertJMessageToAuroraMsg(message)
-      //         AuroraIController.appendMessages([msg])
-      //       }
-      //     }
-      //   }
-      // }
-      // JMessage.addReceiveMessageListener(this.receiveMessageCallBack)
+        if (this.conversation.conversationType === 'single') {
+          if (message.target.type === 'user') {
+            if (message.from.username === this.conversation.key) {
+              var msg = this.convertJMessageToAuroraMsg(message)
+              AuroraIController.appendMessages([msg])
+            }
+            Alert.alert('message.target.username', message.target.username)
+            Alert.alert('this.conversation.key', this.conversation.key)
+          }
+        } else if (this.conversation.conversationType === 'group') {
+          if (message.target.type === 'group') {
+            if (message.from.id === this.conversation.key) {
+              var msg = this.convertJMessageToAuroraMsg(message)
+              AuroraIController.appendMessages([msg])
+            }
+          }
+        } else {
+          if (message.target.type === 'chatroom') {
+            if (message.target.roomId === this.conversation.key) {
+              var msg = this.convertJMessageToAuroraMsg(message)
+              AuroraIController.appendMessages([msg])
+            }
+          }
+        }
+      }
+      JMessage.addReceiveMessageListener(this.receiveMessageCallBack)
     }
     AuroraIController.addMessageListDidLoadListener(this.messageListDidLoadCallback)
     // this.timer = setTimeout(() => {
@@ -232,7 +239,7 @@ export default class Chat extends Component {
       this.setState({
         inputLayoutHeight: size.height,
         inputViewLayout: { width: size.width, height: size.height },
-        messageListLayout: { flex:1, width: window.width, margin: 0 }
+        messageListLayout: { flex: 1, width: window.width, margin: 0 }
       })
     }
   }
@@ -281,14 +288,14 @@ export default class Chat extends Component {
     var navigationBar = 50
     this.setState({
       messageListLayout: { flex: 0, width: 0, height: 0 },
-      inputViewLayout: { flex:1, width: window.width, height: window.height }
+      inputViewLayout: { flex: 1, width: window.width, height: window.height }
     })
   }
 
   onRecoverScreen = () => {
     this.setState({
       messageListLayout: { flex: 1, width: window.width, margin: 0 },
-      inputViewLayout: { flex: 0, width: window.width, height: this.state.inputLayoutHeight}
+      inputViewLayout: { flex: 0, width: window.width, height: this.state.inputLayoutHeight }
     })
   }
 

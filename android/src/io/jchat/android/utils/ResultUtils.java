@@ -136,6 +136,8 @@ public class ResultUtils {
                     result.putMap(Constant.TARGET, toJSObject((UserInfo) msg.getTargetInfo()));
                 } else if (msg.getTargetType() == ConversationType.group) {
                     result.putMap(Constant.TARGET, toJSObject((GroupInfo) msg.getTargetInfo()));
+                } else {
+                    result.putMap(Constant.TARGET, toJSObject((ChatRoomInfo) msg.getTargetInfo()));
                 }
 
             } else {
