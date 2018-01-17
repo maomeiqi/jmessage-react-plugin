@@ -1016,7 +1016,7 @@ export default class JMessage {
      *  "roomName": String,
      *  "appKey": String,
      *  "maxMemberCount": number,
-     *  "totalMemberCount": number,
+     *  "memberCount": number,
      *  "owner": UserInfo,
      *  "description": String,
      *  "createTime": number,
@@ -1063,7 +1063,7 @@ export default class JMessage {
      * @param {function} success = function({conversation})
      * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {} 
      */
-    static enterChatRoom(roomId, success, error) {
+    static enterChatRoom(param, success, error) {
         JMessageModule.enterChatRoom(roomId, success, error);
     }
 
@@ -1073,7 +1073,7 @@ export default class JMessage {
      * @param {function} success = function(0)
      * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {} 
      */
-    static leaveChatRoom(roomId, success, error) {
+    static leaveChatRoom(param, success, error) {
         JMessageModule.leaveChatRoom(roomId, success, error);
     }
 
