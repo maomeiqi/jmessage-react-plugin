@@ -1016,7 +1016,7 @@ export default class JMessage {
      *  "roomName": String,
      *  "appKey": String,
      *  "maxMemberCount": number,
-     *  "totalMemberCount": number,
+     *  "memberCount": number,
      *  "owner": UserInfo,
      *  "description": String,
      *  "createTime": number,
