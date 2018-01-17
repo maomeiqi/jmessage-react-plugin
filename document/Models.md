@@ -2,7 +2,7 @@
 
 - [UserInfo](#userinfo)
 - [GroupInfo](#groupinfo)
-- [ChatRoomInfo](#ChatRoomInfo)
+- [ChatRoomInfo](#chatroominfo)
 - [Conversation](#conversation)
 - [Message](#message)
   - [TextMessage](#textmessage)
