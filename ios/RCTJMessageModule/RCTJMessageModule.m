@@ -1972,6 +1972,13 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)param
     
     self.SendMsgCallbackDic[message.msgId] = @[successCallback,failCallback];
     
+    if (param[@"extras"] && [param[@"extras"] isKindOfClass: [NSDictionary class]]) {
+      NSDictionary *extras = param[@"extras"];
+      for (NSString *key in extras.allKeys) {
+        [message.content addStringExtra:extras[key] forKey:key];
+      }
+    }
+    
     if (messageSendingOptions) {
       [conversation sendMessage:message optionalContent:messageSendingOptions];
     } else {
