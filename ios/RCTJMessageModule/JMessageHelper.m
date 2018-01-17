@@ -252,15 +252,25 @@
 -(NSMutableDictionary*)conversationToDictionary{
   NSMutableDictionary *dict = [NSMutableDictionary dictionary];
   
-  if (self.conversationType == kJMSGConversationTypeSingle) {
-    JMSGUser *user = self.target;
-    dict[@"target"] = [user userToDictionary];
-    dict[@"conversationType"] = @"single";
-    
-  } else {
-    JMSGGroup *group = self.target;
-    dict[@"target"] = [group groupToDictionary];
-    dict[@"conversationType"] = @"group";
+  switch (self.conversationType) {
+    case kJMSGConversationTypeSingle:{
+      JMSGUser *user = self.target;
+      dict[@"target"] = [user userToDictionary];
+      dict[@"conversationType"] = @"single";
+      break;
+    }
+    case kJMSGConversationTypeGroup:{
+      JMSGGroup *group = self.target;
+      dict[@"target"] = [group groupToDictionary];
+      dict[@"conversationType"] = @"group";
+      break;
+    }
+    case kJMSGConversationTypeChatRoom:{
+      JMSGChatRoom *chatRoom = self.target;
+      dict[@"target"] = [chatRoom chatRoomToDictionary];
+      dict[@"conversationType"] = @"chatRoom";
+      break;
+    }
   }
   
   dict[@"latestMessage"] = [self.latestMessage messageToDictionary];
@@ -355,12 +365,23 @@
     dict[@"extras"] = self.content.extras;
   }
   
-  if (self.targetType == kJMSGConversationTypeSingle) {
-    JMSGUser *user = self.target;
-    dict[@"target"] = [user userToDictionary];
-  } else {
-    JMSGGroup *group = self.target;
-    dict[@"target"] = [group groupToDictionary];
+  switch (self.targetType) {
+    case kJMSGConversationTypeSingle: {
+      JMSGUser *user = self.target;
+      dict[@"target"] = [user userToDictionary];
+      break;
+    }
+      
+    case kJMSGConversationTypeGroup:{
+      JMSGGroup *group = self.target;
+      dict[@"target"] = [group groupToDictionary];
+      break;
+    }
+    case kJMSGConversationTypeChatRoom:{
+      JMSGChatRoom *chatRoom= self.target;
+      dict[@"target"] = [chatRoom chatRoomToDictionary];
+      break;
+    }
   }
   
   dict[@"createTime"] = self.timestamp;
@@ -520,7 +541,7 @@
 @implementation JMSGChatRoom (JMessage)
 - (NSMutableDictionary *)chatRoomToDictionary {
   NSMutableDictionary *dict = @{}.mutableCopy;
-  dict[@"type"] = @"chatroom";
+  dict[@"type"] = @"chatRoom";
   dict[@"roomId"] = self.roomID;
   dict[@"roomName"] = self.name;
   dict[@"appKey"] = self.appkey;

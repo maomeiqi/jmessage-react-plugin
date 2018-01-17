@@ -326,7 +326,7 @@ RCT_EXPORT_MODULE();
     return kJMSGConversationTypeGroup;
   }
   
-  if ([str isEqualToString:@"chatroom"]) {
+  if ([str isEqualToString:@"chatRoom"]) {
     return kJMSGConversationTypeChatRoom;
   }
   
@@ -1726,15 +1726,13 @@ RCT_EXPORT_METHOD(deleteConversation:(NSDictionary *)param
     return;
   }
   
-  if ([param[@"type"] isEqual: @"single"] && param[@"username"] != nil) {
+  if (([param[@"type"] isEqual: @"single"] && param[@"username"] != nil) ||
+      ([param[@"type"] isEqual: @"group"] && param[@"groupId"] != nil)   ||
+      ([param[@"type"] isEqual: @"chatRoom"] && param[@"roomId"] != nil)) {
     
   } else {
-    if ([param[@"type"] isEqual: @"group"] && param[@"groupId"] != nil) {
-      
-    } else {
-      failCallback(@[[self getParamError]]);
-      return;
-    }
+    failCallback(@[[self getParamError]]);
+    return;
   }
   
   NSString *appKey = nil;
@@ -2264,14 +2262,17 @@ RCT_EXPORT_METHOD(getChatRoomListByApp:(NSDictionary *)param
   NSNumber *start = nil;
   NSNumber *count = nil;
   if (!param[@"start"]) {
-    start = param[@"start"];
+    failCallback(@[[self getParamError]]);
     return;
   }
   
   if (!param[@"count"]) {
-    count = param[@"count"];
+    failCallback(@[[self getParamError]]);
     return;
   }
+  
+  start = param[@"start"];
+  count = param[@"count"];
   
   NSString *appKey = nil;
   if (param[@"appKey"]) {
@@ -2301,8 +2302,7 @@ RCT_EXPORT_METHOD(getChatRoomListByApp:(NSDictionary *)param
  * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
  */
 //static getChatRoomListByUser(success, error) {
-RCT_EXPORT_METHOD(getChatRoomListByUser:(NSDictionary *)param
-                  successCallback:(RCTResponseSenderBlock)successCallback
+RCT_EXPORT_METHOD(getChatRoomListByUser:(RCTResponseSenderBlock)successCallback
                   failCallBack:(RCTResponseSenderBlock)failCallback) {
   [JMSGChatRoom getMyChatRoomListCompletionHandler:^(id resultObject, NSError *error) {
     if (error) {
