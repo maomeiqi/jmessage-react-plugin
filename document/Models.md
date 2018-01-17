@@ -86,7 +86,7 @@ id: string,                     // 消息 id
 serverMessageId: string,     // 消息服务器Id 用于服务器追踪问题
 type: 'text',                   // 消息类型
 from: UserInfo,                 // 消息发送者对象
-target: UserInfo / GroupInfo,   // 消息接收者对象
+target: UserInfo / GroupInfo / ChatRoomInfo,   // 消息接收者对象
 createTime: number,             // 发送消息时间
 text: string,                   // 消息内容
 extras: object                  // 附带的键值对
@@ -101,7 +101,7 @@ id: string,                    // 消息 id
 serverMessageId: string,       // 消息服务器Id 用于服务器追踪问题
 type: 'image',                 // 消息类型
 from: UserInfo,                // 消息发送者对象
-target: UserInfo / GroupInfo,  // 消息接收者对象
+target: UserInfo / GroupInfo / ChatRoomInfo,  // 消息接收者对象
 extras: object,                // 附带的键值对
 thumbPath: string              // 图片的缩略图路径
 localPath: string              // 图片本地路径
@@ -114,7 +114,7 @@ id: string,                     // 消息 id
 serverMessageId: string,        // 消息服务器Id 用于服务器追踪问题
 type: 'voice',                  // 消息类型
 from: UserInfo,                 // 消息发送者对象
-target: UserInfo / GroupInfo,   // 消息接收者对象
+target: UserInfo / GroupInfo / ChatRoomInfo,   // 消息接收者对象
 extras: object,                 // 附带的键值对
 path: string,                   // 语音文件路径
 duration: number                // 语音时长，单位秒
@@ -127,7 +127,7 @@ id: string,                     // 消息 id
 serverMessageId: string,        // 消息服务器Id 用于服务器追踪问题
 type: 'location',               // 消息类型
 from: UserInfo,                 // 消息发送者对象
-target: UserInfo / GroupInfo,   // 消息接收者对象
+target: UserInfo / GroupInfo / ChatRoomInfo,   // 消息接收者对象
 extras: object,                 // 附带的键值对
 address: string,                // 详细地址
 longitude: number,              // 经度
@@ -144,7 +144,7 @@ id: string,                     // 消息 id
 serverMessageId: string,        // 消息服务器Id 用于服务器追踪问题
 type: 'file',                   // 消息类型
 from: UserInfo,                 // 消息发送者对象
-target: UserInfo / GroupInfo,   // 消息接收者对象
+target: UserInfo / GroupInfo / ChatRoomInfo,   // 消息接收者对象
 extras: object,                 // 附带的键值对
 fileName: string                // 文件名
 ```
