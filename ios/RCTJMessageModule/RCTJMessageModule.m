@@ -2407,8 +2407,7 @@ RCT_EXPORT_METHOD(leaveChatRoom:(NSDictionary *)param
  *
  */
 //static getChatRoomConversationList(callback) {
-RCT_EXPORT_METHOD(getChatRoomConversationList:(NSDictionary *)param
-                  successCallback:(RCTResponseSenderBlock)successCallback
+RCT_EXPORT_METHOD(getChatRoomConversationList:(RCTResponseSenderBlock)successCallback
                   failCallBack:(RCTResponseSenderBlock)failCallback) {
   [JMSGConversation allChatRoomConversation:^(id resultObject, NSError *error) {
     if (error) {
