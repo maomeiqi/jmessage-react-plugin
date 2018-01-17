@@ -78,6 +78,16 @@
   [[NSNotificationCenter defaultCenter] postNotificationName:kJJMessageReceiveMessage object:dict];
 }
 
+- (void)onReceiveChatRoomConversation:(JMSGConversation *)conversation messages:(NSArray<__kindof JMSGMessage *> *)messages {
+
+  NSArray *msgDicArr = [messages mapObjectsUsingBlock:^id(id obj, NSUInteger idx) {
+    JMSGMessage *msg = obj;
+    return [msg messageToDictionary];
+  }];
+  
+  [[NSNotificationCenter defaultCenter] postNotificationName:kJJMessageReceiveChatRoomMessage object:msgDicArr];
+}
+
 - (void)onReceiveNotificationEvent:(JMSGNotificationEvent *)event {
   switch (event.eventType) {
     case kJMSGEventNotificationLoginKicked:
@@ -242,15 +252,25 @@
 -(NSMutableDictionary*)conversationToDictionary{
   NSMutableDictionary *dict = [NSMutableDictionary dictionary];
   
-  if (self.conversationType == kJMSGConversationTypeSingle) {
-    JMSGUser *user = self.target;
-    dict[@"target"] = [user userToDictionary];
-    dict[@"conversationType"] = @"single";
-    
-  } else {
-    JMSGGroup *group = self.target;
-    dict[@"target"] = [group groupToDictionary];
-    dict[@"conversationType"] = @"group";
+  switch (self.conversationType) {
+    case kJMSGConversationTypeSingle:{
+      JMSGUser *user = self.target;
+      dict[@"target"] = [user userToDictionary];
+      dict[@"conversationType"] = @"single";
+      break;
+    }
+    case kJMSGConversationTypeGroup:{
+      JMSGGroup *group = self.target;
+      dict[@"target"] = [group groupToDictionary];
+      dict[@"conversationType"] = @"group";
+      break;
+    }
+    case kJMSGConversationTypeChatRoom:{
+      JMSGChatRoom *chatRoom = self.target;
+      dict[@"target"] = [chatRoom chatRoomToDictionary];
+      dict[@"conversationType"] = @"chatRoom";
+      break;
+    }
   }
   
   dict[@"latestMessage"] = [self.latestMessage messageToDictionary];
@@ -345,12 +365,23 @@
     dict[@"extras"] = self.content.extras;
   }
   
-  if (self.targetType == kJMSGConversationTypeSingle) {
-    JMSGUser *user = self.target;
-    dict[@"target"] = [user userToDictionary];
-  } else {
-    JMSGGroup *group = self.target;
-    dict[@"target"] = [group groupToDictionary];
+  switch (self.targetType) {
+    case kJMSGConversationTypeSingle: {
+      JMSGUser *user = self.target;
+      dict[@"target"] = [user userToDictionary];
+      break;
+    }
+      
+    case kJMSGConversationTypeGroup:{
+      JMSGGroup *group = self.target;
+      dict[@"target"] = [group groupToDictionary];
+      break;
+    }
+    case kJMSGConversationTypeChatRoom:{
+      JMSGChatRoom *chatRoom= self.target;
+      dict[@"target"] = [chatRoom chatRoomToDictionary];
+      break;
+    }
   }
   
   dict[@"createTime"] = self.timestamp;
@@ -391,63 +422,63 @@
       
       switch (eventContent.eventType) {
         case kJMSGEventNotificationAcceptedFriendInvitation: {
-          dict[@"evenType"] = @"acceptedFriendInvitation";
+          dict[@"eventType"] = @"acceptedFriendInvitation";
           break;
         }
         case kJMSGEventNotificationAddGroupMembers: {
-          dict[@"evenType"] = @"group_member_added";
+          dict[@"eventType"] = @"group_member_added";
           break;
         }
         case kJMSGEventNotificationCreateGroup: {
-          dict[@"evenType"] = @"createGroup";
+          dict[@"eventType"] = @"createGroup";
           break;
         }
         case kJMSGEventNotificationCurrentUserInfoChange: {
-          dict[@"evenType"] = @"currentUserInfoChange";
+          dict[@"eventType"] = @"currentUserInfoChange";
           break;
         }
         case kJMSGEventNotificationDeclinedFriendInvitation: {
-          dict[@"evenType"] = @"declinedFriendInvitation";
+          dict[@"eventType"] = @"declinedFriendInvitation";
           break;
         }
         case kJMSGEventNotificationDeletedFriend: {
-          dict[@"evenType"] = @"deletedFriend";
+          dict[@"eventType"] = @"deletedFriend";
           break;
         }
         case kJMSGEventNotificationExitGroup: {
-          dict[@"evenType"] = @"group_member_exit";
+          dict[@"eventType"] = @"group_member_exit";
           break;
         }
         case kJMSGEventNotificationLoginKicked: {
-          dict[@"evenType"] = @"loginKicked";
+          dict[@"eventType"] = @"loginKicked";
           break;
         }
         case kJMSGEventNotificationMessageRetract: {
-          dict[@"evenType"] = @"messageRetract";
+          dict[@"eventType"] = @"messageRetract";
           break;
         }
         case kJMSGEventNotificationReceiveFriendInvitation: {
-          dict[@"evenType"] = @"receiveFriendInvitation";
+          dict[@"eventType"] = @"receiveFriendInvitation";
           break;
         }
         case kJMSGEventNotificationReceiveServerFriendUpdate: {
-          dict[@"evenType"] = @"receiveServerFriendUpdate";
+          dict[@"eventType"] = @"receiveServerFriendUpdate";
           break;
         }
         case kJMSGEventNotificationRemoveGroupMembers: {
-          dict[@"evenType"] = @"group_member_removed";
+          dict[@"eventType"] = @"group_member_removed";
           break;
         }
         case kJMSGEventNotificationServerAlterPassword: {
-          dict[@"evenType"] = @"serverAlterPassword";
+          dict[@"eventType"] = @"serverAlterPassword";
           break;
         }
         case kJMSGEventNotificationUpdateGroupInfo: {
-          dict[@"evenType"] = @"updateGroupInfo";
+          dict[@"eventType"] = @"updateGroupInfo";
           break;
         }
         case kJMSGEventNotificationUserLoginStatusUnexpected: {
-          dict[@"evenType"] = @"userLoginStatusUnexpected";
+          dict[@"eventType"] = @"userLoginStatusUnexpected";
           break;
         }
         default:
@@ -510,7 +541,7 @@
 @implementation JMSGChatRoom (JMessage)
 - (NSMutableDictionary *)chatRoomToDictionary {
   NSMutableDictionary *dict = @{}.mutableCopy;
-  dict[@"type"] = @"chatroom";
+  dict[@"type"] = @"chatRoom";
   dict[@"roomId"] = self.roomID;
   dict[@"roomName"] = self.name;
   dict[@"appKey"] = self.appkey;

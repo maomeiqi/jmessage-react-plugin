@@ -10,6 +10,7 @@
 #import <JMessage/JMessage.h>
 
 #define kJJMessageReceiveMessage     @"kJJMessageReceiveMessage"
+#define kJJMessageReceiveChatRoomMessage     @"kJJMessageReceiveChatRoomMessage"
 #define kJJMessageSendMessageRespone @"kJJMessageSendMessageRespone"
 
 //Conversation 回调
