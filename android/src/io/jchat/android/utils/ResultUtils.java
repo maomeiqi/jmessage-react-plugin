@@ -177,13 +177,13 @@ public class ResultUtils {
                 case voice:
                     result.putString(Constant.TYPE, Constant.VOICE);
                     VoiceContent voiceContent = (VoiceContent) content;
-                    result.putString(Constant.PATH, voiceContent.getLocalPath() + "." + voiceContent.getFormat());
+                    result.putString(Constant.PATH, voiceContent.getLocalPath());
                     result.putInt(Constant.DURATION, ((VoiceContent) content).getDuration());
                     break;
                 case file:
                     result.putString(Constant.TYPE, Constant.FILE);
                     FileContent fileContent = (FileContent) content;
-                    result.putString(Constant.FILE_NAME, fileContent.getFileName() + "." + fileContent.getFormat());
+                    result.putString(Constant.FILE_NAME, fileContent.getLocalPath());
                     break;
                 case custom:
                     result.putString(Constant.TYPE, Constant.CUSTOM);
