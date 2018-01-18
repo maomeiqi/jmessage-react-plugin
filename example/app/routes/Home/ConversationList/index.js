@@ -123,9 +123,8 @@ export default class ConversationList extends React.Component {
         this.reloadConversationList()
     }
 
-    getListItem(conversation, id) {
-        var item = this.state.data[id]
-        let newItem = {...item}
+    getListItem(conversation) {
+        var newItem = {}
         newItem.conversation = conversation
         newItem.type = conversation.conversationType
         if (conversation.conversationType === "single") {
@@ -204,7 +203,7 @@ export default class ConversationList extends React.Component {
     reloadConversationList() {
         JMessage.getConversations((result) => {
             var data = result.map((conversation, index) => {
-                return this.getListItem(conversation, index)
+                return this.getListItem(conversation)
             })
             data.sort((a, b) => {
                 return b.latestMessage.createTime - a.latestMessage.createTime
@@ -225,19 +224,19 @@ export default class ConversationList extends React.Component {
         })
     }
 
-    createConversation(params, id) {
+    createConversation(params) {
         JMessage.createConversation(params, (conv) => {
-            var item = this.getListItem(conv, id)
+            var item = this.getListItem(conv)
             this.enterConversation(item)
         }, (error) => {
             Alert.alert('create conversation error !', JSON.stringify(error))
         })
     }
 
-    enterChatRoom(item, id) {
+    enterChatRoom(item) {
         JMessage.enterChatRoom(item, (conversation) => {
             this.props.navigation.navigate('Chat', {
-                conversation: this.getListItem(conversation, id)
+                conversation: this.getListItem(conversation)
             })
         }, (error) => {
             console.alert("error, code: " + error.code + ", description: " + error.description)
@@ -302,7 +301,7 @@ export default class ConversationList extends React.Component {
                                     params.type = 'single'
                                     params.username = this.state.modalText
                                     this.setState({ isShowModal: false })
-                                    this.createConversation(params, item.id)
+                                    this.createConversation(params)
                                 }}
                                 style={styles.modalButton}
                                 title='创建单聊' />
@@ -314,7 +313,7 @@ export default class ConversationList extends React.Component {
                                         params.type = 'group'
                                         params.groupId = group.id
                                         this.setState({ isShowModal: false })
-                                        this.createConversation(params, item.id)
+                                        this.createConversation(params)
                                     }, (error) => {
                                         Alert.alert('create group error !', JSON.stringify(error))
                                     })
@@ -333,7 +332,7 @@ export default class ConversationList extends React.Component {
                                             owner: conversation.owner,
                                         }
                                         this.setState({ isShowModal: false })
-                                        this.enterChatRoom(params, item.id)
+                                        this.enterChatRoom(params)
                                     })
                                 }}
                                 style={styles.modalButton}
