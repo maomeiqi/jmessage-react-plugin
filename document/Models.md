@@ -38,6 +38,7 @@ isFriend:boolean            // 是否为好友
 ```js
 type: 'group',
 id: string,                 // 群组 id
+avatarThumbPath: string,    // 头像的缩略图地址
 name: string,               // 群组名称
 desc: string,               // 群组描述
 level: number,              // 群组等级，默认等级 4
