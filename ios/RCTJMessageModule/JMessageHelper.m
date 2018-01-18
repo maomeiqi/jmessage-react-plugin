@@ -348,6 +348,13 @@
   dict[@"isNoDisturb"] = @(self.isNoDisturb);
   dict[@"isShieldMessage"] = @(self.isShieldMessage);
   dict[@"displayName"] = self.displayName;
+  
+  if([[NSFileManager defaultManager] fileExistsAtPath: [self thumbAvatarLocalPath] ?: @""]){
+    dict[@"avatarThumbPath"] = [self thumbAvatarLocalPath];
+  } else {
+    dict[@"avatarThumbPath"] = @"";
+  }
+  
   return dict;
 }
 @end
