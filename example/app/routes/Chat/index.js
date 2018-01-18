@@ -130,16 +130,16 @@ export default class Chat extends Component {
   }
 
   getNormalMessage() {
-    var message = {}
-
-    if (this.conversation.conversationType === 'single') {
-      message.type = 'single'
-      message.username = this.conversation.key
+    var msg = {}
+    if (this.conversation.type === 'single') {
+      msg.username = this.conversation.username
+    } else if (this.conversation.type === "group") {
+      msg.groupId = this.conversation.groupId
     } else {
-      message.type = 'group'
-      message.groupId = this.conversation.key
+      msg.roomId = this.conversation.roomId
     }
-    return message
+    msg.type = this.conversation.type
+    return msg
   }
 
   sendCustomMessage = () => {
@@ -171,23 +171,17 @@ export default class Chat extends Component {
 
   componentDidMount() {
     this.resetMenu()
-    var parames = {
-
-      'from': 0,            // 开始的消息下标。
-      'limit': 10            // 要获取的消息数。比如当 from = 0, limit = 10 时，是获取第 0 - 9 条历史消息。
-    }
     this.setState({
       messageListLayout: { flex: 1, margin: 0, width: window.width }
     })
-    if (this.conversation.conversationType === 'single') {
-      parames.type = 'single'
-      parames.username = this.conversation.key
-    } else if (this.conversation.conversationType === 'group') {
-      parames.type = 'group'
-      parames.groupId = this.conversation.key
-    } else {
-      parames.type = 'chatroom'
-      parames.roomId = this.conversation.key
+    var parames = {
+
+      from: 0,            // 开始的消息下标。
+      limit: 10,            // 要获取的消息数。比如当 from = 0, limit = 10 时，是获取第 0 - 9 条历史消息。
+      type: this.conversation.type,
+      username: this.conversation.username,
+      groupId: this.conversation.groupId,
+      roomId: this.conversation.roomId
     }
     this.messageListDidLoadCallback = () => {
 
@@ -206,25 +200,24 @@ export default class Chat extends Component {
 
       this.receiveMessageCallBack = (message) => {
 
-        if (this.conversation.conversationType === 'single') {
+        if (this.conversation.type === 'single') {
           if (message.target.type === 'user') {
-            if (message.from.username === this.conversation.key) {
+            if (message.from.username === this.conversation.username) {
               var msg = this.convertJMessageToAuroraMsg(message)
               AuroraIController.appendMessages([msg])
             }
             Alert.alert('message.target.username', message.target.username)
-            Alert.alert('this.conversation.key', this.conversation.key)
           }
-        } else if (this.conversation.conversationType === 'group') {
+        } else if (this.conversation.type === 'group') {
           if (message.target.type === 'group') {
-            if (message.from.id === this.conversation.key) {
+            if (message.from.id === this.conversation.groupId) {
               var msg = this.convertJMessageToAuroraMsg(message)
               AuroraIController.appendMessages([msg])
             }
           }
         } else {
           if (message.target.type === 'chatroom') {
-            if (message.target.roomId === this.conversation.key) {
+            if (message.target.roomId === this.conversation.roomId) {
               var msg = this.convertJMessageToAuroraMsg(message)
               AuroraIController.appendMessages([msg])
             }
@@ -255,7 +248,16 @@ export default class Chat extends Component {
     JMessage.removeReceiveMessageListener(this.receiveMessageCallBack)
     AuroraIController.removeMessageListDidLoadListener(this.messageListDidLoadCallback)
     this.timer && clearTimeout(this.timer);
-
+    if (this.conversation.type === "chatroom") {
+      JMessage.leaveChatRoom({roomId: this.conversation.roomId}, (code) => {
+        console.log("Leave chat room succeed")
+      }, (error) => {
+        alert("error: " + JSON.stringify(error))
+      })
+    } else {
+      JMessage.exitConversation()
+    }
+    
   }
 
   resetMenu() {
@@ -346,13 +348,14 @@ export default class Chat extends Component {
       AuroraIController.appendMessages([auroraMsg])
       AuroraIController.scrollToBottom(true)
 
-      if (this.conversation.conversationType === 'single') {
-        msg.type = 'single'
-        msg.username = this.conversation.key
+      if (this.conversation.type === 'single') {
+        msg.username = this.conversation.username
+      } else if (this.conversation.type === "group") {
+        msg.groupId = this.conversation.groupId
       } else {
-        msg.type = 'group'
-        msg.groupId = this.conversation.key
+        msg.roomId = this.conversation.roomId
       }
+      msg.type = this.conversation.type
 
       JMessage.sendMessage(msg, (jmessage) => {
 
@@ -375,13 +378,14 @@ export default class Chat extends Component {
       AuroraIController.appendMessages([auroraMsg])
       AuroraIController.scrollToBottom(true)
 
-      if (this.conversation.conversationType === 'single') {
-        msg.type = 'single'
-        msg.username = this.conversation.key
+      if (this.conversation.type === 'single') {
+        msg.username = this.conversation.username
+      } else if (this.conversation.type === "group") {
+        msg.groupId = this.conversation.groupId
       } else {
-        msg.type = 'group'
-        msg.groupId = this.conversation.key
+        msg.roomId = this.conversation.roomId
       }
+      msg.type = this.conversation.type
 
       JMessage.sendMessage(msg, (jmessage) => {
         var auroraMsg = this.convertJMessageToAuroraMsg(jmessage)
@@ -408,13 +412,14 @@ export default class Chat extends Component {
       AuroraIController.appendMessages([auroraMsg])
       AuroraIController.scrollToBottom(true)
 
-      if (this.conversation.conversationType === 'single') {
-        msg.type = 'single'
-        msg.username = this.conversation.key
+      if (this.conversation.type === 'single') {
+        msg.username = this.conversation.username
+      } else if (this.conversation.type === "group") {
+        msg.groupId = this.conversation.groupId
       } else {
-        msg.type = 'group'
-        msg.groupId = this.conversation.key
+        msg.roomId = this.conversation.roomId
       }
+      msg.type = this.conversation.type
 
       JMessage.sendMessage(msg, (jmessage) => {
         var auroraMsg = this.convertJMessageToAuroraMsg(jmessage)
@@ -444,13 +449,14 @@ export default class Chat extends Component {
       AuroraIController.appendMessages([auroraMsg])
       AuroraIController.scrollToBottom(true)
 
-      if (this.conversation.conversationType === 'single') {
-        msg.type = 'single'
-        msg.username = this.conversation.key
+      if (this.conversation.type === 'single') {
+        msg.username = this.conversation.username
+      } else if (this.conversation.type === "group") {
+        msg.groupId = this.conversation.groupId
       } else {
-        msg.type = 'group'
-        msg.groupId = this.conversation.key
+        msg.roomId = this.conversation.roomId
       }
+      msg.type = this.conversation.type
 
       JMessage.sendMessage(msg, (jmessage) => {
         var auroraMsg = this.convertJMessageToAuroraMsg(jmessage)
@@ -473,13 +479,14 @@ export default class Chat extends Component {
         AuroraIController.appendMessages([auroraMsg])
         AuroraIController.scrollToBottom(true)
 
-        if (this.conversation.conversationType === 'single') {
-          msg.type = 'single'
-          msg.username = this.conversation.key
+        if (this.conversation.type === 'single') {
+          msg.username = this.conversation.username
+        } else if (this.conversation.type === "group") {
+          msg.groupId = this.conversation.groupId
         } else {
-          msg.type = 'group'
-          msg.groupId = this.conversation.key
+          msg.roomId = this.conversation.roomId
         }
+        msg.type = this.conversation.type
 
         JMessage.sendMessage(msg, (jmessage) => {
           var auroraMsg = this.convertJMessageToAuroraMsg(jmessage)

@@ -1152,7 +1152,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
                 String username = map.getString(Constant.USERNAME);
                 String appKey = map.hasKey(Constant.APP_KEY) ? map.getString(Constant.APP_KEY) : "";
                 JMessageClient.enterSingleConversation(username, appKey);
-            } else {
+            } else if (type.equals(Constant.TYPE_GROUP)) {
                 long groupId = Long.parseLong(map.getString(Constant.GROUP_ID));
                 JMessageClient.enterGroupConversation(groupId);
             }
