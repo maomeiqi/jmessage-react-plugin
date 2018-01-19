@@ -1961,6 +1961,11 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)param
     
     JMSGMessage *message = [conversation messageWithMessageId: param[@"id"]];
     
+    if (!message) {
+      failCallback(@[[self getErrorWithLog:@"cann't find the message from this id"]]);
+      return;
+    }
+    
     if ([message.content isKindOfClass:[JMSGMediaAbstractContent class]]) {
       JMSGMediaAbstractContent *content = (JMSGMediaAbstractContent *)message.content;
       content.uploadHandler = ^(float percent, NSString *msgID) {
