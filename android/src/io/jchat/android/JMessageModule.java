@@ -260,6 +260,8 @@ public class JMessageModule extends ReactContextBaseJavaModule {
         }
         if (map.hasKey(Constant.BIRTHDAY)) {
             myInfo.setBirthday((long) map.getDouble(Constant.BIRTHDAY));
+        } else {
+            myInfo.setBirthday(0);
         }
         if (map.hasKey(Constant.SIGNATURE)) {
             myInfo.setSignature(map.getString(Constant.SIGNATURE));

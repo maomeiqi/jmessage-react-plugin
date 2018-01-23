@@ -3,8 +3,8 @@
 import React from 'react';
 import ReactNative, { ScrollView } from 'react-native';
 import JMessage from 'jmessage-react-plugin';
-import {observer} from 'mobx-react/native';
-import {observable} from 'mobx';
+import { observer } from 'mobx-react/native';
+import { observable } from 'mobx';
 
 import FormButton from '../../../views/FormButton';
 import ConversationListStore from './ConversationListStore';
@@ -136,17 +136,17 @@ export default class ConversationList extends React.Component {
         })
     }
 
-    enterConversation(conv) {
+    enterConversation(item) {
         this.reloadConversationList()
-        JMessage.enterConversation(conv, (status) => { }, (error) => { })
+        JMessage.enterConversation(item, (status) => { }, (error) => { })
         this.props.navigation.navigate('Chat', {
-            conversation: {type: conv.conversationType, username: conv.target.username, groupId: conv.groupId}
+            conversation: { type: item.type, username: item.username, groupId: item.groupId, appKey: item.appKey }
         })
     }
 
     createConversation(params) {
         JMessage.createConversation(params, (conv) => {
-            this.enterConversation(conv)
+            this.enterConversation(this.ConversationListStore.getListItem(conv))
         }, (error) => {
             Alert.alert('create conversation error !', JSON.stringify(error))
         })
@@ -155,22 +155,31 @@ export default class ConversationList extends React.Component {
     enterChatRoom(item) {
         JMessage.enterChatRoom(item, (conversation) => {
             this.props.navigation.navigate('Chat', {
-                conversation: {type: conversation.conversationType, roomId: conversation.target.roomId}
+                conversation: { type: conversation.conversationType, roomId: conversation.target.roomId }
             })
         }, (error) => {
             console.alert("error, code: " + error.code + ", description: " + error.description)
         })
     }
 
+    onItemLongPress = (key) => {
+        console.log("long press conversation, item key: " + key)
+        this.ConversationListStore.deleteConversation(key)
+    }
+
+    keyExtractor = (item, index) => index;
+
+
     render() {
         this.listView = <FlatList
             data={this.ConversationListStore.convList}
             extraData={this.state}
+            keyExtractor={this.keyExtractor}
             renderItem={
                 ({
                     item
                 }) => (
-                        <View>
+                    <View>
                             <TouchableHighlight
                                 style={[styles.conversationContent]}
                                 underlayColor='#dddddd'
@@ -178,9 +187,10 @@ export default class ConversationList extends React.Component {
                                     if (item.type === "chatroom") {
                                         this.enterChatRoom(item)
                                     } else {
-                                        this.enterConversation(item.conversation)
+                                        this.enterConversation(item)
                                     }
-                                }}>
+                                }}
+                                onLongPress={this.onItemLongPress(item.key)}>
                                 <View style={[styles.conversationItem]}>
                                     <Image
                                         source={{uri: item.avatarThumbPath}}
@@ -194,11 +204,9 @@ export default class ConversationList extends React.Component {
                             </TouchableHighlight>
                         </View>
                     )
-            } >
-
+            }>
         </FlatList>
         return (
-
             <View>
                 <Modal
                     transparent={true}

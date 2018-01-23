@@ -7,18 +7,18 @@ class ConversationListStore {
 
     convertToConvList = (list) => {
         list.map((conversation, index) => {
-            this.convList.push(this.getListItem(conversation))
+            this.convList.push(this.getListItem(conversation, index))
         })
-        return this.convList
+        return this.convList.slice()
     }
 
-    getListItem(conversation) {
+    getListItem(conversation, index) {
         var newItem = {}
+        newItem.key = index
         newItem.conversation = conversation
         newItem.type = conversation.conversationType
         if (conversation.conversationType === "single") {
             newItem.appKey = conversation.target.appKey
-            newItem.key = conversation.target.username
             newItem.username = conversation.target.username
             newItem.avatarThumbPath = conversation.target.avatarThumbPath
             newItem.displayName = conversation.target.nickname
@@ -37,7 +37,6 @@ class ConversationListStore {
             }
         } else if (conversation.conversationType === "group") {
             newItem.appKey = conversation.target.ownerAppKey
-            newItem.key = conversation.target.id
             newItem.groupId = conversation.target.id
             newItem.displayName = conversation.target.name
             newItem.avatarThumbPath = conversation.target.avatarThumbPath
@@ -52,7 +51,6 @@ class ConversationListStore {
             }
         } else {
             newItem.appKey = conversation.target.appKey
-            newItem.key = conversation.target.roomId
             newItem.roomId = conversation.target.roomId
             newItem.avatarThumbPath = "../../../resource/chat-icon.png"
             newItem.displayName = conversation.target.roomName
@@ -81,6 +79,16 @@ class ConversationListStore {
         }
 
         return newItem
+    }
+
+    @action deleteConversation = (key) => {
+        var item = this.convList[key]
+        JMessage.deleteConversation(item, (code) => {
+            this.convList.splice(key, 1)
+            console.log("Delete succeed")
+        }, (error) => {
+            console.log("Delete failed, error: "  + JSON.stringify(error))
+        })
     }
 }
 
