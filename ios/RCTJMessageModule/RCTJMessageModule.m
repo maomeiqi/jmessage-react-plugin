@@ -208,7 +208,8 @@ RCT_EXPORT_MODULE();
         return nil;
       }
       content = [[JMSGImageContent alloc] initWithImageData: [NSData dataWithContentsOfFile: mediaPath]];
-      
+      JMSGImageContent *imgContent = content;
+      imgContent.format = [mediaPath pathExtension];
       break;
     }
     case kJMSGContentTypeVoice:{
@@ -251,6 +252,8 @@ RCT_EXPORT_MODULE();
       }
       
       content = [[JMSGFileContent alloc] initWithFileData:[NSData dataWithContentsOfFile: mediaPath] fileName: fileName];
+      JMSGFileContent *fileContent = content;
+      fileContent.format =[mediaPath pathExtension];
       break;
     }
     case kJMSGContentTypeCustom:{
@@ -830,6 +833,11 @@ RCT_EXPORT_METHOD(getHistoryMessages:(NSDictionary *)param
       return [message messageToDictionary];
     }];
 
+    if (!messageArr) {
+      successCallback(@[@[]]);
+      return;
+    }
+    
     successCallback(@[messageDicArr]);
   }];
 }
@@ -1956,6 +1964,11 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)param
     
     JMSGMessage *message = [conversation messageWithMessageId: param[@"id"]];
     
+    if (!message) {
+      failCallback(@[[self getErrorWithLog:@"cann't find the message from this id"]]);
+      return;
+    }
+    
     if ([message.content isKindOfClass:[JMSGMediaAbstractContent class]]) {
       JMSGMediaAbstractContent *content = (JMSGMediaAbstractContent *)message.content;
       content.uploadHandler = ^(float percent, NSString *msgID) {
@@ -1971,6 +1984,13 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)param
     }
     
     self.SendMsgCallbackDic[message.msgId] = @[successCallback,failCallback];
+    
+    if (param[@"extras"] && [param[@"extras"] isKindOfClass: [NSDictionary class]]) {
+      NSDictionary *extras = param[@"extras"];
+      for (NSString *key in extras.allKeys) {
+        [message.content addStringExtra:extras[key] forKey:key];
+      }
+    }
     
     if (messageSendingOptions) {
       [conversation sendMessage:message optionalContent:messageSendingOptions];

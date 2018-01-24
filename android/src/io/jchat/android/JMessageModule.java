@@ -260,6 +260,8 @@ public class JMessageModule extends ReactContextBaseJavaModule {
         }
         if (map.hasKey(Constant.BIRTHDAY)) {
             myInfo.setBirthday((long) map.getDouble(Constant.BIRTHDAY));
+        } else {
+            myInfo.setBirthday(0);
         }
         if (map.hasKey(Constant.SIGNATURE)) {
             myInfo.setSignature(map.getString(Constant.SIGNATURE));
@@ -1152,7 +1154,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
                 String username = map.getString(Constant.USERNAME);
                 String appKey = map.hasKey(Constant.APP_KEY) ? map.getString(Constant.APP_KEY) : "";
                 JMessageClient.enterSingleConversation(username, appKey);
-            } else {
+            } else if (type.equals(Constant.TYPE_GROUP)) {
                 long groupId = Long.parseLong(map.getString(Constant.GROUP_ID));
                 JMessageClient.enterGroupConversation(groupId);
             }

@@ -3,8 +3,11 @@
 import React from 'react';
 import ReactNative, { ScrollView } from 'react-native';
 import JMessage from 'jmessage-react-plugin';
+import { observer } from 'mobx-react/native';
+import { observable } from 'mobx';
 
-import FormButton from '../../../views/FormButton'
+import FormButton from '../../../views/FormButton';
+import ConversationListStore from './ConversationListStore';
 
 const {
     View,
@@ -64,15 +67,7 @@ const styles = StyleSheet.create({
 
 var count = 0
 
-//   headerRight: <Button 
-//   title="创建会话" 
-//   onPress={
-//       ({state}) => {
-//           Alert.alert('state', JSON.stringify(state.params))
-
-//       }}
-//   />,
-
+@observer
 export default class ConversationList extends React.Component {
     static navigationOptions = ({
         navigation
@@ -103,6 +98,7 @@ export default class ConversationList extends React.Component {
 
     constructor(props) {
         super(props);
+        this.ConversationListStore = ConversationListStore
         this.state = {
             data: [{
                 key: 'a'
@@ -111,6 +107,7 @@ export default class ConversationList extends React.Component {
             }],
             modalText: "",
             isShowModal: false,
+            refresh: (new Map(): Map<string, boolean>)
         }
         this._onCreateConversation = this._onCreateConversation.bind(this)
     }
@@ -123,156 +120,80 @@ export default class ConversationList extends React.Component {
             enable: true
         });
         JMessage.addReceiveMessageListener((message) => {
-            //TODO sort conversation list or create conversation, send message to Chat.
-
+            this.reloadConversationList()
         })
     }
+
     componentWillMount() {
         this.reloadConversationList()
     }
 
     reloadConversationList() {
         JMessage.getConversations((result) => {
-
-            var data = result.map((conversation, index) => {
-                var item = {}
-                item.key = index
-                item.conversation = conversation
-                if (conversation.conversationType === 'single') {
-                    item = {
-                        key: conversation.target.username
-                    }
-                    item.conversationType = 'single'
-                    item.displayName = conversation.target.nickname
-                    if (item.displayName == "") {
-                        item.displayName = conversation.target.username
-                    }
-                } else {
-                    item = {
-                        key: conversation.target.id
-                    }
-                    item.conversationType = 'group'
-                    item.displayName = conversation.target.name
-                }
-
-                if (conversation.latestMessage === undefined) {
-                    item.latestMessageString = ""
-                    return item
-                }
-
-                item.conversationType = conversation.conversationType
-                if (conversation.latestMessage.type === 'text') {
-                    item.latestMessageString = conversation.latestMessage.text
-                }
-
-                if (conversation.latestMessage.type === 'image') {
-                    item.latestMessageString = '[图片]'
-                }
-
-                if (conversation.latestMessage.type === 'voice') {
-                    item.latestMessageString = '[语音]'
-                }
-
-                if (conversation.latestMessage.type === 'file') {
-                    item.latestMessageString = '[文件]'
-                }
-
-                return item
-            })
-            this.setState({
-                data: data
-            })
+            this.ConversationListStore.convertToConvList(result)
         }, (error) => {
             Alert.alert(JSON.stringify(error))
         })
     }
 
-    _onPress() {
-        JMessage.createConversation({
-            type: 'single',
-            username: '0002'
-        }, (conv) => {
-            var item
-            if (conv.conversationType === 'single') {
-                item = {
-                    key: conv.target.username
-                }
-                item.conversationType = 'single'
-            } else {
-                item = {
-                    key: conv.target.id
-                }
-                item.conversationType = 'group'
-            }
-            this.setState({})
-            Alert.alert('the item', JSON.stringify(item))
-            this.props.navigation.navigate('Chat', {
-                conversation: item
-            })
-        }, (error) => {
-            Alert.alert('error', JSON.stringify(error))
+    enterConversation(item) {
+        this.reloadConversationList()
+        JMessage.enterConversation(item, (status) => { }, (error) => { })
+        this.props.navigation.navigate('Chat', {
+            conversation: { type: item.type, username: item.username, groupId: item.groupId, appKey: item.appKey }
         })
     }
 
-    enterConversation(params) {
+    createConversation(params) {
         JMessage.createConversation(params, (conv) => {
-            var item = {}
-
-            if (conv.conversationType === 'single') {
-                item = {
-                    key: conv.target.username
-                }
-                item.conversationType = 'single'
-            } else {
-                item = {
-                    key: conv.target.id
-                }
-                item.conversationType = 'group'
-            }
-            this.reloadConversationList()
-            this.props.navigation.navigate('Chat', {
-                conversation: item
-            })
+            this.enterConversation(this.ConversationListStore.getListItem(conv))
         }, (error) => {
             Alert.alert('create conversation error !', JSON.stringify(error))
         })
     }
 
-    enterChatRoom(params) {
-        JMessage.enterChatRoom(params.roomId, (conversation) => {
-            var chatRoom = {
-                conversationType: 'chatroom',
-                key: conversation.roomId,
-                owner: conversation.owner,
-                totalMemberCount: conversation.totalMemberCount
-            }
+    enterChatRoom(item) {
+        JMessage.enterChatRoom(item, (conversation) => {
             this.props.navigation.navigate('Chat', {
-                conversation: chatRoom
+                conversation: { type: conversation.conversationType, roomId: conversation.target.roomId }
             })
         }, (error) => {
             console.alert("error, code: " + error.code + ", description: " + error.description)
         })
     }
 
+    onItemLongPress = (key) => {
+        console.log("long press conversation, item key: " + key)
+        this.ConversationListStore.deleteConversation(key)
+    }
+
+    keyExtractor = (item, index) => index;
+
+
     render() {
         this.listView = <FlatList
-            data={
-                this.state.data
-            }
+            data={this.ConversationListStore.convList}
+            extraData={this.state}
+            keyExtractor={this.keyExtractor}
             renderItem={
                 ({
                     item
                 }) => (
-                        <View>
+                    <View>
                             <TouchableHighlight
                                 style={[styles.conversationContent]}
                                 underlayColor='#dddddd'
                                 onPress={() => {
-                                    this.props.navigation.navigate('Chat', { conversation: item })
-                                }}>
+                                    if (item.type === "chatroom") {
+                                        this.enterChatRoom(item)
+                                    } else {
+                                        this.enterConversation(item)
+                                    }
+                                }}
+                                onLongPress={this.onItemLongPress(item.key)}>
                                 <View style={[styles.conversationItem]}>
                                     <Image
-                                        source={require('../../../resource/group-icon.png')}
+                                        source={{uri: item.avatarThumbPath}}
                                         style={[styles.conversationAvatar]}>
                                     </Image>
                                     <View>
@@ -283,11 +204,9 @@ export default class ConversationList extends React.Component {
                             </TouchableHighlight>
                         </View>
                     )
-            } >
-
+            }>
         </FlatList>
         return (
-
             <View>
                 <Modal
                     transparent={true}
@@ -307,7 +226,7 @@ export default class ConversationList extends React.Component {
                                     params.type = 'single'
                                     params.username = this.state.modalText
                                     this.setState({ isShowModal: false })
-                                    this.enterConversation(params)
+                                    this.createConversation(params)
                                 }}
                                 style={styles.modalButton}
                                 title='创建单聊' />
@@ -319,7 +238,7 @@ export default class ConversationList extends React.Component {
                                         params.type = 'group'
                                         params.groupId = group.id
                                         this.setState({ isShowModal: false })
-                                        this.enterConversation(params)
+                                        this.createConversation(params)
                                     }, (error) => {
                                         Alert.alert('create group error !', JSON.stringify(error))
                                     })

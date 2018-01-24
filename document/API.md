@@ -293,7 +293,7 @@ JMessage.createGroup({ name: 'group_name', desc: 'group_desc' },
 
 ### createSendMessage
 
-创建消息，创建好消息后需要调用 [sendMessage](#sendmessage) 来发送消息。如果需要状态更新（发送中到发送完成）推荐这种方式。
+创建消息，创建好消息后需要调用 [sendMessage](#sendmessage) 来发送消息。如果需要状态更新（发送中到发送完成）推荐这种方式，聊天室不支持该接口。
 
 #### 示例
 
@@ -306,11 +306,10 @@ JMessage.createSendMessage({type: 'group', groupId: 'group id', appKey: 'appkey'
 
 #### 参数说明
 
-- type: 会话类型。可以为 'single' 或 'group' 或 'chatRoom'。
+- type: 会话类型。可以为 'single' 或 'group'。
 - username: 对方用户的用户名。当 `type` 为 'single' 时，`username` 为必填。
 - appKey: 对方用户所属应用的 AppKey。如果不填，默认为当前应用。
 - groupId: 对象群组 id。当 `type` 为 'group' 时，`groupId` 为必填。
-- roomId: 对象聊天室 id。当 `type` 为 'chatRoom' 时，`roomId` 为必填。
 - messageType: 不同的消息类型需要不同的字段。
   - messageType = text 时 `text` 为必填。
   - messageType = image 时 `path` 为必填。
@@ -346,11 +345,10 @@ JMessage.createSendMessage({type: 'single', username: 'username', appKey: 'appke
 #### 参数
 
 - id: 创建好的 message id。
-- type: 会话类型。可以为 'single' 或 'group'或 'chatRoom'。
+- type: 会话类型。可以为 'single' 或 'group'。
 - username: 对方用户的用户名。当 `type` 为 'single' 时，`username` 为必填。
 - appKey: 对方用户所属应用的 AppKey。如果不填，默认为当前应用。
 - groupId: 对象群组 id。当 `type` 为 'group' 时，`groupId` 为必填。
-- roomId: 对象聊天室 id。当 `type` 为 'chatRoom' 时，`roomId` 为必填。
 
 
 - messageSendingOptions: 消息发送配置参数。支持的属性：
@@ -438,11 +436,10 @@ JMessage.sendImageMessage({ type: 'group', groupId: 'target_group_id', path: 'im
 
 #### 参数说明
 
-- type: 会话类型。可以为 'single' 或 'group' 或 'chatRoom'。
+- type: 会话类型。可以为 'single' 或 'group'。
 - username: 对方用户的用户名。当 `type` 为 'single' 时，`username` 为必填。
 - appKey: 对方用户所属应用的 AppKey。如果不填，默认为当前应用。
 - groupId: 对象群组 id。当 `type` 为 'group' 时，`groupId` 为必填。
-- roomId: 对象聊天室 id。当 `type` 为 'chatRoom' 时，`roomId` 为必填。
 - path: 本地图片的绝对路径。格式分别类似为：
   - Android：`/storage/emulated/0/DCIM/Camera/IMG_20160526_130223.jpg`
   - iOS：`/var/mobile/Containers/Data/Application/7DC5CDFF-6581-4AD3-B165-B604EBAB1250/tmp/photo.jpg`
@@ -486,11 +483,10 @@ JMessage.sendVoiceMessage({ type: 'group', groupId: 'target_group_id', path: 'vo
 
 #### 参数说明
 
-- type: 会话类型。可以为 'single' 或 'group' 或 'chatRoom'。
+- type: 会话类型。可以为 'single' 或 'group'。
 - username: 对方用户的用户名。当 `type` 为 'single' 时，`username` 为必填。
 - appKey: 对方用户所属应用的 AppKey。如果不填，默认为当前应用。
 - groupId: 对象群组 id。当 `type` 为 'group' 时，`groupId` 为必填。
-- roomId: 对象聊天室 id。当 `type` 为 'chatRoom' 时，`roomId` 为必填。
 - path: 本地音频文件的绝对路径。
 - extras: 自定义键值对，value 必须为字符串类型。
 - messageSendingOptions: 消息发送配置参数（只对 Android 生效）。支持的属性：
@@ -532,11 +528,10 @@ JMessage.sendCustomMessage({ type: 'group', groupId: 'target_group_id', path: 'v
 
 #### 参数说明
 
-- type: 会话类型。可以为 'single' 或 'group' 或 'chatRoom'。
+- type: 会话类型。可以为 'single' 或 'group'。
 - username: 对方用户的用户名。当 `type` 为 'single' 时，`username` 为必填。
 - appKey: 对方用户所属应用的 AppKey。如果不填，默认为当前应用。
 - groupId: 对象群组 id。当 `type` 为 'group' 时，`groupId` 为必填。
-- roomId: 对象聊天室 id。当 `type` 为 'chatRoom' 时，`roomId` 为必填。
 - customObject: 自定义键值对，`value` 必须为字符串类型。
 - messageSendingOptions: 消息发送配置参数（只对 Android 生效）。支持的属性：
   - isShowNotification: 接收方是否针对此次消息发送展示通知栏通知。默认为 `true`。
@@ -579,11 +574,10 @@ JMessage.sendLocationMessage({ type: 'group', groupId: 'target_group_id',
 
 #### 参数说明
 
-- type: 会话类型。可以为 'single' 或 'group' 或 'chatRoom'。
+- type: 会话类型。可以为 'single' 或 'group'。
 - username: 对方用户的用户名。当 `type` 为 'single' 时，`username` 为必填。
 - appKey: 对方用户所属应用的 AppKey。如果不填，默认为当前应用。
 - groupId: 对象群组 id。当 `type` 为 'group' 时，`groupId` 为必填。
-- roomId: 对象聊天室 id。当 `type` 为 'chatRoom' 时，`roomId` 为必填。
 - latitude: 纬度。
 - longitude: 经度。
 - scale: 地图缩放比例。
@@ -662,11 +656,10 @@ JMessage.retractMessage({type: 'single', username: 'username', appKey: 'appKey',
 
 #### 参数说明
 
-- type: 会话类型。可以为 'single' 或 'group' 或 'chatRoom'。
+- type: 会话类型。可以为 'single' 或 'group'。
 - username: 对方用户的用户名。当 `type` 为 'single' 时，`username` 为必填。
 - appKey: 对方用户所属应用的 AppKey。如果不填，默认为当前应用。
 - groupId: 对象群组 id。当 `type` 为 'group' 时，`groupId` 为必填。
-- roomId: 对象聊天室 id。当 `type` 为 'chatRoom' 时，`roomId` 为必填。
 - messageId: 要撤回的消息 id。
 
 ### getHistoryMessages
@@ -689,11 +682,10 @@ JMessage.getHistoryMessages({ type: 'single', username: 'username',
 
 #### 参数说明
 
-- type: 会话类型。可以为 'single' 或 'group' 或 'chatRoom'。
+- type: 会话类型。可以为 'single' 或 'group'。
 - username: 对方用户的用户名。当 `type` 为 'single' 时，`username` 为必填。
 - appKey: 对方用户所属应用的 AppKey。如果不填，默认为当前应用。
 - groupId: 对象群组 id。当 `type` 为 'group' 时，`groupId` 为必填。
-- roomId: 对象聊天室 id。当 `type` 为 'chatRoom' 时，`roomId` 为必填。
 - from: 第一条消息对应的下标，起始为 0。
 - limit: 消息数。当 from = 0 并且 limit = -1 时，返回所有的历史消息。
 
@@ -718,11 +710,10 @@ JMessage.downloadOriginalImage({ type: 'single', username: 'username',
 
 #### 参数说明
 
-- type: 会话类型。可以为 'single' 或 'group' 或 'chatRoom'。
+- type: 会话类型。可以为 'single' 或 'group' 。
 - username: 对方用户的用户名。当 `type` 为 'single' 时，`username` 为必填。
 - appKey: 对方用户所属应用的 AppKey。如果不填，默认为当前应用。
 - groupId: 对象群组 id。当 `type` 为 'group' 时，`groupId` 为必填。
-- roomId: 对象聊天室 id。当 `type` 为 'chatRoom' 时，`roomId` 为必填。
 - messageId: 图片消息 id。
 
 ### downloadVoiceFile
@@ -746,11 +737,10 @@ JMessage.downloadVoiceFile({ type: 'single', username: 'username',
 
 #### 参数说明
 
-- type: 会话类型。可以为 'single' 或 'group' 或 'chatRoom'。
+- type: 会话类型。可以为 'single' 或 'group'。
 - username: 对方用户的用户名。当 `type` 为 'single' 时，`username` 为必填。
 - appKey: 对方用户所属应用的 AppKey。如果不填，默认为当前应用。
 - groupId: 对象群组 id。当 `type` 为 'group' 时，`groupId` 为必填。
-- roomId: 对象聊天室 id。当 `type` 为 'chatRoom' 时，`roomId` 为必填。
 - messageId: 语音消息 id。
 
 ### downloadFile
@@ -774,11 +764,10 @@ JMessage.downloadFile({ type: 'single', username: 'username',
 
 #### 参数说明
 
-- type: 会话类型。可以为 'single' 或 'group' 或 'chatRoom'。
+- type: 会话类型。可以为 'single' 或 'group'。
 - username: 对方用户的用户名。当 `type` 为 'single' 时，`username` 为必填。
 - appKey: 对方用户所属应用的 AppKey。如果不填，默认为当前应用。
 - groupId: 对象群组 id。当 `type` 为 'group' 时，`groupId` 为必填。
-- roomId: 对象聊天室 id。当 `type` 为 'chatRoom' 时，`roomId` 为必填。
 - messageId: 文件消息 id。
 
 ## 会话
@@ -937,6 +926,8 @@ JMessage.resetUnreadMessageCount({ type: 'single', username: 'username', appKey:
 
 
 ## 聊天室
+
+聊天室的消息不存数据库，不支持获取历史消息，只支持文本消息。进入聊天室即可接收该聊天室的消息，退出则不在接收。
 
 ### getChatRoomListByApp
 

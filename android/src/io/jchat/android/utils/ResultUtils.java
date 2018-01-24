@@ -7,7 +7,6 @@ import android.graphics.BitmapFactory;
 import android.text.TextUtils;
 
 import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.facebook.react.bridge.WritableArray;
@@ -20,8 +19,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -29,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 
 import cn.jpush.im.android.api.JMessageClient;
-import cn.jpush.im.android.api.callback.GetUserInfoCallback;
 import cn.jpush.im.android.api.content.CustomContent;
 import cn.jpush.im.android.api.content.EventNotificationContent;
 import cn.jpush.im.android.api.content.FileContent;
@@ -117,6 +113,7 @@ public class ResultUtils {
         result.putString(Constant.DESC, groupInfo.getGroupDescription());
         result.putInt(Constant.LEVEL, groupInfo.getGroupLevel());
         result.putString(Constant.OWNER, groupInfo.getGroupOwner());
+        result.putString(Constant.AVATAR_THUMB_PATH, groupInfo.getAvatarFile().getAbsolutePath());
         result.putString(Constant.OWNER_APP_KEY, groupInfo.getOwnerAppkey());
         result.putInt(Constant.MAX_MEMBER_COUNT, groupInfo.getMaxMemberCount());
         result.putBoolean(Constant.IS_NO_DISTURB, groupInfo.getNoDisturb() == 1);
@@ -180,13 +177,13 @@ public class ResultUtils {
                 case voice:
                     result.putString(Constant.TYPE, Constant.VOICE);
                     VoiceContent voiceContent = (VoiceContent) content;
-                    result.putString(Constant.PATH, voiceContent.getLocalPath() + "." + voiceContent.getFormat());
+                    result.putString(Constant.PATH, voiceContent.getLocalPath());
                     result.putInt(Constant.DURATION, ((VoiceContent) content).getDuration());
                     break;
                 case file:
                     result.putString(Constant.TYPE, Constant.FILE);
                     FileContent fileContent = (FileContent) content;
-                    result.putString(Constant.FILE_NAME, fileContent.getFileName() + "." + fileContent.getFormat());
+                    result.putString(Constant.FILE_NAME, fileContent.getLocalPath());
                     break;
                 case custom:
                     result.putString(Constant.TYPE, Constant.CUSTOM);
