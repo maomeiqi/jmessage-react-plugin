@@ -18,8 +18,18 @@
 {
   NSURL *jsCodeLocation;
 
-//  jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index.ios" fallbackResource:nil];
-  jsCodeLocation = [NSURL URLWithString:@"http://192.168.10.155:8081/index.ios.bundle?platform=ios&dev=true"];
+  NSString *mainBundlePath = [[NSBundle mainBundle] bundlePath];
+  NSLog(@"mainBundlePath: %@",mainBundlePath);
+  
+  NSString *LibraryDirectory = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
+  NSString *UserDirectory = [NSSearchPathForDirectoriesInDomains(NSUserDirectory, NSUserDomainMask, YES) lastObject];
+  NSString *ApplicationDirectory = [NSSearchPathForDirectoriesInDomains(NSApplicationDirectory, NSUserDomainMask, YES) lastObject];
+
+  NSLog(@"LibraryDirectory: %@",LibraryDirectory);
+  NSLog(@"UserDirectory: %@",UserDirectory);
+  NSLog(@"ApplicationDirectory: %@",ApplicationDirectory);
+  jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index.ios" fallbackResource:nil];
+//  jsCodeLocation = [NSURL URLWithString:@"http://192.168.10.155:8081/index.ios.bundle?platform=ios&dev=true"];
   RCTRootView *rootView = [[RCTRootView alloc] initWithBundleURL:jsCodeLocation
                                                       moduleName:@"ReactJChat"
                                                initialProperties:nil

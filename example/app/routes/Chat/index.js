@@ -310,7 +310,8 @@ export default class Chat extends Component {
 
   onMsgClick = (message) => {
     console.log(message)
-    alert(JSON.stringify(message))
+    // alert(JSON.stringify(message))
+    Alert.alert('onSendGalleryFiles',JSON.stringify(message))
   }
 
   onStatusViewClick = (message) => {
@@ -469,32 +470,38 @@ export default class Chat extends Component {
 
   onSendGalleryFiles = (mediaFiles) => {
     for (index in mediaFiles) {
+      Alert.alert('onSendGalleryFiles',JSON.stringify(mediaFiles[index]['mediaPath']))
       var message = this.getNormalMessage()
       message.messageType = "image"
       message.path = mediaFiles[index].mediaPath
-
-      JMessage.createSendMessage(message, (msg) => {
+      JMessage.sendImageMessage(message, (msg) => {
         var auroraMsg = this.convertJMessageToAuroraMsg(msg)
         auroraMsg.status = 'send_going'
         AuroraIController.appendMessages([auroraMsg])
         AuroraIController.scrollToBottom(true)
+      }, () => {})
+      // JMessage.createSendMessage(message, (msg) => {
+      //   var auroraMsg = this.convertJMessageToAuroraMsg(msg)
+      //   auroraMsg.status = 'send_going'
+      //   AuroraIController.appendMessages([auroraMsg])
+      //   AuroraIController.scrollToBottom(true)
 
-        if (this.conversation.type === 'single') {
-          msg.username = this.conversation.username
-        } else if (this.conversation.type === "group") {
-          msg.groupId = this.conversation.groupId
-        } else {
-          msg.roomId = this.conversation.roomId
-        }
-        msg.type = this.conversation.type
+      //   if (this.conversation.type === 'single') {
+      //     msg.username = this.conversation.username
+      //   } else if (this.conversation.type === "group") {
+      //     msg.groupId = this.conversation.groupId
+      //   } else {
+      //     msg.roomId = this.conversation.roomId
+      //   }
+      //   msg.type = this.conversation.type
 
-        JMessage.sendMessage(msg, (jmessage) => {
-          var auroraMsg = this.convertJMessageToAuroraMsg(jmessage)
-          AuroraIController.updateMessage(auroraMsg)
-        }, (error) => {
-          Alert.alert('send image fail')
-        })
-      })
+      //   JMessage.sendMessage(msg, (jmessage) => {
+      //     var auroraMsg = this.convertJMessageToAuroraMsg(jmessage)
+      //     AuroraIController.updateMessage(auroraMsg)
+      //   }, (error) => {
+      //     Alert.alert('send image fail')
+      //   })
+      // })
     }
   }
 

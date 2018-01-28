@@ -41,7 +41,7 @@ class ConversationListStore {
             newItem.displayName = conversation.target.name
             newItem.avatarThumbPath = conversation.target.avatarThumbPath
             if (newItem.avatarThumbPath === "") {
-                JMessage.getGroupInfo({id: groupId}, (groupInfo) => {
+                JMessage.getGroupInfo({id: newItem.groupId}, (groupInfo) => {
                     console.log("Get group info succeed")
                     newItem.avatarThumbPath = groupInfo.avatarThumbPath
                     newItem.displayName = groupInfo.displayName
