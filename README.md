@@ -10,6 +10,20 @@ npm install jcore-react-native --save（目前 jmessage-react-plugin 2.1.1 版�
 react-native link
 ```
 
+##### （如果是原生应用集成 react-native）使用 CocoaPods 安装
+
+在 Podfile 中添加如下代码:
+
+```
+pod 'JPushRN', :path => '../node_modules/jpush-react-native'
+```
+
+终端执行如下指令:
+
+```
+pod install
+```
+
 ## 配置
 
 #### Android

@@ -208,7 +208,8 @@ RCT_EXPORT_MODULE();
         return nil;
       }
       content = [[JMSGImageContent alloc] initWithImageData: [NSData dataWithContentsOfFile: mediaPath]];
-      
+      JMSGImageContent *imgContent = content;
+      imgContent.format = [mediaPath pathExtension];
       break;
     }
     case kJMSGContentTypeVoice:{
@@ -251,6 +252,8 @@ RCT_EXPORT_MODULE();
       }
       
       content = [[JMSGFileContent alloc] initWithFileData:[NSData dataWithContentsOfFile: mediaPath] fileName: fileName];
+      JMSGFileContent *fileContent = content;
+      fileContent.format =[mediaPath pathExtension];
       break;
     }
     case kJMSGContentTypeCustom:{

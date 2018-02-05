@@ -62,8 +62,8 @@ import JMessage from 'jmessage-react-plugin';
   - [消息事件](#addreceivemessagelistener)
     - [addReceiveMessageListener](#addreceivemessagelistener)
     - [removeReceiveMessageListener](#addreceivemessagelistener)
-    - [*addReceiveChatRoomMsgListener]()
-    - [*removeReceiveChatRoomMsgListener]()
+    - [addReceiveChatRoomMsgListener](#addreceivechatroommsglistener)
+    - [removeReceiveChatRoomMsgListener](#removereceivechatroommsglistener)
   - [离线消息](#addsyncofflinemessagelistener)
     - [addSyncOfflineMessageListener](#addsyncofflinemessagelistener)
     - [removeSyncOfflineMessageListener](#addsyncofflinemessagelistener)
@@ -1228,6 +1228,8 @@ JMessage.updateFriendNoteText({ username: 'username', appKey: 'appKey', noteText
 
 #### addReceiveMessageListener
 
+添加消息事件的监听。
+
 ##### 示例
 
 ```javascript
@@ -1237,6 +1239,21 @@ var listener = (message) => {
 
 JMessage.addReceiveMessageListener(listener) // 添加监听
 JMessage.removeReceiveMessageListener(listener) // 移除监听(一般在 componentWillUnmount 中调用)
+```
+
+#### addReceiveChatRoomMsgListener
+
+添加聊天室消息事件的监听。
+
+##### 示例
+
+```javascript
+var listener = ([message]) => {
+  // 收到的消息会返回一个消息列表，列表元素为消息对象. 对象字段可以参考对象说明
+}
+
+JMessage.addReceiveChatRoomMsgListene(listener) // 添加监听
+JMessage.removeReceiveChatRoomMsgListener(listener) // 移除监听(一般在 componentWillUnmount 中调用)
 ```
 
 ####  addSyncOfflineMessageListener
