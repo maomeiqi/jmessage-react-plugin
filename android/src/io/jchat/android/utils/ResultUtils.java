@@ -2,8 +2,6 @@ package io.jchat.android.utils;
 
 
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.text.TextUtils;
 
 import com.facebook.react.bridge.Arguments;
@@ -18,8 +16,6 @@ import com.google.gson.jpush.JsonParser;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -157,21 +153,7 @@ public class ResultUtils {
                 case image:
                     result.putString(Constant.TYPE, Constant.IMAGE);
                     ImageContent imageContent = (ImageContent) content;
-                    // jmessage did not add file extension, so save to local.
-                    File file = new File(imageContent.getLocalThumbnailPath() + ".png");
-                    FileOutputStream fos = new FileOutputStream(file);
-                    BitmapFactory.Options opts = new BitmapFactory.Options();
-                    opts.inJustDecodeBounds = false;
-                    opts.inSampleSize = 1;
-                    Bitmap bitmap = BitmapFactory.decodeFile(imageContent.getLocalThumbnailPath(), opts);
-                    try {
-                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
-                        fos.flush();
-                        fos.close();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    result.putString(Constant.THUMB_PATH, file.getAbsolutePath());
+                    result.putString(Constant.THUMB_PATH, imageContent.getLocalThumbnailPath());
                     result.putString(Constant.LOCAL_PATH, imageContent.getLocalPath());
                     break;
                 case voice:

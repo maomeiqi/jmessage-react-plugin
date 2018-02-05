@@ -307,7 +307,8 @@ public class JMessageModule extends ReactContextBaseJavaModule {
                 content = new TextContent(map.getString(Constant.TEXT));
             } else if (type.equals(Constant.IMAGE)) {
                 String path = map.getString(Constant.PATH);
-                content = new ImageContent(new File(path));
+                String suffix = path.substring(path.lastIndexOf(".") + 1);
+                content = new ImageContent(new File(path), suffix);
             } else if (type.equals(Constant.VOICE)) {
                 String path = map.getString(Constant.PATH);
                 File file = new File(path);
