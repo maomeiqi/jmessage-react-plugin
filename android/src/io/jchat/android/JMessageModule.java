@@ -404,7 +404,8 @@ public class JMessageModule extends ReactContextBaseJavaModule {
     public void sendImageMessage(ReadableMap map, Callback success, Callback fail) {
         String path = map.getString(Constant.PATH);
         try {
-            ImageContent content = new ImageContent(new File(path));
+            String suffix = path.substring(path.lastIndexOf(".") + 1);
+            ImageContent content = new ImageContent(new File(path), suffix);
             mJMessageUtils.sendMessage(map, content, success, fail);
         } catch (FileNotFoundException e) {
             e.printStackTrace();

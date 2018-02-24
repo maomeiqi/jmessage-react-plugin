@@ -122,6 +122,11 @@ export default class ConversationList extends React.Component {
         JMessage.addReceiveMessageListener((message) => {
             this.reloadConversationList()
         })
+        JMessage.addSyncRoamingMessageListener((result) => {
+            var conv = result.conversation;
+            console.log("Receive roaming conversation: " + JSON.stringify(conv))
+            ConversationListStore.insertConversation(conv)
+        })
     }
 
     componentWillMount() {
@@ -164,7 +169,7 @@ export default class ConversationList extends React.Component {
 
     onItemLongPress = (key) => {
         console.log("long press conversation, item key: " + key)
-        this.ConversationListStore.deleteConversation(key)
+        // this.ConversationListStore.deleteConversation(key)
     }
 
     keyExtractor = (item, index) => index;

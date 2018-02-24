@@ -22,7 +22,7 @@ const {
         const { navigate } = this.props.navigation;
         var params = {
               'appkey': "a1703c14b186a68a66ef86c1",
-              'isOpenMessageRoaming': false,
+              'isOpenMessageRoaming': true,
               'isProduction': false,
               'channel': ""
              }
