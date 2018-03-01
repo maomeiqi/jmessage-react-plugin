@@ -732,6 +732,19 @@ export default class JMessage {
     }
 
     /**
+     * iOS Only
+     * 设置服务器 badge 值，用于 badge+1 功能
+     */
+    static setBadge (badge, cb) {
+        if (Platform.OS === 'ios') {
+            JMessageModule.setBadge(badge, value => {
+              cb(value)
+            })
+        }
+    }
+
+
+    /**
      * @param {object} params = {
      *  'type': String,            // 'single' / 'group' / 'chatRoom'
      *  'groupId': String,         // 目标群组 id。
