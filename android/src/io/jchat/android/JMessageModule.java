@@ -1094,10 +1094,6 @@ public class JMessageModule extends ReactContextBaseJavaModule {
                 mJMessageUtils.handleError(fail, ERR_CODE_MESSAGE, ERR_MSG_MESSAGE);
                 return;
             }
-            if (msg.getContentType() != ContentType.image) {
-                mJMessageUtils.handleError(fail, ERR_CODE_MESSAGE, "Wrong message type");
-                return;
-            }
             FileContent content = (FileContent) msg.getContent();
             content.downloadFile(msg, new DownloadCompletionCallback() {
                 @Override
