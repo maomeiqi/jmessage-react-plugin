@@ -284,7 +284,6 @@ export default class JMessage {
      *  'username': String,                            // 当 type = single 时，username 不能为空。
      *  'appKey': String,                              // 当 type = single 时，用于指定对象所属应用的 appKey。如果为空，默认为当前应用。
      *  'path': String,                                // 本地文件路径。
-     *  'fileName': String,                            // 文件名
      *  'extras': Object,                              // Optional. 自定义键值对 = {'key1': 'value1'}
      *  'messageSendingOptions': MessageSendingOptions // Optional. MessageSendingOptions 对象。
      * }
