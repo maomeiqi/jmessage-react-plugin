@@ -165,7 +165,7 @@ public class ResultUtils {
                 case file:
                     result.putString(Constant.TYPE, Constant.FILE);
                     FileContent fileContent = (FileContent) content;
-                    result.putString(Constant.FILE_NAME, fileContent.getLocalPath());
+                    result.putString(Constant.FILE_NAME, fileContent.getFileName());
                     break;
                 case custom:
                     result.putString(Constant.TYPE, Constant.CUSTOM);
