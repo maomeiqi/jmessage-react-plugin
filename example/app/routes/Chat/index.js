@@ -54,6 +54,8 @@ export default class Chat extends Component {
       messageListLayout: {},
       inputViewLayout: { width: window.width, height: initHeight, },
       menuContainerHeight: 625,
+      from: 0,
+      limit: 10,
     };
 
     this.updateLayout = this.updateLayout.bind(this);
@@ -176,8 +178,8 @@ export default class Chat extends Component {
     })
     var parames = {
 
-      from: 0,            // 开始的消息下标。
-      limit: 10,            // 要获取的消息数。比如当 from = 0, limit = 10 时，是获取第 0 - 9 条历史消息。
+      from: this.state.from,            // 开始的消息下标。
+      limit: this.state.limit,            // 要获取的消息数。比如当 from = 0, limit = 10 时，是获取第 0 - 9 条历史消息。
       type: this.conversation.type,
       username: this.conversation.username,
       groupId: this.conversation.groupId,
@@ -186,6 +188,9 @@ export default class Chat extends Component {
     this.messageListDidLoadCallback = () => {
 
       JMessage.getHistoryMessages(parames, (messages) => {
+        this.setState({
+          from: this.state.from + 10
+        })
         var auroraMessages = messages.map((message) => {
           var normalMessage = this.convertJMessageToAuroraMsg(message)
           if (normalMessage.msgType === "unknow") {
@@ -310,7 +315,8 @@ export default class Chat extends Component {
 
   onMsgClick = (message) => {
     console.log(message)
-    alert(JSON.stringify(message))
+    // alert(JSON.stringify(message))
+    Alert.alert('onSendGalleryFiles',JSON.stringify(message))
   }
 
   onStatusViewClick = (message) => {
@@ -327,13 +333,33 @@ export default class Chat extends Component {
 
   onPullToRefresh = () => {
     console.log("on pull to refresh")
-    // After loading history messages
-    if (Platform.OS === "android") {
-      this.timer = setTimeout(() => {
-        console.log("send refresh complete event")
-        this.refs["MessageList"].refreshComplete()
-      }, 2000);
+    var parames = {
+
+      from: this.state.from,            // 开始的消息下标。
+      limit: this.state.limit,            // 要获取的消息数。比如当 from = 0, limit = 10 时，是获取第 0 - 9 条历史消息。
+      type: this.conversation.type,
+      username: this.conversation.username,
+      groupId: this.conversation.groupId,
+      roomId: this.conversation.roomId
     }
+    JMessage.getHistoryMessages(parames, (messages) => {
+      if (Platform.OS == "android") {
+        this.refs["MessageList"].refreshComplete()
+      }
+      this.setState({
+        from: this.state.from + 10
+      })
+      var auroraMessages = messages.map((message) => {
+        var normalMessage = this.convertJMessageToAuroraMsg(message)
+        if (normalMessage.msgType === "unknow") {
+          return
+        }
+        return normalMessage
+      })
+      AuroraIController.insertMessagesToTop(auroraMessages)
+    }, (error) => {
+      Alert.alert('error!', JSON.stringify(error))
+    })
   }
 
   onSendText = (text) => {
@@ -469,32 +495,38 @@ export default class Chat extends Component {
 
   onSendGalleryFiles = (mediaFiles) => {
     for (index in mediaFiles) {
+      Alert.alert('onSendGalleryFiles',JSON.stringify(mediaFiles[index]['mediaPath']))
       var message = this.getNormalMessage()
       message.messageType = "image"
       message.path = mediaFiles[index].mediaPath
-
-      JMessage.createSendMessage(message, (msg) => {
+      JMessage.sendImageMessage(message, (msg) => {
         var auroraMsg = this.convertJMessageToAuroraMsg(msg)
         auroraMsg.status = 'send_going'
         AuroraIController.appendMessages([auroraMsg])
         AuroraIController.scrollToBottom(true)
+      }, () => {})
+      // JMessage.createSendMessage(message, (msg) => {
+      //   var auroraMsg = this.convertJMessageToAuroraMsg(msg)
+      //   auroraMsg.status = 'send_going'
+      //   AuroraIController.appendMessages([auroraMsg])
+      //   AuroraIController.scrollToBottom(true)
 
-        if (this.conversation.type === 'single') {
-          msg.username = this.conversation.username
-        } else if (this.conversation.type === "group") {
-          msg.groupId = this.conversation.groupId
-        } else {
-          msg.roomId = this.conversation.roomId
-        }
-        msg.type = this.conversation.type
+      //   if (this.conversation.type === 'single') {
+      //     msg.username = this.conversation.username
+      //   } else if (this.conversation.type === "group") {
+      //     msg.groupId = this.conversation.groupId
+      //   } else {
+      //     msg.roomId = this.conversation.roomId
+      //   }
+      //   msg.type = this.conversation.type
 
-        JMessage.sendMessage(msg, (jmessage) => {
-          var auroraMsg = this.convertJMessageToAuroraMsg(jmessage)
-          AuroraIController.updateMessage(auroraMsg)
-        }, (error) => {
-          Alert.alert('send image fail')
-        })
-      })
+      //   JMessage.sendMessage(msg, (jmessage) => {
+      //     var auroraMsg = this.convertJMessageToAuroraMsg(jmessage)
+      //     AuroraIController.updateMessage(auroraMsg)
+      //   }, (error) => {
+      //     Alert.alert('send image fail')
+      //   })
+      // })
     }
   }
 

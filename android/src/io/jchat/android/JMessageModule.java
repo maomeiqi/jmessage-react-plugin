@@ -303,27 +303,37 @@ public class JMessageModule extends ReactContextBaseJavaModule {
             MessageContent content;
             Conversation conversation = mJMessageUtils.getConversation(map);
             String type = map.getString(Constant.MESSAGE_TYPE);
-            if (type.equals(Constant.TEXT)) {
-                content = new TextContent(map.getString(Constant.TEXT));
-            } else if (type.equals(Constant.IMAGE)) {
-                String path = map.getString(Constant.PATH);
-                content = new ImageContent(new File(path));
-            } else if (type.equals(Constant.VOICE)) {
-                String path = map.getString(Constant.PATH);
-                File file = new File(path);
-                MediaPlayer mediaPlayer = MediaPlayer.create(mContext, Uri.parse(path));
-                int duration = mediaPlayer.getDuration() / 1000;    // Millisecond to second.
-                content = new VoiceContent(file,
-                        duration);
-                mediaPlayer.release();
-            } else if (type.equals(Constant.LOCATION)) {
-                double latitude = map.getDouble(Constant.LATITUDE);
-                double longitude = map.getDouble(Constant.LONGITUDE);
-                int scale = map.getInt(Constant.SCALE);
-                String address = map.getString(Constant.ADDRESS);
-                content = new LocationContent(latitude, longitude, scale, address);
-            } else {
-                content = new CustomContent();
+            switch (type) {
+                case Constant.TEXT:
+                    content = new TextContent(map.getString(Constant.TEXT));
+                    break;
+                case Constant.IMAGE:
+                    String path = map.getString(Constant.PATH);
+                    String suffix = path.substring(path.lastIndexOf(".") + 1);
+                    content = new ImageContent(new File(path), suffix);
+                    break;
+                case Constant.VOICE:
+                    path = map.getString(Constant.PATH);
+                    File file = new File(path);
+                    MediaPlayer mediaPlayer = MediaPlayer.create(mContext, Uri.parse(path));
+                    int duration = mediaPlayer.getDuration() / 1000;    // Millisecond to second.
+                    content = new VoiceContent(file, duration);
+                    mediaPlayer.release();
+                    break;
+                case Constant.FILE:
+                    path = map.getString(Constant.PATH);
+                    file = new File(path);
+                    content = new FileContent(file);
+                    break;
+                case Constant.LOCATION:
+                    double latitude = map.getDouble(Constant.LATITUDE);
+                    double longitude = map.getDouble(Constant.LONGITUDE);
+                    int scale = map.getInt(Constant.SCALE);
+                    String address = map.getString(Constant.ADDRESS);
+                    content = new LocationContent(latitude, longitude, scale, address);
+                    break;
+                default:
+                    content = new CustomContent();
             }
             if (map.hasKey(Constant.EXTRAS)) {
                 content.setExtras(ResultUtils.fromMap(map.getMap(Constant.EXTRAS)));
@@ -403,7 +413,8 @@ public class JMessageModule extends ReactContextBaseJavaModule {
     public void sendImageMessage(ReadableMap map, Callback success, Callback fail) {
         String path = map.getString(Constant.PATH);
         try {
-            ImageContent content = new ImageContent(new File(path));
+            String suffix = path.substring(path.lastIndexOf(".") + 1);
+            ImageContent content = new ImageContent(new File(path), suffix);
             mJMessageUtils.sendMessage(map, content, success, fail);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -452,9 +463,8 @@ public class JMessageModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void sendFileMessage(ReadableMap map, Callback success, Callback fail) {
         try {
-            String fileName = map.getString(Constant.FILE_NAME);
             String path = map.getString(Constant.PATH);
-            FileContent content = new FileContent(new File(path), fileName);
+            FileContent content = new FileContent(new File(path));
             mJMessageUtils.sendMessage(map, content, success, fail);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -1082,10 +1092,6 @@ public class JMessageModule extends ReactContextBaseJavaModule {
             Message msg = conversation.getMessage(Integer.parseInt(messageId));
             if (null == msg) {
                 mJMessageUtils.handleError(fail, ERR_CODE_MESSAGE, ERR_MSG_MESSAGE);
-                return;
-            }
-            if (msg.getContentType() != ContentType.image) {
-                mJMessageUtils.handleError(fail, ERR_CODE_MESSAGE, "Wrong message type");
                 return;
             }
             FileContent content = (FileContent) msg.getContent();

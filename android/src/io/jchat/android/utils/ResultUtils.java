@@ -2,8 +2,6 @@ package io.jchat.android.utils;
 
 
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.text.TextUtils;
 
 import com.facebook.react.bridge.Arguments;
@@ -18,8 +16,6 @@ import com.google.gson.jpush.JsonParser;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -128,18 +124,20 @@ public class ResultUtils {
             result.putString(Constant.SERVER_ID, String.valueOf(msg.getServerMessageId()));
             result.putMap(Constant.FROM, toJSObject(msg.getFromUser()));
 
-            if (msg.getDirect() == MessageDirect.send) {
-                if (msg.getTargetType() == ConversationType.single) {
-                    result.putMap(Constant.TARGET, toJSObject((UserInfo) msg.getTargetInfo()));
-                } else if (msg.getTargetType() == ConversationType.group) {
+            switch (msg.getTargetType()) {
+                case group:
                     result.putMap(Constant.TARGET, toJSObject((GroupInfo) msg.getTargetInfo()));
-                } else {
+                    break;
+                case single:
+                    if (msg.getDirect() == MessageDirect.send) {
+                        result.putMap(Constant.TARGET, toJSObject((UserInfo) msg.getTargetInfo()));
+                    } else {
+                        result.putMap(Constant.TARGET, toJSObject(JMessageClient.getMyInfo()));
+                    }
+                    break;
+                case chatroom:
                     result.putMap(Constant.TARGET, toJSObject((ChatRoomInfo) msg.getTargetInfo()));
-                }
-
-            } else {
-                UserInfo myInfo = JMessageClient.getMyInfo();
-                result.putMap(Constant.TARGET, toJSObject(myInfo));
+                    break;
             }
 
             MessageContent content = msg.getContent();
@@ -157,21 +155,7 @@ public class ResultUtils {
                 case image:
                     result.putString(Constant.TYPE, Constant.IMAGE);
                     ImageContent imageContent = (ImageContent) content;
-                    // jmessage did not add file extension, so save to local.
-                    File file = new File(imageContent.getLocalThumbnailPath() + ".png");
-                    FileOutputStream fos = new FileOutputStream(file);
-                    BitmapFactory.Options opts = new BitmapFactory.Options();
-                    opts.inJustDecodeBounds = false;
-                    opts.inSampleSize = 1;
-                    Bitmap bitmap = BitmapFactory.decodeFile(imageContent.getLocalThumbnailPath(), opts);
-                    try {
-                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
-                        fos.flush();
-                        fos.close();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    result.putString(Constant.THUMB_PATH, file.getAbsolutePath());
+                    result.putString(Constant.THUMB_PATH, imageContent.getLocalThumbnailPath());
                     result.putString(Constant.LOCAL_PATH, imageContent.getLocalPath());
                     break;
                 case voice:
@@ -183,7 +167,7 @@ public class ResultUtils {
                 case file:
                     result.putString(Constant.TYPE, Constant.FILE);
                     FileContent fileContent = (FileContent) content;
-                    result.putString(Constant.FILE_NAME, fileContent.getLocalPath());
+                    result.putString(Constant.FILE_NAME, fileContent.getFileName());
                     break;
                 case custom:
                     result.putString(Constant.TYPE, Constant.CUSTOM);

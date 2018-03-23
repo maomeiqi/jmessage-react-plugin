@@ -2473,5 +2473,9 @@ RCT_EXPORT_METHOD(getChatRoomOwner:(NSDictionary *)param
   }];
 }
 
-
+RCT_EXPORT_METHOD(setBadge:(NSInteger)value callback:(RCTResponseSenderBlock)callback) {// ->Bool
+  [[UIApplication sharedApplication] setApplicationIconBadgeNumber:value];
+  NSNumber *badgeNumber = [NSNumber numberWithBool:[JMessage setBadge: value]];
+  callback(@[badgeNumber]);
+}
 @end

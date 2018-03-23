@@ -11,6 +11,7 @@ import JMessage from 'jmessage-react-plugin';
 - [初始化](#初始化)
   - [init](#init)
   - [setDebugMode](#setdebugmode)
+  - [setBadge](#setbadge)
 - [用户登录、注册及属性维护](#用户登录注册及属性维护)
   - [register](#register)
   - [login](#login)
@@ -119,6 +120,16 @@ JMessage.setDebugMode({ enable: true })
 #### 参数说明
 
 - enable：为 true 打开 Debug 模式，false 关闭 Debug 模式。
+
+### setBadge
+
+设置 badge 值，该操作会设置本地应用的 badge 值，同时设置极光服务器的 badge 值，收到消息 badge +1 会在极光服务器 badge 的基础上累加。
+
+#### 示例
+
+```javascript
+JMessage.setBadge(5, (success) => {})
+```
 
 ## 用户登录、注册及属性维护
 

@@ -284,7 +284,6 @@ export default class JMessage {
      *  'username': String,                            // 当 type = single 时，username 不能为空。
      *  'appKey': String,                              // 当 type = single 时，用于指定对象所属应用的 appKey。如果为空，默认为当前应用。
      *  'path': String,                                // 本地文件路径。
-     *  'fileName': String,                            // 文件名
      *  'extras': Object,                              // Optional. 自定义键值对 = {'key1': 'value1'}
      *  'messageSendingOptions': MessageSendingOptions // Optional. MessageSendingOptions 对象。
      * }
@@ -730,6 +729,20 @@ export default class JMessage {
             JMessageModule.exitConversation()
         }
     }
+
+    /**
+     * iOS Only
+     * 设置服务器 badge 值，用于 badge+1 功能
+     * 成功返回 true
+     */
+    static setBadge (badge, cb) {
+        if (Platform.OS === 'ios') {
+            JMessageModule.setBadge(badge, value => {
+              cb(value)
+            })
+        }
+    }
+
 
     /**
      * @param {object} params = {
