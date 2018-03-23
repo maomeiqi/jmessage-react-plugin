@@ -124,18 +124,20 @@ public class ResultUtils {
             result.putString(Constant.SERVER_ID, String.valueOf(msg.getServerMessageId()));
             result.putMap(Constant.FROM, toJSObject(msg.getFromUser()));
 
-            if (msg.getDirect() == MessageDirect.send) {
-                if (msg.getTargetType() == ConversationType.single) {
-                    result.putMap(Constant.TARGET, toJSObject((UserInfo) msg.getTargetInfo()));
-                } else if (msg.getTargetType() == ConversationType.group) {
+            switch (msg.getTargetType()) {
+                case group:
                     result.putMap(Constant.TARGET, toJSObject((GroupInfo) msg.getTargetInfo()));
-                } else {
+                    break;
+                case single:
+                    if (msg.getDirect() == MessageDirect.send) {
+                        result.putMap(Constant.TARGET, toJSObject((UserInfo) msg.getTargetInfo()));
+                    } else {
+                        result.putMap(Constant.TARGET, toJSObject(JMessageClient.getMyInfo()));
+                    }
+                    break;
+                case chatroom:
                     result.putMap(Constant.TARGET, toJSObject((ChatRoomInfo) msg.getTargetInfo()));
-                }
-
-            } else {
-                UserInfo myInfo = JMessageClient.getMyInfo();
-                result.putMap(Constant.TARGET, toJSObject(myInfo));
+                    break;
             }
 
             MessageContent content = msg.getContent();
