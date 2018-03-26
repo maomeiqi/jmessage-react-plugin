@@ -1063,7 +1063,7 @@ RCT_EXPORT_METHOD(createGroup:(NSDictionary *)param
     }
     
     JMSGGroup *group = resultObject;
-    successCallback(@[[group groupToDictionary]]);
+    successCallback(@[group.gid]);
   }];
 }
 
