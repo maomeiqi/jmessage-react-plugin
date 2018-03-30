@@ -821,6 +821,12 @@ RCT_EXPORT_METHOD(getHistoryMessages:(NSDictionary *)param
     return;
   }
   
+  BOOL isDescend = false;
+  if (param[@"isDescend"]) {
+    NSNumber *number = param[@"isDescend"];
+    isDescend = [number boolValue];
+  }
+  
   [self getConversationWithDictionary:param callback:^(JMSGConversation *conversation, NSError *error) {
     if (error) {
       failCallback(@[[error errorToDictionary]]);
@@ -832,10 +838,14 @@ RCT_EXPORT_METHOD(getHistoryMessages:(NSDictionary *)param
       JMSGMessage *message = obj;
       return [message messageToDictionary];
     }];
-
+    
     if (!messageArr) {
       successCallback(@[@[]]);
       return;
+    }
+    
+    if (isDescend) {
+      messageDicArr = [[messageDicArr reverseObjectEnumerator] allObjects];
     }
     
     successCallback(@[messageDicArr]);
