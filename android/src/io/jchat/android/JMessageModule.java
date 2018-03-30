@@ -25,6 +25,7 @@ import com.google.gson.jpush.JsonObject;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -508,7 +509,15 @@ public class JMessageModule extends ReactContextBaseJavaModule {
             int from = map.getInt(Constant.FROM);
             int limit = map.getInt(Constant.LIMIT);
             List<Message> messages = conversation.getMessagesFromNewest(from, limit);
+            // Is descend 为 false 则按照时间顺序排列，2.3.5 新增字段
+            if (map.hasKey(Constant.IS_DESCEND)) {
+                boolean isDescend = map.getBoolean(Constant.IS_DESCEND);
+                if (!isDescend) {
+                    Collections.reverse(messages);
+                }
+            }
             success.invoke(ResultUtils.toJSArray(messages));
+
         } catch (Exception e) {
             e.printStackTrace();
             mJMessageUtils.handleError(fail, ERR_CODE_PARAMETER, "Unexpected error");

@@ -322,6 +322,7 @@ export default class JMessage {
      *  'appKey': String,          // 当 type = single 时，用于指定对象所属应用的 appKey。如果为空，默认为当前应用。
      *  'from': Number,            // 开始的消息下标。
      *  'limit': Number            // 要获取的消息数。比如当 from = 0, limit = 10 时，是获取第 0 - 9 条历史消息。
+     *  'isDescend': Bool          // 2.3.5 新增。如果设置为 true，则返回的消息列表按照时间降序排列，反之，按照时间顺序排列。
      * }
      * @param {function} success = function (messageArray)) {}  // 以参数形式返回历史消息对象数组
      * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
