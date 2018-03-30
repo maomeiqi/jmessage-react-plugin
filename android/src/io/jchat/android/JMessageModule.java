@@ -509,15 +509,15 @@ public class JMessageModule extends ReactContextBaseJavaModule {
             int from = map.getInt(Constant.FROM);
             int limit = map.getInt(Constant.LIMIT);
             List<Message> messages = conversation.getMessagesFromNewest(from, limit);
-            // Is descend 为 false 则按照时间顺序排列，2.3.5 新增字段
+            // Is descend 为 false，即默认按照时间顺序排列，2.3.5 新增字段
+            boolean isDescend = false;
             if (map.hasKey(Constant.IS_DESCEND)) {
-                boolean isDescend = map.getBoolean(Constant.IS_DESCEND);
-                if (!isDescend) {
-                    Collections.reverse(messages);
-                }
+                isDescend = map.getBoolean(Constant.IS_DESCEND);
+            }
+            if (!isDescend) {
+                Collections.reverse(messages);
             }
             success.invoke(ResultUtils.toJSArray(messages));
-
         } catch (Exception e) {
             e.printStackTrace();
             mJMessageUtils.handleError(fail, ERR_CODE_PARAMETER, "Unexpected error");
