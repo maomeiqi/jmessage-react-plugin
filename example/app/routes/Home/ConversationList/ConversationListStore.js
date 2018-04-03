@@ -35,7 +35,9 @@ class ConversationListStore {
                 })
             }
         } else if (item.type === "group") {
-            item.appKey = conversation.target.ownerAppKey
+            if (conversation.target.ownerAppKey != undefined) {
+                item.appKey = conversation.target.ownerAppKey
+            }
             item.groupId = conversation.target.id
             item.displayName = conversation.target.name
             item.avatarThumbPath = conversation.target.avatarThumbPath

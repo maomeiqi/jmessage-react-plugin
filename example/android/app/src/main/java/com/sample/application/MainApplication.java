@@ -50,6 +50,7 @@ public class MainApplication extends Application implements ReactApplication {
         SoLoader.init(this, /* native exopackage */ false);
         Log.i("MainApplication", "Init JMessageClient");
         JMessageClient.setDebugMode(true);
-//        JMessageClient.init(this, true);
+        // JMessage SDK 2.5.0 后必须在 MainApplication 中初始化
+        JMessageClient.init(this, true);
     }
 }

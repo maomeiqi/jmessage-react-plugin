@@ -109,7 +109,9 @@ public class ResultUtils {
         result.putString(Constant.DESC, groupInfo.getGroupDescription());
         result.putInt(Constant.LEVEL, groupInfo.getGroupLevel());
         result.putString(Constant.OWNER, groupInfo.getGroupOwner());
-        result.putString(Constant.AVATAR_THUMB_PATH, groupInfo.getAvatarFile().getAbsolutePath());
+        if (groupInfo.getAvatarFile() != null) {
+            result.putString(Constant.AVATAR_THUMB_PATH, groupInfo.getAvatarFile().getAbsolutePath());
+        }
         result.putString(Constant.OWNER_APP_KEY, groupInfo.getOwnerAppkey());
         result.putInt(Constant.MAX_MEMBER_COUNT, groupInfo.getMaxMemberCount());
         result.putBoolean(Constant.IS_NO_DISTURB, groupInfo.getNoDisturb() == 1);

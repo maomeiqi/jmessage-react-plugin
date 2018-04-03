@@ -238,10 +238,10 @@ export default class ConversationList extends React.Component {
                             <Button
                                 onPress={() => {
 
-                                    JMessage.createGroup({ name: this.state.modalText, desc: "" }, (group) => {
+                                    JMessage.createGroup({ name: this.state.modalText, desc: "" }, (groupId) => {
                                         var params = {}
                                         params.type = 'group'
-                                        params.groupId = group.id
+                                        params.groupId = groupId
                                         this.setState({ isShowModal: false })
                                         this.createConversation(params)
                                     }, (error) => {
