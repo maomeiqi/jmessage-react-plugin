@@ -93,6 +93,7 @@ public class Constant {
     static final String MESSAGE_ARRAY = "messageArray";
     static final String PROGRESS = "progress";
     public static final String UNRECEIPT_COUNT = "unreceiptCount";
+    public static final String IS_DESCEND = "isDescend";
     /**
      * ChatRoom
      */
