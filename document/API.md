@@ -21,6 +21,8 @@ import JMessage from 'jmessage-react-plugin';
   - [updateMyPassword](#updatemypassword)
   - [updateMyAvatar](#updatemyavatar)
   - [updateMyInfo](#updatemyinfo)
+  - [downloadThumbUserAvatar](#downloadthumbuseravatar)
+  - [downloadOriginalUserAvatar](#downloadoriginaluseravatar)
 - [聊天](#聊天)
   - [createSendMessage](#createsendmessage)
   - [sendMessage](#sendmessage)
@@ -275,6 +277,54 @@ JMessage.updateMyInfo({ nickname: 'nickname' },
 - birthday: (Number)生日日期的毫秒数。
 - gender: 必须为 'male', 'female' 和 'unknown' 中的一种。
 - 其余都为 `string` 类型，支持全部字符串；长度限制为 Byte (0~250)。
+
+### downloadThumbUserAvatar
+
+下载用户头像缩略图。
+
+#### 示例
+
+```javascript
+const param = {
+  username: 'theUserName'，
+  appKey: 'you appKey'
+}
+JMessage.downloadThumbUserAvatar(param, (result) => {}, (err) => {})
+```
+
+#### 参数说明：
+
+- param (object):
+  - username (string): 用户名
+  - appKey (string): 
+- result (object):
+  - username (string): 用户名
+  - appKey (string):
+  - filePath (string): 下载后的图片路径
+
+### downloadOriginalUserAvatar
+
+下载用户头像原图。
+
+#### 示例
+
+```javascript
+const param = {
+  username: 'theUserName'，
+  appKey: 'you appKey'
+}
+JMessage.downloadThumbUserAvatar(param, (result) => {}, (err) => {})
+```
+
+#### 参数说明：
+
+- param (object):
+  - username (string): 用户名
+  - appKey (string): 
+- result (object):
+  - username (string): 用户名
+  - appKey (string):
+  - filePath (string): 下载后的图片路径
 
 ## 群组
 
