@@ -23,6 +23,15 @@ import JMessage from 'jmessage-react-plugin';
   - [updateMyInfo](#updatemyinfo)
   - [downloadThumbUserAvatar](#downloadthumbuseravatar)
   - [downloadOriginalUserAvatar](#downloadoriginaluseravatar)
+
+- [群组](#群组)
+  - [addGroupAdmins](#addgroupadmins)
+  - [removeGroupAdmins](#removegroupadmins)
+  - [changeGroupType](#changegrouptype)
+  - [getPublicGroupInfos](#getpublicgroupinfos)
+  - [applyJoinGroup](#applyjoingroup)
+  - [processApplyJoinGroup](#processapplyjoingroup)
+  - [dissolveGroup](#dissolvegroup)
 - [聊天](#聊天)
   - [createSendMessage](#createsendmessage)
   - [sendMessage](#sendmessage)
@@ -362,8 +371,150 @@ JMessage.createGroup({ name: 'group_name', desc: 'group_desc' },
 
 #### 参数说明
 
-- name: 群组名。不支持 "\n" 和 "\r" 字符，长度限制为 0 ~ 64 Byte。
-- desc: 群组描述。长度限制为 0 ~ 250 Byte。
+- name (string): 群组名。不支持 "\n" 和 "\r" 字符，长度限制为 0 ~ 64 Byte。
+- desc (string): 群组描述。长度限制为 0 ~ 250 Byte。
+
+
+### dissolveGroup
+
+解散群
+
+#### 示例
+```js
+JMessage.dissolveGroup({ groupId: 'group_id' },
+  () => {  // 
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+- groupId (string): 要解散的群组 id。
+
+
+### addGroupAdmins
+
+批量添加管理员
+
+#### 示例
+```js
+JMessage.addGroupAdmins({ groupId: 'group_id', usernames: ['ex_username1', 'ex_username2'] },
+  () => {  // 
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+- groupId (string): 指定操作的群 groupId。
+- usernames (array<string>): 被添加的的用户名数组。
+
+### removeGroupAdmins
+
+批量删除管理员
+
+#### 示例
+```js
+JMessage.removeGroupAdmins({ groupId: 'group_id', usernames: ['ex_username1', 'ex_username2'] },
+  () => {  // 
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+- groupId (string): 指定操作的群 groupId。
+- usernames (array<string>): 被移除的的用户名数组。
+
+### changeGroupType
+
+修改群类型
+
+#### 示例
+```js
+JMessage.changeGroupType({ groupId: 'group_id', type: 'public' },
+  () => {  // 
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+- groupId (string): 指定操作的群 groupId。
+- type (string): 要修改的类型可以为如下值  'private' | 'public'
+
+### getPublicGroupInfos
+
+分页获取指定 appKey 下的共有群
+
+#### 示例
+```js
+JMessage.getPublicGroupInfos({ appKey: 'my_appkey', start: 0, count: 20 },
+  (groudArr) => {  //group = [{GroupInfo}] 
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+- appKey (string): 获取指定 appkey
+- start (int): 开始的位置
+- count (int): 获取的数量
+
+### applyJoinGroup
+
+申请入群（公开群）
+
+#### 示例
+```js
+JMessage.applyJoinGroup({ appKey: 'group_id', reason: 'Hello I from ...' },
+  () => {  
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+
+### processApplyJoinGroup
+
+批量处理入群（公开群）申请
+
+#### 示例
+```js
+JMessage.processApplyJoinGroup({ events: ['ex_event_id_1', 'ex_event_id_2'], reason: 'Hello I from ...' },
+  () => {  
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+- events (array<string>): eventId 数组,当有用户申请入群的时候(或者被要求)会回调一个 event(通过 addReceiveApplyJoinGroupApprovalListener 监听)，每个 event 会有个 id，用于审核入群操作。
+- reason (string): 入群理由。
+
+
 
 ## 聊天
 
