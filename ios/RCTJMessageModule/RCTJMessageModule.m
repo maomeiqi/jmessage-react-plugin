@@ -102,11 +102,6 @@ RCT_EXPORT_MODULE();
                         name:kJJMessageRetractMessage
                       object:nil];
   
-  
-//  [defaultCenter addObserver:self
-//                    selector:@selector(groupInfoChanged:)
-//                        name:kJJMessageGroupInfoChanged
-//                      object:nil];
   // have
   [defaultCenter addObserver:self
                     selector:@selector(onSyncOfflineMessage:)
@@ -117,6 +112,29 @@ RCT_EXPORT_MODULE();
                     selector:@selector(onSyncRoamingMessage:)
                         name:kJJMessageSyncRoamingMessage
                       object:nil];
+    
+    
+//    group event
+
+    [defaultCenter addObserver:self
+                      selector:@selector(groupInfoChanged:)
+                          name:kJJMessageGroupInfoChanged
+                        object:nil];
+    
+    [defaultCenter addObserver:self
+                      selector:@selector(didReceiveApplyJoinGroupApproval:)
+                          name:kJJMessageReceiveApplyJoinGroupApproval
+                        object:nil];
+    
+    [defaultCenter addObserver:self
+                      selector:@selector(didReceiveGroupAdminReject:)
+                          name:kJJMessageReceiveGroupAdminReject
+                        object:nil];
+    
+    [defaultCenter addObserver:self
+                      selector:@selector(didReceiveGroupAdminApproval:)
+                          name:kJMessageReceiveGroupAdminApproval
+                        object:nil];
 }
 
 - (void)getConversationWithDictionary:(NSDictionary *)param callback:(JMSGConversationCallback)callback {
@@ -336,6 +354,14 @@ RCT_EXPORT_MODULE();
   return kJMSGConversationTypeSingle;
 }
 
+- (JMSGGroupType)convertStringToGroupType:(NSString *)str {
+    if ([str isEqualToString:@"private"]) {
+        return kJMSGGroupTypePrivate;
+    }
+    
+    return kJMSGGroupTypePublic;
+}
+
 - (NSDictionary *)getParamError {
   return @{@"code": @(1), @"description": @"param error!"};
 }
@@ -360,7 +386,7 @@ RCT_EXPORT_METHOD(setDebugMode:(NSDictionary *)param) {
   }
 }
 
-#pragma mark IM - Notifications
+#pragma mark IM - Notifications - begin
 - (void)onSyncOfflineMessage: (NSNotification *) notification {
   [self.bridge.eventDispatcher sendAppEventWithName:syncOfflineMessageEvent body:notification.object];
 }
@@ -414,6 +440,29 @@ RCT_EXPORT_METHOD(setDebugMode:(NSDictionary *)param) {
 - (void)conversationChanged:(NSNotification *)notification {
   [self.bridge.eventDispatcher sendAppEventWithName:conversationChangeEvent body:notification.object];
 }
+
+
+- (void)groupInfoChanged:(NSNotification *)notification {
+    // current not supported
+}
+
+- (void)didReceiveApplyJoinGroupApproval:(NSNotification *)notification {
+    [self.bridge.eventDispatcher sendAppEventWithName:receiveApplyJoinGroupApprovalEvent body:notification.object];
+}
+
+- (void)didReceiveGroupAdminReject:(NSNotification *)notification {
+    [self.bridge.eventDispatcher sendAppEventWithName:receiveGroupAdminRejectEvent body:notification.object];
+}
+
+- (void)didReceiveGroupAdminApproval:(NSNotification *)notification {
+    [self.bridge.eventDispatcher sendAppEventWithName:receiveGroupAdminApprovalEvent body:notification.object];
+}
+
+
+#pragma mark IM - Notifications - end
+
+
+
 
 //#pragma mark IM - User
 
@@ -1656,7 +1705,7 @@ RCT_EXPORT_METHOD(downloadVoiceFile:(NSDictionary *)param
         }
         
         JMSGMediaAbstractContent *mediaContent = (JMSGMediaAbstractContent *) message.content;
-        failCallback(@[@{@"messageId": message.msgId,
+        successCallback(@[@{@"messageId": message.msgId,
                          @"filePath": [mediaContent originMediaLocalPath]}]);
       }];
     }
@@ -2487,5 +2536,193 @@ RCT_EXPORT_METHOD(setBadge:(NSInteger)value callback:(RCTResponseSenderBlock)cal
   [[UIApplication sharedApplication] setApplicationIconBadgeNumber:value];
   NSNumber *badgeNumber = [NSNumber numberWithBool:[JMessage setBadge: value]];
   callback(@[badgeNumber]);
+}
+
+RCT_EXPORT_METHOD(getAllUnreadCount:(RCTResponseSenderBlock)callback) {
+    callback(@[[JMSGConversation getAllUnreadCount]]);
+}
+
+RCT_EXPORT_METHOD(addGroupAdmins:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallBack:(RCTResponseSenderBlock)failCallback) {
+    if (param[@"groupId"] == nil ||
+        param[@"usernames"] == nil) {
+        failCallback(@[[self getParamError]]);
+        return;
+    }
+    
+    NSString *appKey = nil;
+    if (param[@"appKey"]) {
+        appKey = param[@"appKey"];
+    } else {
+        appKey = [JMessageHelper shareInstance].JMessageAppKey;
+    }
+    
+    [JMSGGroup groupInfoWithGroupId:param[@"groupId"] completionHandler:^(id resultObject, NSError *error) {
+        if (error) {
+            failCallback(@[[error errorToDictionary]]);
+            return;
+        }
+        
+        JMSGGroup *group = resultObject;
+        [group addGroupAdminWithUsernames:param[@"usernames"] appKey:appKey completionHandler:^(id resultObject, NSError *error) {
+            if (error) {
+                failCallback(@[[error errorToDictionary]]);
+                return;
+            }
+            successCallback(@[]);
+        }];
+    }];
+    
+}
+
+RCT_EXPORT_METHOD(removeGroupAdmins:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallBack:(RCTResponseSenderBlock)failCallback) {
+    if (param[@"groupId"] == nil ||
+        param[@"usernames"] == nil) {
+        failCallback(@[[self getParamError]]);
+        return;
+    }
+    
+    NSString *appKey = nil;
+    if (param[@"appKey"]) {
+        appKey = param[@"appKey"];
+    } else {
+        appKey = [JMessageHelper shareInstance].JMessageAppKey;
+    }
+    
+    [JMSGGroup groupInfoWithGroupId:param[@"groupId"] completionHandler:^(id resultObject, NSError *error) {
+        if (error) {
+            failCallback(@[[error errorToDictionary]]);
+            return;
+        }
+        
+        JMSGGroup *group = resultObject;
+        [group deleteGroupAdminWithUsernames:param[@"usernames"] appKey:appKey completionHandler:^(id resultObject, NSError *error) {
+            if (error) {
+                failCallback(@[[error errorToDictionary]]);
+                return;
+            }
+            successCallback(@[]);
+        }];
+    }];
+}
+
+RCT_EXPORT_METHOD(changeGroupType:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallBack:(RCTResponseSenderBlock)failCallback) {
+    if (param[@"groupId"] == nil ||
+        param[@"type"] == nil) {
+        failCallback(@[[self getParamError]]);
+        return;
+    }
+    
+    [JMSGGroup groupInfoWithGroupId:param[@"groupId"] completionHandler:^(id resultObject, NSError *error) {
+        if (error) {
+            failCallback(@[[error errorToDictionary]]);
+            return;
+        }
+        
+        JMSGGroup *group = resultObject;
+        JMSGGroupType type = [self convertStringToGroupType:param[@"type"]];
+        [group changeGroupType:type handler:^(id resultObject, NSError *error) {
+            if (error) {
+                failCallback(@[[error errorToDictionary]]);
+                return;
+            }
+            successCallback(@[]);
+        }];
+    }];
+}
+
+RCT_EXPORT_METHOD(getPublicGroupInfo:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallBack:(RCTResponseSenderBlock)failCallback) {
+    if (param[@"start"] == nil ||
+        param[@"count"] == nil) {
+        failCallback(@[[self getParamError]]);
+        return;
+    }
+    
+    NSString *appKey = nil;
+    if (param[@"appKey"]) {
+        appKey = param[@"appKey"];
+    } else {
+        appKey = [JMessageHelper shareInstance].JMessageAppKey;
+    }
+    
+    [JMSGGroup getPublicGroupInfoWithAppKey:appKey start:[param[@"start"] integerValue] count:[param[@"count"] integerValue] completionHandler:^(id resultObject, NSError *error) {
+        if (error) {
+            failCallback(@[[error errorToDictionary]]);
+            return;
+        }
+        
+        NSArray *groupInfoArr = resultObject;
+        NSArray *groupDicArr = [groupInfoArr mapObjectsUsingBlock:^id(id obj, NSUInteger idx) {
+            JMSGGroupInfo *groupInfo = obj;
+            return [groupInfo groupToDictionary];
+        }];
+        successCallback(@[groupDicArr]);
+    }];
+}
+
+RCT_EXPORT_METHOD(applyJoinGroup:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallBack:(RCTResponseSenderBlock)failCallback) {
+    if (param[@"groupId"] == nil) {
+        failCallback(@[[self getParamError]]);
+        return;
+    }
+    
+    [JMSGGroup applyJoinGroupWithGid:param[@"groupId"] reason:param[@"reason"] completionHandler:^(id resultObject, NSError *error) {
+        if (error) {
+            failCallback(@[[error errorToDictionary]]);
+            return;
+        }
+        successCallback(@[]);
+    }];
+}
+
+RCT_EXPORT_METHOD(processApplyJoinGroup:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallBack:(RCTResponseSenderBlock)failCallback) {
+    if (param[@"events"] == nil ||
+        param[@"isAgree"] == nil ||
+        param[@"isRespondInviter"] == nil) {
+        failCallback(@[[self getParamError]]);
+        return;
+    }
+    
+    [JMSGGroup processApplyJoinGroupEvents:param[@"events"]
+                                   isAgree:[param[@"isAgree"] boolValue]
+                                    reason:param[@"reason"]
+                               sendInviter:[param[@"isRespondInviter"] boolValue]
+                                   handler:^(id resultObject, NSError *error) {
+                                       if (error) {
+                                           failCallback(@[[error errorToDictionary]]);
+                                           return;
+                                       }
+                                       
+                                       successCallback(@[]);
+                                   }];
+}
+
+RCT_EXPORT_METHOD(dissolveGroup:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallBack:(RCTResponseSenderBlock)failCallback) {
+    if (param[@"groupId"] == nil) {
+        failCallback(@[[self getParamError]]);
+        return;
+    }
+    
+    [JMSGGroup dissolveGroupWithGid:param[@"groupId"] handler:^(id resultObject, NSError *error) {
+        if (error) {
+            failCallback(@[[error errorToDictionary]]);
+            return;
+        }
+        
+        successCallback(@[]);
+    }];
 }
 @end

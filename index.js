@@ -18,6 +18,10 @@ const uploadProgress = "JMessage.UploadProgress" // 收到好友请求消息事�
 const conversationChange = "JMessage.conversationChange" // 会话变更事件
 const chatRoomMsgEvent = "JMessage.ReceiveChatRoomMsgEvent"; // 收到聊天室消息事件
 
+const receiveApplyJoinGroupApprovalEvent = "JMessage.ReceiveApplyJoinGroupApprovalEvent" // 接收到入群申请
+const receiveGroupAdminRejectEvent = "JMessage.ReceiveGroupAdminRejectEvent" // 接收到管理员拒绝入群申请
+const receiveGroupAdminApprovalEvent = "JMessage.ReceiveGroupAdminApprovalEvent" // 接收到管理员同意入群申请
+
 export default class JMessage {
 
     /**
@@ -870,11 +874,12 @@ export default class JMessage {
             listeners[listener].remove();
             listeners[listener] = null;
         }
-        /**
-         * 添加点击通知栏消息通知事件监听。
-         * Note: Android only, (如果想要 iOS 端 实现相同的功能，需要同时集成 jpush-react-native)
-         * @param {function} listener = function (message) {}  // 以参数形式返回消息对象。
-         */
+
+    /**
+     * 添加点击通知栏消息通知事件监听。
+     * Note: Android only, (如果想要 iOS 端 实现相同的功能，需要同时集成 jpush-react-native)
+     * @param {function} listener = function (message) {}  // 以参数形式返回消息对象。
+     */
     static addClickMessageNotificationListener(listener) {
         listeners[listener] = DeviceEventEmitter.addListener(clickMessageNotificationEvent,
             (message) => {
@@ -889,11 +894,12 @@ export default class JMessage {
             listeners[listener].remove();
             listeners[listener] = null;
         }
-        /**
-         * 添加同步离线消息事件监听。
-         *
-         * @param {function} listener = function ({'conversation': {}, 'messageArray': []}) {}  // 以参数形式返回消息对象数组。
-         */
+
+    /**
+     * 添加同步离线消息事件监听。
+     *
+     * @param {function} listener = function ({'conversation': {}, 'messageArray': []}) {}  // 以参数形式返回消息对象数组。
+     */
     static addSyncOfflineMessageListener(listener) {
         listeners[listener] = DeviceEventEmitter.addListener(syncOfflineMessage,
             (message) => {
@@ -908,11 +914,12 @@ export default class JMessage {
             listeners[listener].remove();
             listeners[listener] = null;
         }
-        /**
-         * 添加同步漫游消息事件监听。
-         *
-         * @param {function} listener = function ({'conversation': {}}) {}  // 以参数形式返回消息对象数组。
-         */
+
+    /**
+     * 添加同步漫游消息事件监听。
+     *
+     * @param {function} listener = function ({'conversation': {}}) {}  // 以参数形式返回消息对象数组。
+     */
     static addSyncRoamingMessageListener(listener) {
         listeners[listener] = DeviceEventEmitter.addListener(syncRoamingMessage,
             (message) => {
@@ -949,17 +956,18 @@ export default class JMessage {
             listeners[listener].remove();
             listeners[listener] = null;
         }
-        /**
-         * 好友相关通知事件。
-         *
-         * @param {function} listener = function (event) {}  // 以参数形式返回事件信息。
-         * event = {
-         *  'type': String,            // 'invite_received' / 'invite_accepted' / 'invite_declined' / 'contact_deleted'
-         *  'reason': String,          // 事件发生的理由，该字段由对方发起请求时所填，对方如果未填则返回默认字符串。
-         *  'fromUsername': String,    // 事件发送者的 username。
-         *  'fromUserAppKey': String   // 事件发送者的 AppKey。
-         * }
-         */
+
+    /**
+     * 好友相关通知事件。
+     *
+     * @param {function} listener = function (event) {}  // 以参数形式返回事件信息。
+     * event = {
+     *  'type': String,            // 'invite_received' / 'invite_accepted' / 'invite_declined' / 'contact_deleted'
+     *  'reason': String,          // 事件发生的理由，该字段由对方发起请求时所填，对方如果未填则返回默认字符串。
+     *  'fromUsername': String,    // 事件发送者的 username。
+     *  'fromUserAppKey': String   // 事件发送者的 AppKey。
+     * }
+     */
     static addContactNotifyListener(listener) {
         listeners[listener] = DeviceEventEmitter.addListener(contactNotify,
             (message) => {
@@ -973,15 +981,16 @@ export default class JMessage {
             listeners[listener].remove();
             listeners[listener] = null;
         }
-        /**
-         * 消息撤回事件监听。
-         *
-         * @param {function} listener = function (event) {} // 以参数形式返回事件信息。
-         * event = {
-         *  'conversation': Object      // 会话对象。
-         *  'retractedMessage': Object  // 被撤回的消息对象。
-         * }
-         */
+        
+    /**
+     * 消息撤回事件监听。
+     *
+     * @param {function} listener = function (event) {} // 以参数形式返回事件信息。
+     * event = {
+     *  'conversation': Object      // 会话对象。
+     *  'retractedMessage': Object  // 被撤回的消息对象。
+     * }
+     */
     static addMessageRetractListener(listener) {
         listeners[listener] = DeviceEventEmitter.addListener(messageRetract,
             (message) => {
@@ -996,14 +1005,15 @@ export default class JMessage {
             listeners[listener].remove();
             listeners[listener] = null;
         }
-        /**
-         * 
-         * @param {function} listener  = function (result) {}
-         * result = {
-         *  messageId = String, // 消息 Id
-         *  progress = Float // 消息文件上传的进度
-         * }
-         */
+    
+    /**
+     * 
+     * @param {function} listener  = function (result) {}
+     * result = {
+     *  messageId = String, // 消息 Id
+     *  progress = Float // 消息文件上传的进度
+     * }
+     */
     static addUploadProgressListener(listener) {
         listeners[listener] = DeviceEventEmitter.addListener(uploadProgress,
             (message) => {
@@ -1012,6 +1022,82 @@ export default class JMessage {
     }
 
     static removeUploadProgressListener(listener) {
+        if (!listeners[listener]) {
+            return;
+        }
+        listeners[listener].remove();
+        listeners[listener] = null;
+    }
+
+    /**
+     * 接收聊天室消息
+     * @param {function} listener = function([{Message}])
+     */
+    static addReceiveChatRoomMsgListener(listener) {
+        listeners[listener] = DeviceEventEmitter.addListener(chatRoomMsgEvent,
+            (messages) => {
+                listener(messages);
+            });
+    }
+
+    static removeReceiveChatRoomMsgListener(listener) {
+        if (!listeners[listener]) {
+            return;
+        }
+        listeners[listener].remove();
+        listeners[listener] = null;
+    }
+
+    /**
+     * 监听接收入群申请事件
+     * @param {function} listener = function([{Message}])
+     */
+    static addReceiveApplyJoinGroupApprovalListener(listener) {
+        listeners[listener] = DeviceEventEmitter.addListener(receiveApplyJoinGroupApprovalEvent,
+            (event) => {
+                listener(event);
+            });
+    }
+
+    static removeReceiveApplyJoinGroupApprovalListener(listener) {
+        if (!listeners[listener]) {
+            return;
+        }
+        listeners[listener].remove();
+        listeners[listener] = null;
+    }
+
+    /**
+     * 监听管理员拒绝入群申请事件
+     * @param {function} listener = function([{Message}])
+     */
+    static addReceiveGroupAdminRejectListener(listener) {
+        listeners[listener] = DeviceEventEmitter.addListener(receiveGroupAdminRejectEvent,
+            (event) => {
+                listener(event);
+            });
+    }
+
+    static removeReceiveGroupAdminRejectListener(listener) {
+        if (!listeners[listener]) {
+            return;
+        }
+        listeners[listener].remove();
+        listeners[listener] = null;
+    }
+
+    /**
+     * 监听管理员拒绝入群申请事件
+     * @param {function} listener = function([{Message}])
+     */
+    static addReceiveGroupAdminApprovalListener(listener) {
+        listeners[listener] = DeviceEventEmitter.addListener(receiveGroupAdminApprovalEvent,
+            (event) => {
+                listener(event);
+            });
+    }
+
+    static removeReceiveGroupAdminApprovalListener(listener) {
         if (!listeners[listener]) {
             return;
         }
@@ -1100,23 +1186,98 @@ export default class JMessage {
         JMessageModule.getChatRoomConversationList(callback);
     }
 
+
+    
+
+
+
+
+
+
     /**
-     * 接收聊天室消息
-     * @param {function} listener = function([{Message}])
+     * 获取所有会话未读消息总数
+     * @param {function} callback = function([{count: number}])
      */
-    static addReceiveChatRoomMsgListener(listener) {
-        listeners[listener] = DeviceEventEmitter.addListener(chatRoomMsgEvent,
-            (messages) => {
-                listener(messages);
-            });
+    static getAllUnreadCount(callback) {
+        JMessageModule.getAllUnreadCount(callback);
     }
 
-    static removeReceiveChatRoomMsgListener(listener) {
-        if (!listeners[listener]) {
-            return;
-        }
-        listeners[listener].remove();
-        listeners[listener] = null;
+
+    /**
+     * Group 相关功能
+     */
+
+    /**
+     * 批量添加管理员
+     * @param {object} param = {groupId: string, usernames: [string], appKey: string}
+     * @param {function} success 
+     * @param {function} error 
+     */
+    static addGroupAdmins(param, success, error) {
+        JMessageModule.addGroupAdmins(param, success, error);
+    }
+    
+    /**
+     * 批量删除管理员
+     * @param {object} param = {groupId: string, usernames: [string], appKey: string}
+     * @param {function} success 
+     * @param {function} error 
+     */
+    static removeGroupAdmins(param, success, error) {
+        JMessageModule.removeGroupAdmins(param, success, error);
+    }
+
+    /**
+     * 修改群类型，
+     * @param {object} param = {groudId: String, type: 'public' | 'private'} 
+     * @param {function} success = function({conversation})
+     * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {} 
+     */
+    static changeGroupType(param, success, error) {
+        JMessageModule.changeGroupType(param, success, error);
+    }
+    
+    /**
+     * 分页获取群页面
+     * @param {object} param = {appKey: string, start: number, count: number} 
+     * @param {function} success = function([groupInfo])
+     * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {} 
+     */
+    static getPublicGroupInfos(param, success, error) {
+        JMessageModule.getPublicGroupInfo(param, success, error);
+    }
+
+    /**
+     * 申请公开群入群
+     * @param {object} param = {groupId: string, reason: string} 
+     * @param {function} success = function()
+     * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {} 
+     */
+    static applyJoinGroup(param, success, error) {
+        JMessageModule.applyJoinGroup(param, success, error);
+    }
+
+    /**
+     * 批量处理公开群入群请求
+     * @param {object} param = {events: [string], isAgree: boolean, reason: string, isRespondInviter: boolean}
+     *  events: 请求的 eventId 数组。
+     *  isAgree: 是否同意入群。
+     *  isRespondInviter: 是否将处理结果返回给申请入群者
+     * @param {function} success = _ => {}
+     * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {} 
+     */
+    static processApplyJoinGroup(param, success, error) {
+        JMessageModule.processApplyJoinGroup(param, success, error);
+    }
+
+    /**
+     * 解散群
+     * @param {object} param = { groupId: string }
+     * @param {function} success = _ => {}
+     * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {} 
+     */
+    static dissolveGroup(param, success, error) {
+        JMessageModule.dissolveGroup(param, success, error);
     }
 
 }
