@@ -12,6 +12,7 @@
   - [FileMessage](#filemessage)
   - [CustomMessage](#custommessage)
   - [EventMessage](#eventmessage)
+  
 
 ## UserInfo
 
@@ -38,15 +39,16 @@ isFriend:boolean            // 是否为好友
 ```js
 type: 'group',
 id: string,                 // 群组 id
-avatarThumbPath: string,    // 头像的缩略图地址
+groupType: string,          // 'public' | 'private'  公共群和私有群
+avatarThumbPath: string,    // 头像的缩略图地址，不过不存在可以调用 下载缩略图的相关接口
 name: string,               // 群组名称
 desc: string,               // 群组描述
-level: number,              // 群组等级，默认等级 4
-owner: string,              // 群主的 username
-ownerAppKey: string,        // 群主的 appKey
+level?: number,              // 群组等级，默认等级 4
+owner?: string,              // 群主的 username
+ownerAppKey?: string,        // 群主的 appKey
 maxMemberCount: number,     // 最大成员数
-isNoDisturb: boolean,       // 是否免打扰
-isBlocked: boolean          // 是否屏蔽群消息
+isNoDisturb?: boolean,       // 是否免打扰
+isBlocked?: boolean          // 是否屏蔽群消息
 ```
 
 ## ChatRoomInfo

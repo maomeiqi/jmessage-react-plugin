@@ -82,6 +82,21 @@ import JMessage from 'jmessage-react-plugin';
   - [登录状态变更](#addloginstatechangedlistener)
     - [addLoginStateChangedListener](#addloginstatechangedlistener)
     - [removeLoginStateChangedListener](#addloginstatechangedlistener)
+
+  - [监听接收入群申请事件](#addreceiveapplyjoingroupapprovallistener)
+    - [addReceiveApplyJoinGroupApprovalListener](#addreceiveapplyjoingroupapprovallistener)
+    - [removeReceiveApplyJoinGroupApprovalListener](#removereceiveapplyjoingroupapprovallistener)
+
+  - [监听管理员拒绝入群申请事件](#addreceivegroupadminrejectlistener)
+    - [addReceiveGroupAdminRejectListener](#addreceivegroupadminrejectlistener)
+    - [removeReceiveGroupAdminRejectListener](#removereceivegroupadminrejectlistener)
+
+  - [监听管理员同意入群申请事件](#addreceivegroupadminapprovallistener)
+    - [addReceiveGroupAdminApprovalListener](#addreceivegroupadminapprovallistener)
+    - [removeReceiveGroupAdminApprovalListener](#removereceivegroupadminapprovallistener)
+
+
+
   - [点击消息通知事件（Android Only）](#addclickmessagenotificationlistener)
     - [addClickMessageNotificationListener](#addclickmessagenotificationlistener)
     - [removeClickMessageNotificationListener](#addclickmessagenotificationlistener)
@@ -1464,3 +1479,71 @@ JMessage.removeUploadProgressListener(listener) // 移除监听(一般在 compon
 - result
   - messageId：消息 id。
   - progress：上传进度，从 0-1 float 类型。
+
+### 群组事件
+
+#### addReceiveApplyJoinGroupApprovalListener
+
+监听接收入群申请事件
+
+##### 示例
+
+```javascript
+var listener = (result) => { }
+
+JMessage.addReceiveApplyJoinGroupApprovalListener(listener) // 添加监听
+JMessage.removeReceiveApplyJoinGroupApprovalListener(listener) // 移除监听(一般在 componentWillUnmount 中调用)
+```
+
+##### 回调参数说明
+
+- event
+  - eventId (string)：消息 id。
+  - groupId (string)：申请入群的 groudId。
+  - isInitiativeApply (boolean)：是否是用户主动申请入群，YES：主动申请加入，NO：被邀请加入
+  - sendApplyUser ([{UserInfo}])：发送申请的用户
+  - reason (string)：入群原因
+
+#### addReceiveGroupAdminRejectListener
+
+监听管理员拒绝入群申请事件
+
+##### 示例
+
+```javascript
+var listener = (result) => { }
+
+JMessage.addReceiveGroupAdminRejectListener(listener) // 添加监听
+JMessage.removeReceiveGroupAdminRejectListener(listener) // 移除监听(一般在 componentWillUnmount 中调用)
+```
+
+##### 回调参数说明
+
+- result
+  - eventId (string): 消息 id。
+  - rejectReason (string): 拒绝原因。
+  - groupManager ({UserInfo}): 操作的管理员
+
+
+#### addReceiveGroupAdminApprovalListener
+
+监听管理员同意入群申请事件
+
+##### 示例
+
+```javascript
+var listener = (result) => { }
+
+JMessage.addReceiveGroupAdminApprovalListener(listener) // 添加监听
+JMessage.removeReceiveGroupAdminApprovalListener(listener) // 移除监听(一般在 componentWillUnmount 中调用)
+```
+
+##### 回调参数说明
+
+- result
+  - isAgreeApply (boolean): 管理员是否同意申请，YES：同意，NO：拒绝.
+  - applyEventID (string): 申请入群事件的事件 id.
+  - groupId (string): 群 gid.
+  - groupAdmin {GroupInfo}: 操作的管理员.
+  - users [{UserInfo}]: 申请或被邀请加入群的用户，即：实际入群的用户
+

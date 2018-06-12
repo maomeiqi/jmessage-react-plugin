@@ -1087,7 +1087,7 @@ export default class JMessage {
     }
 
     /**
-     * 监听管理员拒绝入群申请事件
+     * 监听管理员同意入群申请事件
      * @param {function} listener = function([{Message}])
      */
     static addReceiveGroupAdminApprovalListener(listener) {
