@@ -768,16 +768,6 @@
 
 @implementation JMSGGroupAdminApprovalEvent (JMessage)
 - (NSMutableDictionary *)eventToDictionary {
-//    /// 管理员是否同意申请，YES：同意，NO：拒绝
-//    @property(nonatomic, assign, readonly) BOOL isAgreeApply;
-//    /// 申请入群事件的事件 id
-//    @property(nonatomic, strong, readonly) NSString *applyEventID;
-//    /// 群 gid
-//    @property(nonatomic, strong, readonly) NSString *groupID;
-//    /// 操作的管理员
-//    @property(nonatomic, strong, readonly) JMSGUser *groupAdmin;
-//    /// 申请或被邀请加入群的用户，即：实际入群的用户
-//    @property(nonatomic, strong, readonly) NSArray JMSG_GENERIC(__kindof JMSGUser *)*users;
     NSMutableDictionary *dict = @{}.mutableCopy;
     dict[@"isAgree"] = @(self.isAgreeApply);
     dict[@"applyEventId"] = self.applyEventID;
