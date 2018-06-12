@@ -1114,16 +1114,22 @@ RCT_EXPORT_METHOD(createGroup:(NSDictionary *)param
   if (param[@"desc"] != nil) {
     descript = param[@"desc"];
   }
-  
-  [JMSGGroup createGroupWithName:groupName desc:descript memberArray:nil completionHandler:^(id resultObject, NSError *error) {
-    if (error) {
-      failCallback(@[[error errorToDictionary]]);
-      return ;
-    }
     
-    JMSGGroup *group = resultObject;
-    successCallback(@[group.gid]);
-  }];
+  JMSGGroupType type = [self convertStringToGroupType:param[@"groupType"]];
+    JMSGGroupInfo *groupInfo = [[JMSGGroupInfo alloc] init];
+    groupInfo.name = groupName;
+    groupInfo.groupType = type;
+    groupInfo.desc = descript;
+    
+    [JMSGGroup createGroupWithGroupInfo:groupInfo memberArray:nil completionHandler:^(id resultObject, NSError *error) {
+        if (error) {
+            failCallback(@[[error errorToDictionary]]);
+            return ;
+        }
+        
+        JMSGGroup *group = resultObject;
+        successCallback(@[group.gid]);
+    }];
 }
 
 RCT_EXPORT_METHOD(getGroupIds:(RCTResponseSenderBlock)successCallback
