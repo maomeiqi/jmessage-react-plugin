@@ -355,11 +355,15 @@ RCT_EXPORT_MODULE();
 }
 
 - (JMSGGroupType)convertStringToGroupType:(NSString *)str {
-    if ([str isEqualToString:@"private"]) {
+    if (str == nil) {
         return kJMSGGroupTypePrivate;
     }
     
-    return kJMSGGroupTypePublic;
+    if ([str isEqualToString:@"public"]) {
+        return kJMSGGroupTypePublic;
+    }
+    
+    return kJMSGGroupTypePrivate;
 }
 
 - (NSDictionary *)getParamError {
@@ -1115,7 +1119,7 @@ RCT_EXPORT_METHOD(createGroup:(NSDictionary *)param
     descript = param[@"desc"];
   }
     
-  JMSGGroupType type = [self convertStringToGroupType:param[@"groupType"]];
+    JMSGGroupType type = [self convertStringToGroupType:param[@"groupType"]] ;
     JMSGGroupInfo *groupInfo = [[JMSGGroupInfo alloc] init];
     groupInfo.name = groupName;
     groupInfo.groupType = type;
