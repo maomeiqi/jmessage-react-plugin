@@ -425,6 +425,7 @@ export default class JMessage {
      * @param {object} params = {
      *  'name': String          // 群组名称。
      *  'desc': String          // 群组描述。
+     *  'groupTyp': String      //  'public' | 'private'
      * }
      * @param {function} success = function (groupId) {}  // 以参数形式返回 group id
      * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
@@ -1238,17 +1239,17 @@ export default class JMessage {
     }
     
     /**
-     * 分页获取群页面
+     * 分页获取群
      * @param {object} param = {appKey: string, start: number, count: number} 
      * @param {function} success = function([groupInfo])
      * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {} 
      */
     static getPublicGroupInfos(param, success, error) {
-        JMessageModule.getPublicGroupInfo(param, success, error);
+        JMessageModule.getPublicGroupInfos(param, success, error);
     }
 
     /**
-     * 申请公开群入群
+     * 申请入群（公开群）
      * @param {object} param = {groupId: string, reason: string} 
      * @param {function} success = function()
      * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {} 

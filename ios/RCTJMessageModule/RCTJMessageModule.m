@@ -2646,7 +2646,7 @@ RCT_EXPORT_METHOD(changeGroupType:(NSDictionary *)param
     }];
 }
 
-RCT_EXPORT_METHOD(getPublicGroupInfo:(NSDictionary *)param
+RCT_EXPORT_METHOD(getPublicGroupInfos:(NSDictionary *)param
                   successCallback:(RCTResponseSenderBlock)successCallback
                   failCallBack:(RCTResponseSenderBlock)failCallback) {
     if (param[@"start"] == nil ||
