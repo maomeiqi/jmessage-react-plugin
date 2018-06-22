@@ -425,7 +425,7 @@ export default class JMessage {
      * @param {object} params = {
      *  'name': String          // 群组名称。
      *  'desc': String          // 群组描述。
-     *  'groupTyp': String      //  'public' | 'private'
+     *  'groupType': String      //  'public' | 'private'
      * }
      * @param {function} success = function (groupId) {}  // 以参数形式返回 group id
      * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}

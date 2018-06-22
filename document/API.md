@@ -25,6 +25,7 @@ import JMessage from 'jmessage-react-plugin';
   - [downloadOriginalUserAvatar](#downloadoriginaluseravatar)
 
 - [群组](#群组)
+  - [createGroup](#creategroup)
   - [addGroupAdmins](#addgroupadmins)
   - [removeGroupAdmins](#removegroupadmins)
   - [changeGroupType](#changegrouptype)
@@ -372,6 +373,7 @@ JMessage.createGroup({ name: 'group_name', desc: 'group_desc' },
 #### 参数说明
 
 - name (string): 群组名。不支持 "\n" 和 "\r" 字符，长度限制为 0 ~ 64 Byte。
+- groupType (string): 指定创建群的类型，可以为 'private' 和 'public', 默认为 private。
 - desc (string): 群组描述。长度限制为 0 ~ 250 Byte。
 
 
