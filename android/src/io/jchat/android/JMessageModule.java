@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -59,6 +60,9 @@ import cn.jpush.im.android.api.enums.ContentType;
 import cn.jpush.im.android.api.event.ChatRoomMessageEvent;
 import cn.jpush.im.android.api.event.ContactNotifyEvent;
 import cn.jpush.im.android.api.event.ConversationRefreshEvent;
+import cn.jpush.im.android.api.event.GroupApprovalEvent;
+import cn.jpush.im.android.api.event.GroupApprovalRefuseEvent;
+import cn.jpush.im.android.api.event.GroupApprovedNotificationEvent;
 import cn.jpush.im.android.api.event.LoginStateChangeEvent;
 import cn.jpush.im.android.api.event.MessageEvent;
 import cn.jpush.im.android.api.event.MessageRetractEvent;
@@ -66,6 +70,7 @@ import cn.jpush.im.android.api.event.NotificationClickEvent;
 import cn.jpush.im.android.api.event.OfflineMessageEvent;
 import cn.jpush.im.android.api.model.ChatRoomInfo;
 import cn.jpush.im.android.api.model.Conversation;
+import cn.jpush.im.android.api.model.GroupBasicInfo;
 import cn.jpush.im.android.api.model.GroupInfo;
 import cn.jpush.im.android.api.model.Message;
 import cn.jpush.im.android.api.model.UserInfo;
@@ -86,6 +91,10 @@ public class JMessageModule extends ReactContextBaseJavaModule {
     private static final String CONTACT_NOTIFY_EVENT = "JMessage.ContactNotify"; // 收到好友请求消息事件
     private static final String UPLOAD_PROGRESS_EVENT = "JMessage.UploadProgress"; // 上传（图片，文件等）进度事件
     private static final String RECEIVE_CHAT_ROOM_MSG_EVENT = "JMessage.ReceiveChatRoomMsgEvent"; // 收到聊天室消息事件
+    private static final String RECEIVE_APPLY_JOIN_GROUP_APPROVAL_EVENT = "JMessage.ReceiveApplyJoinGroupApprovalEvent"; // 接收到入群申请
+    private static final String RECEIVE_GROUP_ADMIN_REJECT_EVENT = "JMessage.ReceiveGroupAdminRejectEvent"; // 接收到管理员拒绝入群申请
+    private static final String RECEIVE_GROUP_ADMIN_APPROVAL_EVENT = "JMessage.ReceiveGroupAdminApprovalEvent"; // 接收到管理员同意入群申请
+
     private static final int ERR_CODE_PARAMETER = 1;
     private static final int ERR_CODE_CONVERSATION = 2;
     private static final int ERR_CODE_MESSAGE = 3;
@@ -97,11 +106,13 @@ public class JMessageModule extends ReactContextBaseJavaModule {
 
     private Context mContext;
     private JMessageUtils mJMessageUtils;
+    private HashMap<String,GroupApprovalEvent> groupApprovalEventHashMap ;
 
     public JMessageModule(ReactApplicationContext reactContext, boolean shutdownToast) {
         super(reactContext);
         mJMessageUtils = new JMessageUtils(reactContext, shutdownToast);
         mContext = reactContext;
+        groupApprovalEventHashMap = new HashMap<>();
     }
 
     @Override
@@ -672,12 +683,25 @@ public class JMessageModule extends ReactContextBaseJavaModule {
         try {
             String name = map.getString(Constant.NAME);
             String desc = map.getString(Constant.DESC);
-            JMessageClient.createGroup(name, desc, new CreateGroupCallback() {
-                @Override
-                public void gotResult(int status, String desc, long groupId) {
-                    mJMessageUtils.handleCallbackWithValue(status, desc, success, fail, String.valueOf(groupId));
-                }
-            });
+            String groupType = map.getString(Constant.GROUP_TYPE);
+            if(groupType.equals("private")){
+                JMessageClient.createGroup(name, desc, new CreateGroupCallback() {
+                    @Override
+                    public void gotResult(int status, String desc, long groupId) {
+                        mJMessageUtils.handleCallbackWithValue(status, desc, success, fail, String.valueOf(groupId));
+                    }
+                });
+            }else if(groupType.equals("public")){
+                JMessageClient.createPublicGroup(name, desc, new CreateGroupCallback() {
+                    @Override
+                    public void gotResult(int status, String desc, long groupId) {
+                        mJMessageUtils.handleCallbackWithValue(status, desc, success, fail, String.valueOf(groupId));
+                    }
+                });
+            }else {
+                mJMessageUtils.handleError(fail, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER + " : "+groupType);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             mJMessageUtils.handleError(fail, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);
@@ -1636,6 +1660,175 @@ public class JMessageModule extends ReactContextBaseJavaModule {
         success.invoke(ResultUtils.toJSObject(conversation));
     }
 
+    /**
+     * 获取所有回话未读消息总数
+     * @param success 成功回调
+     */
+    @ReactMethod
+    public void getAllUnreadCount(Callback success) {
+        WritableMap map = Arguments.createMap();
+        int count = JMessageClient.getAllUnReadMsgCount();
+        map.putInt("count",count);
+        success.invoke(map);
+    }
+
+
+    @ReactMethod
+    public void addGroupAdmins(final ReadableMap map, final Callback success, final Callback fail) {
+        try {
+            long groupId = Long.parseLong(map.getString(Constant.GROUP_ID));
+            JMessageClient.getGroupInfo(groupId, new GetGroupInfoCallback() {
+                @Override
+                public void gotResult(int status, String desc, GroupInfo groupInfo) {
+                    if (status == 0) {
+                        String appKey = map.hasKey(Constant.APP_KEY) ? map.getString(Constant.APP_KEY) : "";
+                        ReadableArray array = map.getArray(Constant.USERNAMES);
+                        final List<UserInfo> userInfos = new ArrayList<>();
+                        for (int i = 0; i < array.size(); i++) {
+                            userInfos.add(groupInfo.getGroupMemberInfo(array.getString(i),appKey));
+                        }
+                        groupInfo.addGroupKeeper(userInfos, new BasicCallback() {
+                            @Override
+                            public void gotResult(int status, String desc) {
+                                mJMessageUtils.handleCallback(status, desc, success, fail);
+                            }
+                        });
+                    } else {
+                        mJMessageUtils.handleError(fail, status, desc);
+                    }
+                }
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mJMessageUtils.handleError(fail, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);
+        }
+    }
+
+    @ReactMethod
+    public void removeGroupAdmins(final ReadableMap map, final Callback success, final Callback fail) {
+        try {
+            long groupId = Long.parseLong(map.getString(Constant.GROUP_ID));
+            JMessageClient.getGroupInfo(groupId, new GetGroupInfoCallback() {
+                @Override
+                public void gotResult(int status, String desc, GroupInfo groupInfo) {
+                    if (status == 0) {
+                        String appKey = map.hasKey(Constant.APP_KEY) ? map.getString(Constant.APP_KEY) : "";
+                        ReadableArray array = map.getArray(Constant.USERNAMES);
+                        final List<UserInfo> userInfos = new ArrayList<>();
+                        for (int i = 0; i < array.size(); i++) {
+                            userInfos.add(groupInfo.getGroupMemberInfo(array.getString(i),appKey));
+                        }
+                        groupInfo.removeGroupKeeper(userInfos, new BasicCallback() {
+                            @Override
+                            public void gotResult(int status, String desc) {
+                                mJMessageUtils.handleCallback(status, desc, success, fail);
+                            }
+                        });
+                    } else {
+                        mJMessageUtils.handleError(fail, status, desc);
+                    }
+                }
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mJMessageUtils.handleError(fail, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);
+        }
+    }
+
+    @ReactMethod
+    public void getPublicGroupInfos(final ReadableMap map, final Callback success, final Callback fail) {
+        try {
+            String appKey = map.hasKey(Constant.APP_KEY) ? map.getString(Constant.APP_KEY) : "";
+            int start = Integer.parseInt(map.getString(Constant.START));
+            int count = Integer.parseInt(map.getString(Constant.COUNT));
+            String reason = map.getString(Constant.REASON);
+            JMessageClient.getPublicGroupListByApp(appKey, start, count, new RequestCallback<List<GroupBasicInfo>>() {
+                @Override
+                public void gotResult(int status, String desc, List<GroupBasicInfo> groupBasicInfos) {
+                    mJMessageUtils.handleCallbackWithArray(status, desc, success, fail, ResultUtils.toJSArray(groupBasicInfos));
+                }
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mJMessageUtils.handleError(fail, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);
+        }
+    }
+
+    @ReactMethod
+    public void applyJoinGroup(final ReadableMap map, final Callback success, final Callback fail) {
+        try {
+            long groupId = Long.parseLong(map.getString(Constant.GROUP_ID));
+            String reason = map.getString(Constant.REASON);
+            JMessageClient.applyJoinGroup(groupId, reason, new BasicCallback() {
+                @Override
+                public void gotResult(int status, String desc) {
+                    mJMessageUtils.handleCallback(status, desc, success, fail);
+                }
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mJMessageUtils.handleError(fail, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);
+        }
+    }
+
+    @ReactMethod
+    public void processApplyJoinGroup(final ReadableMap map, final Callback success, final Callback fail) {
+        try {
+            String appKey = map.hasKey(Constant.APP_KEY) ? map.getString(Constant.APP_KEY) : "";
+            String reason = map.getString(Constant.REASON);
+            Boolean isAgree =map.getBoolean(Constant.IS_AGREE);
+            ReadableArray array = map.getArray(Constant.EVENTS);
+            for (int i = 0; i < array.size(); i++) {
+                GroupApprovalEvent groupApprovalEvent = groupApprovalEventHashMap.get(array.getString(i));
+                if(groupApprovalEvent == null){
+                    mJMessageUtils.handleError(fail,ERR_CODE_PARAMETER,ERR_MSG_PARAMETER + ": can't get event through " +array.getString(i));
+                    return;
+                }
+                if(isAgree){
+                    groupApprovalEvent.acceptGroupApproval(groupApprovalEvent.getFromUsername(), appKey, new BasicCallback() {
+                        @Override
+                        public void gotResult(int status, String desc) {
+                            mJMessageUtils.handleCallback(status, desc, success, fail);
+                        }
+                    });
+
+                }else {
+                    groupApprovalEvent.refuseGroupApproval(groupApprovalEvent.getFromUsername(), appKey, reason, new BasicCallback() {
+                        @Override
+                        public void gotResult(int status, String desc) {
+                            mJMessageUtils.handleCallback(status, desc, success, fail);
+                        }
+                    });
+                }
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            mJMessageUtils.handleError(fail, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);
+        }
+    }
+
+    @ReactMethod
+    public void dissolveGroup(final ReadableMap map, final Callback success, final Callback fail) {
+        try {
+            long groupId = Long.parseLong(map.getString(Constant.GROUP_ID));
+            JMessageClient.adminDissolveGroup(groupId, new BasicCallback() {
+                @Override
+                public void gotResult(int status, String desc) {
+                    mJMessageUtils.handleCallback(status, desc, success, fail);
+                }
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mJMessageUtils.handleError(fail, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);
+        }
+    }
+
 
 
     public void onEvent(LoginStateChangeEvent event) {
@@ -1777,5 +1970,78 @@ public class JMessageModule extends ReactContextBaseJavaModule {
         Log.d(TAG, "收到聊天室消息");
         getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                 .emit(RECEIVE_MSG_EVENT, ResultUtils.toJSArray(list));
+    }
+
+
+    public void onEvent(GroupApprovalEvent event) {
+        Log.d(TAG, "GroupApprovalEvent, event: " + event);
+        groupApprovalEventHashMap.put(event.getEventId() + "",event);
+        GroupApprovalEvent.Type type = event.getType();
+        final WritableMap map = Arguments.createMap();
+        map.putString(Constant.EVENT_ID, event.getEventId() + "");
+        map.putString(Constant.GROUP_ID, event.getGid() + "");
+        map.putBoolean(Constant.IS_INITIATIVE_APPLY,type.equals(GroupApprovalEvent.Type.apply_join_group));
+        event.getFromUserInfo(new GetUserInfoCallback() {
+            @Override
+            public void gotResult(int status, String desc, UserInfo userInfo) {
+                if(status == 0){
+                    map.putMap(Constant.SEND_APPLY_USER,ResultUtils.toJSObject(userInfo));
+                }
+            }
+        });
+        event.getApprovalUserInfoList(new GetUserInfoListCallback() {
+            @Override
+            public void gotResult(int status, String s, List<UserInfo> list) {
+                if(status == 0){
+                    map.putArray(Constant.JOIN_GROUP_USERS,ResultUtils.toJSArray(list));
+                }
+            }
+        });
+        map.putString(Constant.REASON, event.getReason());
+        getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                .emit(RECEIVE_APPLY_JOIN_GROUP_APPROVAL_EVENT, map);
+    }
+
+    public void onEvent(GroupApprovedNotificationEvent event) {
+        Log.d(TAG, "GroupApprovedNotificationEvent, event: " + event);
+        final WritableMap map = Arguments.createMap();
+        map.putBoolean(Constant.IS_AGREE, event.getApprovalResult());
+        map.putString(Constant.APPLY_EVENT_ID, event.getApprovalEventID() + "");
+        map.putString(Constant.GROUP_ID, event.getGroupID() + "");
+        event.getOperator(new GetUserInfoCallback() {
+            @Override
+            public void gotResult(int status, String desc, UserInfo userInfo) {
+                if(status == 0){
+                    map.putMap(Constant.GROUP_ADMIN,ResultUtils.toJSObject(userInfo));
+                }
+            }
+        });
+        event.getApprovedUserInfoList(new GetUserInfoListCallback() {
+            @Override
+            public void gotResult(int status, String s, List<UserInfo> list) {
+                if(status == 0){
+                    map.putArray(Constant.USERS,ResultUtils.toJSArray(list));
+                }
+            }
+        });
+        getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                .emit(RECEIVE_GROUP_ADMIN_APPROVAL_EVENT, map);
+    }
+
+    public void onEvent(GroupApprovalRefuseEvent event) {
+        Log.d(TAG, "GroupApprovalRefuseEvent, event: " + event);
+        final WritableMap map = Arguments.createMap();
+        map.putString(Constant.REASON, event.getReason());
+        map.putString(Constant.GROUP_ID, event.getGid() + "");
+        event.getFromUserInfo(new GetUserInfoCallback() {
+            @Override
+            public void gotResult(int status, String desc, UserInfo userInfo) {
+                if(status == 0){
+                    map.putMap(Constant.GROUP_MANAGER,ResultUtils.toJSObject(userInfo));
+                }
+            }
+        });
+        getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                .emit(RECEIVE_GROUP_ADMIN_REJECT_EVENT, map);
     }
 }
