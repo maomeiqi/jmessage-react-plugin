@@ -36,6 +36,7 @@ public class Constant {
     public static final String SERVER_ID = "serverMessageId";
     public static final String MESSAGE_ID = "messageId";
     public static final String GROUP_ID = "groupId";
+    public static final String GROUP_TYPE = "groupType";
     public static final String NAME = "name";
     public static final String DESC = "desc";
     public static final String LEVEL = "level";
@@ -47,6 +48,16 @@ public class Constant {
     public static final String LATEST_MESSAGE = "latestMessage";
     public static final String UNREAD_COUNT = "unreadCount";
     public static final String CONVERSATION_TYPE = "conversationType";
+    public static final String IS_INITIATIVE_APPLY = "isInitiativeApply";
+    public static final String SEND_APPLY_USER = "sendApplyUser";
+    public static final String JOIN_GROUP_USERS = "joinGroupUsers";
+    public static final String IS_AGREE = "isAgree";
+    public static final String GROUP_ADMIN = "groupAdmin";
+    public static final String USERS = "users";
+    public static final String GROUP_MANAGER = "groupManager";
+    public static final String START = "start";
+    public static final String COUNT = "count";
+
 
     /**
      * Message
@@ -94,6 +105,7 @@ public class Constant {
     static final String PROGRESS = "progress";
     public static final String UNRECEIPT_COUNT = "unreceiptCount";
     public static final String IS_DESCEND = "isDescend";
+
     /**
      * ChatRoom
      */
@@ -101,4 +113,12 @@ public class Constant {
     public static final String ROOM_IDS = "roomIds";
     public static final String ROOM_NAME = "roomName";
     public static final String MEMBER_COUNT = "memberCount";
+    /**
+     * Event
+     */
+    public static final String EVENT_ID = "eventId";
+    public static final String EVENTS = "events";
+    public static final String APPLY_EVENT_ID = "applyEventId";
+
+
 }
