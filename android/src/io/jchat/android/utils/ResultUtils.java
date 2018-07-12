@@ -34,6 +34,7 @@ import cn.jpush.im.android.api.enums.ConversationType;
 import cn.jpush.im.android.api.enums.MessageDirect;
 import cn.jpush.im.android.api.model.ChatRoomInfo;
 import cn.jpush.im.android.api.model.Conversation;
+import cn.jpush.im.android.api.model.GroupBasicInfo;
 import cn.jpush.im.android.api.model.GroupInfo;
 import cn.jpush.im.android.api.model.Message;
 import cn.jpush.im.android.api.model.UserInfo;
@@ -119,6 +120,19 @@ public class ResultUtils {
         return result;
     }
 
+    public static WritableMap toJSObject(GroupBasicInfo groupInfo) {
+        WritableMap result = Arguments.createMap();
+
+        result.putString(Constant.TYPE, Constant.TYPE_GROUP);
+        result.putString(Constant.ID, String.valueOf(groupInfo.getGroupID()));
+        result.putString(Constant.NAME, groupInfo.getGroupName());
+        result.putString(Constant.DESC, groupInfo.getGroupDescription());
+        result.putInt(Constant.LEVEL, groupInfo.getGroupLevel());
+        result.putString(Constant.AVATAR_THUMB_PATH, groupInfo.getAvatar());
+        result.putInt(Constant.MAX_MEMBER_COUNT, groupInfo.getMaxMemberCount());
+        return result;
+    }
+
     public static WritableMap toJSObject(Message msg) {
         WritableMap result = Arguments.createMap();
         try {
@@ -169,6 +183,7 @@ public class ResultUtils {
                 case file:
                     result.putString(Constant.TYPE, Constant.FILE);
                     FileContent fileContent = (FileContent) content;
+                    result.putString(Constant.PATH, fileContent.getLocalPath());
                     result.putString(Constant.FILE_NAME, fileContent.getFileName());
                     break;
                 case custom:
@@ -199,6 +214,9 @@ public class ResultUtils {
                         case group_member_exit:
                             //群成员退群事件
                             result.putString(Constant.EVENT_TYPE, "group_member_exit");
+                            break;
+                        case group_info_updated:
+                            result.putString(Constant.EVENT_TYPE, "group_info_updated");
                             break;
                     }
                 default:
@@ -277,6 +295,8 @@ public class ResultUtils {
                     array.pushMap(toJSObject((UserInfo) object));
                 } else if (object instanceof GroupInfo) {
                     array.pushMap(toJSObject((GroupInfo) object));
+                } else if (object instanceof GroupBasicInfo) {
+                    array.pushMap(toJSObject((GroupBasicInfo) object));
                 } else if (object instanceof Message) {
                     array.pushMap(toJSObject((Message) object));
                 } else if (object instanceof Conversation) {

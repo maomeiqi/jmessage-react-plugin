@@ -6,19 +6,11 @@
 
 import React, { Component } from 'react';
 import {
-  AppRegistry,
   StyleSheet,
-  Text,
   View,
-  TouchableHighlight,
-  NativeModules,
-  requireNativeComponent,
   Alert,
   Dimensions,
-  DeviceEventEmitter,
   Platform,
-  UIManager,
-  findNodeHandle,
 } from 'react-native';
 
 import IMUI from 'aurora-imui-react-native'
@@ -28,12 +20,6 @@ const AuroraIController = IMUI.AuroraIMUIController;
 const window = Dimensions.get('window');
 
 import JMessage from 'jmessage-react-plugin';
-
-import Translations from '../../resource/Translations'
-
-var themsgid = 1
-var from = 0;
-var limit = 10;
 
 export default class Chat extends Component {
 
@@ -62,7 +48,7 @@ export default class Chat extends Component {
     this.onTouchMsgList = this.onTouchMsgList.bind(this);
     this.conversation = this.props.navigation.state.params.conversation
     console.log(JSON.stringify(this.conversation))
-    // Alert.alert("the conversation ",JSON.stringify(this.conversation))
+
     JMessage.getMyInfo((myInfo) => {
       this.myInfo = myInfo
     })
@@ -87,14 +73,17 @@ export default class Chat extends Component {
     }
 
     if (jmessage.type === 'file') {
-      auroraMsg.mediaPath = jmessage.path
-      auroraMsg.duration = jmessage.duration
-      auroraMsg.msgType = "video"
+      if (jmessage.extras.fileType === 'video') {
+        auroraMsg.mediaPath = jmessage.path
+        auroraMsg.duration = jmessage.duration
+        auroraMsg.msgType = "video"  
+      } else {
+        console.log("cann't parse this file type ignore")
+        return {}
+      }
     }
 
     if (jmessage.type === 'event') {
-      // auroraMsg.mediaPath = jmessage.path
-      // auroraMsg.duration = jmessage.duration
       Alert.alert('event' , jmessage.eventType)
       auroraMsg.text = jmessage.eventType
     }
@@ -167,8 +156,7 @@ export default class Chat extends Component {
       messages[i] = message;
     }
 
-    AuroraIController.appendMessages(messages);
-
+    AuroraIController.appendMessages(messages)
   }
 
   componentDidMount() {
@@ -188,6 +176,8 @@ export default class Chat extends Component {
     this.messageListDidLoadCallback = () => {
 
       JMessage.getHistoryMessages(parames, (messages) => {
+        // Alert.alert('messages',JSON.stringify(messages))
+        console.log(JSON.stringify(messages));
         this.setState({
           from: this.state.from + 10
         })
@@ -283,7 +273,7 @@ export default class Chat extends Component {
   }
 
   onAvatarClick = (message) => {
-    console.log(message)
+
   }
 
   onTouchMsgList() {
@@ -362,6 +352,18 @@ export default class Chat extends Component {
     })
   }
 
+
+  setMessageTarget = (msg) => {
+    if (this.conversation.type === 'single') {
+      msg.username = this.conversation.username
+    } else if (this.conversation.type === "group") {
+      msg.groupId = this.conversation.groupId
+    } else {
+      msg.roomId = this.conversation.roomId
+    }
+    msg.type = this.conversation.type
+  }
+
   onSendText = (text) => {
 
     var message = this.getNormalMessage()
@@ -370,21 +372,17 @@ export default class Chat extends Component {
 
     JMessage.createSendMessage(message, (msg) => {
       var auroraMsg = this.convertJMessageToAuroraMsg(msg)
+      if (auroraMsg.msgType === undefined) {
+        return
+      }
+
       auroraMsg.status = 'send_going'
       AuroraIController.appendMessages([auroraMsg])
       AuroraIController.scrollToBottom(true)
-
-      if (this.conversation.type === 'single') {
-        msg.username = this.conversation.username
-      } else if (this.conversation.type === "group") {
-        msg.groupId = this.conversation.groupId
-      } else {
-        msg.roomId = this.conversation.roomId
-      }
-      msg.type = this.conversation.type
-
+      this.setMessageTarget(msg)
+      Alert.alert('send text', JSON.stringify(msg))
+      
       JMessage.sendMessage(msg, (jmessage) => {
-
         var auroraMsg = this.convertJMessageToAuroraMsg(jmessage)
         AuroraIController.updateMessage(auroraMsg)
       }, (error) => {
@@ -392,42 +390,33 @@ export default class Chat extends Component {
     })
   }
 
-  onTakePicture = (mediaPath) => {
-    console.log("onTakePicture, path: " + mediaPath)
+  onTakePicture = (media) => {
+    console.log("onTakePicture, path: " + media)
     var message = this.getNormalMessage()
     message.messageType = "image"
-    message.path = mediaPath
+    message.path = media.mediaPath
 
     JMessage.createSendMessage(message, (msg) => {
       var auroraMsg = this.convertJMessageToAuroraMsg(msg)
       auroraMsg.status = 'send_going'
       AuroraIController.appendMessages([auroraMsg])
       AuroraIController.scrollToBottom(true)
-
-      if (this.conversation.type === 'single') {
-        msg.username = this.conversation.username
-      } else if (this.conversation.type === "group") {
-        msg.groupId = this.conversation.groupId
-      } else {
-        msg.roomId = this.conversation.roomId
-      }
-      msg.type = this.conversation.type
-
+      this.setMessageTarget(msg)
       JMessage.sendMessage(msg, (jmessage) => {
         var auroraMsg = this.convertJMessageToAuroraMsg(jmessage)
         AuroraIController.updateMessage(auroraMsg)
       }, (error) => {
-        Alert.alert('send image fail')
+        Alert.alert(`send image fail ${JSON.stringify(error)}`)
       })
     })
-
   }
 
   onStartRecordVoice = (e) => {
     console.log("on start record voice")
   }
 
-  onFinishRecordVoice = (mediaPath, duration) => {
+  onFinishRecordVoice = (mediaPath) => {
+    Alert.alert('onFinishRecordVoice', JSON.stringify(mediaPath))
     var message = this.getNormalMessage()
     message.messageType = "voice"
     message.path = mediaPath
@@ -437,21 +426,12 @@ export default class Chat extends Component {
       auroraMsg.status = 'send_going'
       AuroraIController.appendMessages([auroraMsg])
       AuroraIController.scrollToBottom(true)
-
-      if (this.conversation.type === 'single') {
-        msg.username = this.conversation.username
-      } else if (this.conversation.type === "group") {
-        msg.groupId = this.conversation.groupId
-      } else {
-        msg.roomId = this.conversation.roomId
-      }
-      msg.type = this.conversation.type
-
+      this.setMessageTarget(msg)
       JMessage.sendMessage(msg, (jmessage) => {
         var auroraMsg = this.convertJMessageToAuroraMsg(jmessage)
         AuroraIController.updateMessage(auroraMsg)
       }, (error) => {
-        Alert.alert('send image fail')
+        Alert.alert(`send image fail ${JSON.stringify(error)}`)
       })
     })
   }
@@ -464,31 +444,24 @@ export default class Chat extends Component {
     console.log("on start record video")
   }
 
-  onFinishRecordVideo = (mediaPath) => {
+  onFinishRecordVideo = (video) => {
     var message = this.getNormalMessage()
     message.messageType = "file"
-    message.path = mediaPath
+    message.extras = {fileType: 'video'}
+    message.path = video.mediaPath
 
     JMessage.createSendMessage(message, (msg) => {
       var auroraMsg = this.convertJMessageToAuroraMsg(msg)
       auroraMsg.status = 'send_going'
       AuroraIController.appendMessages([auroraMsg])
       AuroraIController.scrollToBottom(true)
-
-      if (this.conversation.type === 'single') {
-        msg.username = this.conversation.username
-      } else if (this.conversation.type === "group") {
-        msg.groupId = this.conversation.groupId
-      } else {
-        msg.roomId = this.conversation.roomId
-      }
-      msg.type = this.conversation.type
+      this.setMessageTarget(msg)
 
       JMessage.sendMessage(msg, (jmessage) => {
         var auroraMsg = this.convertJMessageToAuroraMsg(jmessage)
         AuroraIController.updateMessage(auroraMsg)
       }, (error) => {
-        Alert.alert('send image fail')
+        Alert.alert(`send image fail ${JSON.stringify(error)}`)
       })
     })
   }
@@ -499,34 +472,20 @@ export default class Chat extends Component {
       var message = this.getNormalMessage()
       message.messageType = "image"
       message.path = mediaFiles[index].mediaPath
-      JMessage.sendImageMessage(message, (msg) => {
+
+      JMessage.createSendMessage(message, (msg) => {
         var auroraMsg = this.convertJMessageToAuroraMsg(msg)
         auroraMsg.status = 'send_going'
         AuroraIController.appendMessages([auroraMsg])
         AuroraIController.scrollToBottom(true)
-      }, () => {})
-      // JMessage.createSendMessage(message, (msg) => {
-      //   var auroraMsg = this.convertJMessageToAuroraMsg(msg)
-      //   auroraMsg.status = 'send_going'
-      //   AuroraIController.appendMessages([auroraMsg])
-      //   AuroraIController.scrollToBottom(true)
-
-      //   if (this.conversation.type === 'single') {
-      //     msg.username = this.conversation.username
-      //   } else if (this.conversation.type === "group") {
-      //     msg.groupId = this.conversation.groupId
-      //   } else {
-      //     msg.roomId = this.conversation.roomId
-      //   }
-      //   msg.type = this.conversation.type
-
-      //   JMessage.sendMessage(msg, (jmessage) => {
-      //     var auroraMsg = this.convertJMessageToAuroraMsg(jmessage)
-      //     AuroraIController.updateMessage(auroraMsg)
-      //   }, (error) => {
-      //     Alert.alert('send image fail')
-      //   })
-      // })
+        this.setMessageTarget(msg)
+        JMessage.sendMessage(msg, (jmessage) => {
+          var auroraMsg = this.convertJMessageToAuroraMsg(jmessage)
+          AuroraIController.updateMessage(auroraMsg)
+        }, (error) => {
+          Alert.alert(`send image fail ${JSON.stringify(error)}`)
+        })
+      })
     }
   }
 
@@ -552,7 +511,7 @@ export default class Chat extends Component {
   }
 
   onInitPress() {
-    console.log('on click init push ');
+    console.log('on click init push');
     this.updateAction();
   }
 

@@ -26,6 +26,9 @@
 
 //Group 回调
 #define kJJMessageGroupInfoChanged @"kJJMessageGroupInfoChanged"
+#define kJJMessageReceiveApplyJoinGroupApproval @"kJJMessageReceiveApplyJoinGroupApproval"
+#define kJJMessageReceiveGroupAdminReject @"kJJMessageReceiveGroupAdminReject"
+#define kJMessageReceiveGroupAdminApproval @"kJMessageReceiveGroupAdminApproval"
 
 //User 回调
 #define kJJMessageLoginUserKicked  @"kJJMessageLoginUserKicked"
@@ -67,6 +70,10 @@
 -(NSMutableDictionary*)groupToDictionary;
 @end
 
+@interface JMSGGroupInfo (JMessage)
+-(NSMutableDictionary*)groupToDictionary;
+@end
+
 @interface JMSGMessage (JMessage)
 - (NSMutableDictionary *)messageToDictionary;
 @end
@@ -78,3 +85,16 @@
 @interface JMSGChatRoom (JMessage)
 - (NSMutableDictionary *)chatRoomToDictionary;
 @end
+
+@interface JMSGApplyJoinGroupEvent (JMessage)
+- (NSMutableDictionary *)eventToDictionary;
+@end
+
+@interface JMSGGroupAdminRejectApplicationEvent (JMessage)
+- (NSMutableDictionary *)eventToDictionary;
+@end
+
+@interface JMSGGroupAdminApprovalEvent (JMessage)
+- (NSMutableDictionary *)eventToDictionary;
+@end
+

@@ -23,6 +23,16 @@ import JMessage from 'jmessage-react-plugin';
   - [updateMyInfo](#updatemyinfo)
   - [downloadThumbUserAvatar](#downloadthumbuseravatar)
   - [downloadOriginalUserAvatar](#downloadoriginaluseravatar)
+
+- [群组](#群组)
+  - [createGroup](#creategroup)
+  - [addGroupAdmins](#addgroupadmins)
+  - [removeGroupAdmins](#removegroupadmins)
+  - [changeGroupType](#changegrouptype)
+  - [getPublicGroupInfos](#getpublicgroupinfos)
+  - [applyJoinGroup](#applyjoingroup)
+  - [processApplyJoinGroup](#processapplyjoingroup)
+  - [dissolveGroup](#dissolvegroup)
 - [聊天](#聊天)
   - [createSendMessage](#createsendmessage)
   - [sendMessage](#sendmessage)
@@ -82,6 +92,21 @@ import JMessage from 'jmessage-react-plugin';
   - [登录状态变更](#addloginstatechangedlistener)
     - [addLoginStateChangedListener](#addloginstatechangedlistener)
     - [removeLoginStateChangedListener](#addloginstatechangedlistener)
+
+  - [监听接收入群申请事件](#addreceiveapplyjoingroupapprovallistener)
+    - [addReceiveApplyJoinGroupApprovalListener](#addreceiveapplyjoingroupapprovallistener)
+    - [removeReceiveApplyJoinGroupApprovalListener](#removereceiveapplyjoingroupapprovallistener)
+
+  - [监听管理员拒绝入群申请事件](#addreceivegroupadminrejectlistener)
+    - [addReceiveGroupAdminRejectListener](#addreceivegroupadminrejectlistener)
+    - [removeReceiveGroupAdminRejectListener](#removereceivegroupadminrejectlistener)
+
+  - [监听管理员同意入群申请事件](#addreceivegroupadminapprovallistener)
+    - [addReceiveGroupAdminApprovalListener](#addreceivegroupadminapprovallistener)
+    - [removeReceiveGroupAdminApprovalListener](#removereceivegroupadminapprovallistener)
+
+
+
   - [点击消息通知事件（Android Only）](#addclickmessagenotificationlistener)
     - [addClickMessageNotificationListener](#addclickmessagenotificationlistener)
     - [removeClickMessageNotificationListener](#addclickmessagenotificationlistener)
@@ -347,8 +372,151 @@ JMessage.createGroup({ name: 'group_name', desc: 'group_desc' },
 
 #### 参数说明
 
-- name: 群组名。不支持 "\n" 和 "\r" 字符，长度限制为 0 ~ 64 Byte。
-- desc: 群组描述。长度限制为 0 ~ 250 Byte。
+- name (string): 群组名。不支持 "\n" 和 "\r" 字符，长度限制为 0 ~ 64 Byte。
+- groupType (string): 指定创建群的类型，可以为 'private' 和 'public', 默认为 private。
+- desc (string): 群组描述。长度限制为 0 ~ 250 Byte。
+
+
+### dissolveGroup
+
+解散群
+
+#### 示例
+```js
+JMessage.dissolveGroup({ groupId: 'group_id' },
+  () => {  // 
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+- groupId (string): 要解散的群组 id。
+
+
+### addGroupAdmins
+
+批量添加管理员
+
+#### 示例
+```js
+JMessage.addGroupAdmins({ groupId: 'group_id', usernames: ['ex_username1', 'ex_username2'] },
+  () => {  // 
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+- groupId (string): 指定操作的群 groupId。
+- usernames (array<string>): 被添加的的用户名数组。
+
+### removeGroupAdmins
+
+批量删除管理员
+
+#### 示例
+```js
+JMessage.removeGroupAdmins({ groupId: 'group_id', usernames: ['ex_username1', 'ex_username2'] },
+  () => {  // 
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+- groupId (string): 指定操作的群 groupId。
+- usernames (array<string>): 被移除的的用户名数组。
+
+### changeGroupType
+
+修改群类型
+
+#### 示例
+```js
+JMessage.changeGroupType({ groupId: 'group_id', type: 'public' },
+  () => {  // 
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+- groupId (string): 指定操作的群 groupId。
+- type (string): 要修改的类型可以为如下值  'private' | 'public'
+
+### getPublicGroupInfos
+
+分页获取指定 appKey 下的共有群
+
+#### 示例
+```js
+JMessage.getPublicGroupInfos({ appKey: 'my_appkey', start: 0, count: 20 },
+  (groudArr) => {  //group = [{GroupInfo}] 
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+- appKey (string): 获取指定 appkey
+- start (int): 开始的位置
+- count (int): 获取的数量
+
+### applyJoinGroup
+
+申请入群（公开群）
+
+#### 示例
+```js
+JMessage.applyJoinGroup({ appKey: 'group_id', reason: 'Hello I from ...' },
+  () => {  
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+
+### processApplyJoinGroup
+
+批量处理入群（公开群）申请
+
+#### 示例
+```js
+JMessage.processApplyJoinGroup({ events: ['ex_event_id_1', 'ex_event_id_2'], reason: 'Hello I from ...' },
+  () => {  
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+- events (array<string>): eventId 数组,当有用户申请入群的时候(或者被要求)会回调一个 event(通过 addReceiveApplyJoinGroupApprovalListener 监听)，每个 event 会有个 id，用于审核入群操作。
+- reason (string): 入群理由。
+
+
 
 ## 聊天
 
@@ -1464,3 +1632,71 @@ JMessage.removeUploadProgressListener(listener) // 移除监听(一般在 compon
 - result
   - messageId：消息 id。
   - progress：上传进度，从 0-1 float 类型。
+
+### 群组事件
+
+#### addReceiveApplyJoinGroupApprovalListener
+
+监听接收入群申请事件
+
+##### 示例
+
+```javascript
+var listener = (result) => { }
+
+JMessage.addReceiveApplyJoinGroupApprovalListener(listener) // 添加监听
+JMessage.removeReceiveApplyJoinGroupApprovalListener(listener) // 移除监听(一般在 componentWillUnmount 中调用)
+```
+
+##### 回调参数说明
+
+- event
+  - eventId (string)：消息 id。
+  - groupId (string)：申请入群的 groudId。
+  - isInitiativeApply (boolean)：是否是用户主动申请入群，YES：主动申请加入，NO：被邀请加入
+  - sendApplyUser ([{UserInfo}])：发送申请的用户
+  - reason (string)：入群原因
+
+#### addReceiveGroupAdminRejectListener
+
+监听管理员拒绝入群申请事件
+
+##### 示例
+
+```javascript
+var listener = (result) => { }
+
+JMessage.addReceiveGroupAdminRejectListener(listener) // 添加监听
+JMessage.removeReceiveGroupAdminRejectListener(listener) // 移除监听(一般在 componentWillUnmount 中调用)
+```
+
+##### 回调参数说明
+
+- result
+  - eventId (string): 消息 id。
+  - rejectReason (string): 拒绝原因。
+  - groupManager ({UserInfo}): 操作的管理员
+
+
+#### addReceiveGroupAdminApprovalListener
+
+监听管理员同意入群申请事件
+
+##### 示例
+
+```javascript
+var listener = (result) => { }
+
+JMessage.addReceiveGroupAdminApprovalListener(listener) // 添加监听
+JMessage.removeReceiveGroupAdminApprovalListener(listener) // 移除监听(一般在 componentWillUnmount 中调用)
+```
+
+##### 回调参数说明
+
+- result
+  - isAgreeApply (boolean): 管理员是否同意申请，YES：同意，NO：拒绝.
+  - applyEventID (string): 申请入群事件的事件 id.
+  - groupId (string): 群 gid.
+  - groupAdmin {GroupInfo}: 操作的管理员.
+  - users [{UserInfo}]: 申请或被邀请加入群的用户，即：实际入群的用户
+
