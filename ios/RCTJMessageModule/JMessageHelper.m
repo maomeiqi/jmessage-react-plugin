@@ -111,7 +111,7 @@
 //                                                          object:@{
 //                                                                   @"type":@"invite_received",
 //                                                                   @"reason":[friendEvent eventDescription],
-//                                                                   @"fromUsername":[friendEvent getFromUsername],
+//                                                                   @"fromUsername":[friendEvent getFromUser].username,
 //                                                                   @"fromUserAppKey":user.appKey}];
 //    }
 //      break;
@@ -122,7 +122,7 @@
 //                                                          object:@{
 //                                                                   @"type":@"invite_accepted",
 //                                                                   @"reason":[friendEvent eventDescription],
-//                                                                   @"fromUsername":[friendEvent getFromUsername],
+//                                                                   @"fromUsername":[friendEvent getFromUser].username,
 //                                                                   @"fromUserAppKey":user.appKey}];
 //    }
 //      break;
@@ -133,7 +133,7 @@
 //                                                          object:@{
 //                                                                   @"type":@"invite_declined",
 //                                                                   @"reason":[friendEvent eventDescription],
-//                                                                   @"fromUsername":[friendEvent getFromUsername],
+//                                                                   @"fromUsername":[friendEvent getFromUser].username,
 //                                                                   @"fromUserAppKey":user.appKey}];
 //    }
 //      break;
@@ -144,7 +144,7 @@
 //                                                          object:@{
 //                                                                   @"type":@"contact_deleted",
 //                                                                   @"reason":[friendEvent eventDescription],
-//                                                                   @"fromUsername":[friendEvent getFromUsername],
+//                                                                   @"fromUsername":[friendEvent getFromUser].username,
 //                                                                   @"fromUserAppKey":user.appKey}];
 //    }
 //      break;
@@ -201,7 +201,7 @@
                                                                 object:@{
                                                                          @"type":@"invite_received",
                                                                          @"reason":[friendEvent eventDescription],
-                                                                         @"fromUsername":[friendEvent getFromUsername],
+                                                                         @"fromUsername":[friendEvent getFromUser].username,
                                                                          @"fromUserAppKey":user.appKey}];
         }
             break;
@@ -212,7 +212,7 @@
                                                                 object:@{
                                                                          @"type":@"invite_accepted",
                                                                          @"reason":[friendEvent eventDescription],
-                                                                         @"fromUsername":[friendEvent getFromUsername],
+                                                                         @"fromUsername":[friendEvent getFromUser].username,
                                                                          @"fromUserAppKey":user.appKey}];
         }
             break;
@@ -223,7 +223,7 @@
                                                                 object:@{
                                                                          @"type":@"invite_declined",
                                                                          @"reason":[friendEvent eventDescription],
-                                                                         @"fromUsername":[friendEvent getFromUsername],
+                                                                         @"fromUsername":[friendEvent getFromUser].username,
                                                                          @"fromUserAppKey":user.appKey}];
         }
             break;
@@ -234,7 +234,7 @@
                                                                 object:@{
                                                                          @"type":@"contact_deleted",
                                                                          @"reason":[friendEvent eventDescription],
-                                                                         @"fromUsername":[friendEvent getFromUsername],
+                                                                         @"fromUsername":[friendEvent getFromUser].username,
                                                                          @"fromUserAppKey":user.appKey}];
         }
             break;
