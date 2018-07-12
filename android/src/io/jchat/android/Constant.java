@@ -57,7 +57,7 @@ public class Constant {
     public static final String GROUP_MANAGER = "groupManager";
     public static final String START = "start";
     public static final String COUNT = "count";
-
+    public static final String IS_RESPOND_INVITER = "isRespondInviter";
 
     /**
      * Message
@@ -119,6 +119,5 @@ public class Constant {
     public static final String EVENT_ID = "eventId";
     public static final String EVENTS = "events";
     public static final String APPLY_EVENT_ID = "applyEventId";
-
 
 }
