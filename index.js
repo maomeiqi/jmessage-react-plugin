@@ -623,7 +623,7 @@ export default class JMessage {
     }
 
     /**
-     * 下载指定图片消息的原图，如果已经下载，会直接返回本地文件路径，不会重复下载。
+     * 下载指定图片消息的缩略图，如果已经下载，会直接返回本地文件路径，不会重复下载。
      *
      * @param {object} params = {
      *  'type': String,            // 'single' / 'group'
@@ -637,6 +637,23 @@ export default class JMessage {
      */
     static downloadOriginalImage(params, success, error) {
         JMessageModule.downloadOriginalImage(params, success, error)
+    }
+
+    /**
+     * 下载指定图片消息的原图，如果已经下载，会直接返回本地文件路径，不会重复下载。
+     *
+     * @param {object} params = {
+     *  'type': String,            // 'single' / 'group'
+     *  'groupId': String,         // 目标群组 id。
+     *  'username': String,        // 目标用户名。
+     *  'appKey': String,          // 目标用户所属 AppKey。
+     *  'messageId': String        // 指定消息 id。
+     * }
+     * @param {function} success = function ({'messageId': String, 'filePath': String}) {}
+     * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+     */
+    static downloadThumbImage(params, success, error) {
+        JMessageModule.downloadThumbImage(params, success, error)
     }
 
     /**
