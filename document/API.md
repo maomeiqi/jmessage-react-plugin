@@ -45,6 +45,7 @@ import JMessage from 'jmessage-react-plugin';
   - [retractMessage](#retractmessage)
   - [getHistoryMessages](#gethistorymessages)
   - [downloadOriginalImage](#downloadoriginalimage)
+  - [downloadThumbImage](#downloadthumbimage)
   - [downloadVoiceFile](#downloadvoicefile)
   - [downloadFile](#downloadfile)
 - [会话](#会话)
@@ -107,7 +108,7 @@ import JMessage from 'jmessage-react-plugin';
 
 
 
-  - [点击消息通知事件（Android Only）](#addclickmessagenotificationlistener)
+- [点击消息通知事件（Android Only）](#addclickmessagenotificationlistener)
     - [addClickMessageNotificationListener](#addclickmessagenotificationlistener)
     - [removeClickMessageNotificationListener](#addclickmessagenotificationlistener)
 
@@ -927,6 +928,33 @@ JMessage.getHistoryMessages({ type: 'single', username: 'username',
 
 ```js
 JMessage.downloadOriginalImage({ type: 'single', username: 'username',
+  messageId: 'target_msg_id' },
+  (result) => {
+    var msgId = result.messageId
+    var imgPath = result.filePath
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+
+- type: 会话类型。可以为 'single' 或 'group' 。
+- username: 对方用户的用户名。当 `type` 为 'single' 时，`username` 为必填。
+- appKey: 对方用户所属应用的 AppKey。如果不填，默认为当前应用。
+- groupId: 对象群组 id。当 `type` 为 'group' 时，`groupId` 为必填。
+- messageId: 图片消息 id。
+
+### downloadThumbImage
+
+下载图片消息缩略图。如果已经下载，会直接返回本地文件路径，不会重复下载。
+
+#### 示例
+
+```js
+JMessage.downloadThumbImage({ type: 'single', username: 'username',
   messageId: 'target_msg_id' },
   (result) => {
     var msgId = result.messageId

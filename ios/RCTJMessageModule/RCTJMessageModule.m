@@ -1664,6 +1664,62 @@ RCT_EXPORT_METHOD(downloadOriginalImage:(NSDictionary *)param
   }];
 }
 
+RCT_EXPORT_METHOD(downloadThumbImage:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallback:(RCTResponseSenderBlock)failCallback) {
+    if (param[@"messageId"] == nil ||
+        param[@"type"] == nil) {
+        failCallback(@[[self getParamError]]);
+        return;
+    }
+    
+    NSString *appKey = nil;
+    if (param[@"appKey"]) {
+        appKey = param[@"appKey"];
+    } else {
+        appKey = [JMessageHelper shareInstance].JMessageAppKey;
+    }
+    
+    if ([param[@"type"] isEqual: @"single"] && param[@"username"] != nil) {
+        
+    } else {
+        if ([param[@"type"] isEqual: @"group"] && param[@"groupId"] != nil) {
+        } else {
+            failCallback(@[[self getParamError]]);
+            return;
+        }
+    }
+    [self getConversationWithDictionary:param callback:^(JMSGConversation *conversation, NSError *error) {
+        if (error) {
+            failCallback(@[[error errorToDictionary]]);
+            return;
+        }
+        
+        JMSGMessage *message = [conversation messageWithMessageId:param[@"messageId"]];
+        if (message == nil) {
+            failCallback(@[[self getErrorWithLog:@"cann't find this message"]]);
+            return;
+        }
+        
+        if (message.contentType != kJMSGContentTypeImage) {
+            failCallback(@[[self getErrorWithLog:@"It is not voice message"]]);
+            return;
+        } else {
+            JMSGImageContent *content = (JMSGImageContent *) message.content;
+            [content thumbImageData:^(NSData *data, NSString *objectId, NSError *error) {
+                if (error) {
+                    failCallback(@[[error errorToDictionary]]);
+                    return;
+                }
+                
+                JMSGMediaAbstractContent *mediaContent = (JMSGMediaAbstractContent *) message.content;
+                successCallback(@[@{@"messageId": message.msgId,
+                                    @"filePath": [content thumbImageLocalPath]}]);
+            }];
+        }
+    }];
+}
+
 RCT_EXPORT_METHOD(downloadVoiceFile:(NSDictionary *)param
                   successCallback:(RCTResponseSenderBlock)successCallback
                   failCallback:(RCTResponseSenderBlock)failCallback) {
