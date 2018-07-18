@@ -1074,6 +1074,44 @@ public class JMessageModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void downloadThumbImage(ReadableMap map, final Callback success, final Callback fail) {
+        try {
+            Conversation conversation = mJMessageUtils.getConversation(map);
+            if (null == conversation) {
+                mJMessageUtils.handleError(fail, ERR_CODE_CONVERSATION, ERR_MSG_CONVERSATION);
+                return;
+            }
+            final String messageId = map.getString(Constant.MESSAGE_ID);
+            Message msg = conversation.getMessage(Integer.parseInt(messageId));
+            if (null == msg) {
+                mJMessageUtils.handleError(fail, ERR_CODE_MESSAGE, ERR_MSG_MESSAGE);
+                return;
+            }
+            if (msg.getContentType() != ContentType.image) {
+                mJMessageUtils.handleError(fail, ERR_CODE_MESSAGE, "Wrong message type");
+                return;
+            }
+            ImageContent content = (ImageContent) msg.getContent();
+            content.downloadThumbnailImage(msg, new DownloadCompletionCallback() {
+                @Override
+                public void onComplete(int status, String desc, File file) {
+                    if (status == 0) {
+                        WritableMap result = Arguments.createMap();
+                        result.putString(Constant.MESSAGE_ID, messageId);
+                        result.putString(Constant.FILE_PATH, file.getAbsolutePath());
+                        mJMessageUtils.handleCallbackWithObject(status, desc, success, fail, result);
+                    } else {
+                        mJMessageUtils.handleError(fail, status, desc);
+                    }
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            mJMessageUtils.handleError(fail, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);
+        }
+    }
+
+    @ReactMethod
     public void downloadVoiceFile(ReadableMap map, final Callback success, final Callback fail) {
         try {
             Conversation conversation = mJMessageUtils.getConversation(map);
