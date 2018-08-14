@@ -105,6 +105,7 @@ public class Constant {
     static final String PROGRESS = "progress";
     public static final String UNRECEIPT_COUNT = "unreceiptCount";
     public static final String IS_DESCEND = "isDescend";
+    public static final String UNKNOW = "unknow";
 
     /**
      * ChatRoom
