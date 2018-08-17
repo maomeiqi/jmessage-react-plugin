@@ -1599,8 +1599,8 @@ RCT_EXPORT_METHOD(downloadOriginalUserAvatar:(NSDictionary *)param
       }
 
       successCallback(@[@{@"username": user.username,
-                          @"appKey": user.appKey,
-                          @"filePath": [user largeAvatarLocalPath]}]);
+                          @"appKey": user.appKey ?: @"",
+                          @"filePath": [user largeAvatarLocalPath] ?: @""}]);
     }];
   }];
   
@@ -1658,7 +1658,7 @@ RCT_EXPORT_METHOD(downloadOriginalImage:(NSDictionary *)param
         
         JMSGMediaAbstractContent *mediaContent = (JMSGMediaAbstractContent *) message.content;
         successCallback(@[@{@"messageId": message.msgId,
-                            @"filePath": [mediaContent originMediaLocalPath]}]);
+                            @"filePath": [mediaContent originMediaLocalPath] ?: @""}]);
       }];
     }
   }];
@@ -1714,7 +1714,7 @@ RCT_EXPORT_METHOD(downloadThumbImage:(NSDictionary *)param
                 
                 JMSGMediaAbstractContent *mediaContent = (JMSGMediaAbstractContent *) message.content;
                 successCallback(@[@{@"messageId": message.msgId,
-                                    @"filePath": [content thumbImageLocalPath]}]);
+                                    @"filePath": [content thumbImageLocalPath] ?: @""}]);
             }];
         }
     }];
@@ -1772,7 +1772,7 @@ RCT_EXPORT_METHOD(downloadVoiceFile:(NSDictionary *)param
         
         JMSGMediaAbstractContent *mediaContent = (JMSGMediaAbstractContent *) message.content;
         successCallback(@[@{@"messageId": message.msgId,
-                         @"filePath": [mediaContent originMediaLocalPath]}]);
+                            @"filePath": [mediaContent originMediaLocalPath] ?: @""}]);
       }];
     }
   }];
@@ -1830,7 +1830,7 @@ RCT_EXPORT_METHOD(downloadFile:(NSDictionary *)param
         }
         JMSGFileContent *fileContent = (JMSGFileContent *) message.content;
         successCallback(@[@{@"messageId": message.msgId,
-                            @"filePath":[fileContent originMediaLocalPath]}]);
+                            @"filePath":[fileContent originMediaLocalPath] ?: @"" }]);
       }];
     }
   }];
@@ -2319,7 +2319,7 @@ RCT_EXPORT_METHOD(downloadThumbGroupAvatar:(NSDictionary *)param
         return ;
       }
       
-      successCallback(@[@{@"id": objectId, @"filePath": group.thumbAvatarLocalPath}]);
+        successCallback(@[@{@"id": objectId, @"filePath": group.thumbAvatarLocalPath ?: @""}]);
     }];
   }];
 }
@@ -2345,7 +2345,7 @@ RCT_EXPORT_METHOD(downloadOriginalGroupAvatar:(NSDictionary *)param
         return ;
       }
       
-      successCallback(@[@{@"id": objectId, @"filePath": group.largeAvatarLocalPath}]);
+      successCallback(@[@{@"id": objectId, @"filePath": group.largeAvatarLocalPath  ?: @""}]);
     }];
   }];
 }
