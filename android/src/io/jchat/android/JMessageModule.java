@@ -1713,9 +1713,6 @@ public class JMessageModule extends ReactContextBaseJavaModule {
         // WritableMap map = Arguments.createMap();
         int count = JMessageClient.getAllUnReadMsgCount();
         // map.putInt("count", count);
-        if (count < 0) {
-            count = 0;
-        }
         success.invoke(count);
     }
 
