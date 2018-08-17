@@ -88,6 +88,11 @@ export default class Chat extends Component {
       auroraMsg.text = jmessage.eventType
     }
 
+    if(jmessage.type === 'prompt') {
+      auroraMsg.msgType = 'event'
+      auroraMsg.text = jmessage.promptText
+    }
+
     var user = {
       userId: "1",
       displayName: "",
@@ -309,6 +314,24 @@ export default class Chat extends Component {
     Alert.alert('onSendGalleryFiles',JSON.stringify(message))
   }
 
+  onMsgLongClick = (message) => {
+    var msg = {}
+    msg.type = 'group'
+    msg.groupId = this.conversation.groupId
+    msg.messageId = message.msgId
+    Alert.alert('撤回消息','撤回消息')
+    JMessage.retractMessage(msg, (success) => {
+      var eventMsg = {}
+      eventMsg.msgId = message.msgId
+      eventMsg.msgType = "event"
+      eventMsg.text = "撤回的消息"
+      AuroraIController.updateMessage(message)
+    }, (error) => {
+
+    })
+    
+  }
+
   onStatusViewClick = (message) => {
     console.log(message)
     message.status = 'send_succeed'
@@ -522,6 +545,7 @@ export default class Chat extends Component {
           ref="MessageList"
           onAvatarClick={this.onAvatarClick}
           onMsgClick={this.onMsgClick}
+          onMsgLongClick={this.onMsgLongClick}
           onStatusViewClick={this.onStatusViewClick}
           onTouchMsgList={this.onTouchMsgList}
           onTapMessageCell={this.onTapMessageCell}
