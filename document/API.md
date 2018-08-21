@@ -33,6 +33,8 @@ import JMessage from 'jmessage-react-plugin';
   - [applyJoinGroup](#applyjoingroup)
   - [processApplyJoinGroup](#processapplyjoingroup)
   - [dissolveGroup](#dissolvegroup)
+  - [getGroupIds](#getgroupids)
+  - [getGroupInfo](#getgroupinfo)
 - [聊天](#聊天)
   - [createSendMessage](#createsendmessage)
   - [sendMessage](#sendmessage)
@@ -55,6 +57,7 @@ import JMessage from 'jmessage-react-plugin';
   - [exitConversation](#exitconversation)
   - [getConversation](#getconversation)
   - [getConversations](#getconversations)
+  - [getAllUnreadCount](#getallunreadcount)
   - [resetUnreadMessageCount](#resetunreadmessagecount)
 - [聊天室](#聊天室)
   - [getChatRoomListByApp](#getchatroomlistbyapp)
@@ -397,6 +400,65 @@ JMessage.dissolveGroup({ groupId: 'group_id' },
 #### 参数说明
 - groupId (string): 要解散的群组 id。
 
+### getGroupIds
+
+获取当前用户群组
+
+#### 示例
+```js
+JMessage.getGroupIds(
+  (result) => {
+    /**
+     * result {Array[Number]} 当前用户所加入的群组的groupID的list
+     */
+  }, (error) => {
+    /**
+     * error {Object} {code:Number,desc:String}
+     */
+  }
+)
+```
+
+#### 参数说明
+
+无
+
+### getGroupInfo
+
+根据群组id获取群组信息
+
+#### 示例
+
+```js
+JMessage.getGroupInfo(
+  { id: "1234567" },
+  (result) => {
+    /**
+     * result {Object} 群组信息
+        {
+          desc:""
+          id:"1234567"
+          isBlocked:false
+          isNoDisturb:false
+          level:0
+          maxMemberCount:500
+          name:"China no 1"
+          owner:"1234"
+          ownerAppKey:"abcdef..."
+          type:"group" // or single
+        }
+     */
+  }, (error) => {
+    /**
+     * error {Object} {code:Number,desc:String}
+     */
+  }
+)
+```
+
+#### 参数说明
+
+- id(string): 指定群组
 
 ### addGroupAdmins
 
@@ -1156,6 +1218,28 @@ JMessage.getConversations((conArr) => { // conArr: 会话数组。
     var desc = error.description
 })
 ```
+
+### getAllUnreadCount
+
+当前用户所有会话的未读消息总数
+
+- ⚠️  截止jmessage-sdk-2.6.1 返回的数量为会话列表的未读总数即包括了被移除的群组、好友的未读.
+
+#### 示例
+
+```js
+JMessage.getAllUnreadCount(
+  (result) => {
+    /**
+     * result {Number} 当前用户所有会话的未读消息总数
+     */
+  }
+)
+```
+
+#### 参数说明
+
+无
 
 ### resetUnreadMessageCount
 

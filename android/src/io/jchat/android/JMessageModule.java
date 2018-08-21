@@ -1710,10 +1710,10 @@ public class JMessageModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void getAllUnreadCount(Callback success) {
-        WritableMap map = Arguments.createMap();
+        // WritableMap map = Arguments.createMap();
         int count = JMessageClient.getAllUnReadMsgCount();
-        map.putInt("count", count);
-        success.invoke(map);
+        // map.putInt("count", count);
+        success.invoke(count);
     }
 
     @ReactMethod

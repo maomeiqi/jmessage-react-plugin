@@ -243,8 +243,9 @@ public class ResultUtils {
                             result.putString(Constant.EVENT_TYPE, "group_type_changed");
                             break;
                     }
+                    break;
                 default:
-                    return null;
+                    result.putString(Constant.TYPE, Constant.UNKNOW);
             }
         } catch (Exception e) {
             e.printStackTrace();
