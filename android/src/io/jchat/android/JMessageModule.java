@@ -224,7 +224,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void getUserInfo(ReadableMap map, final Callback success, final Callback fail) {
         String username = map.getString(Constant.USERNAME);
-        String appKey = map.getString(Constant.APP_KEY);
+        String appKey = map.hasKey(Constant.APP_KEY) ? map.getString(Constant.APP_KEY) : "";
         JMessageClient.getUserInfo(username, appKey, new GetUserInfoCallback() {
             @Override
             public void gotResult(int i, String s, UserInfo userInfo) {
