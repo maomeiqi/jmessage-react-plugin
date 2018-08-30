@@ -379,7 +379,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
                     options.setCustomNotificationEnabled(optionMap.getBoolean("isCustomNotificationEnabled"));
                 }
                 if (optionMap.hasKey("notificationTitle")) {
-                    options.setNotificationText(optionMap.getString("notificationTitle"));
+                    options.setNotificationTitle(optionMap.getString("notificationTitle"));
                 }
                 if (optionMap.hasKey("notificationText")) {
                     options.setNotificationText(optionMap.getString("notificationText"));
@@ -1125,7 +1125,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
                 mJMessageUtils.handleError(fail, ERR_CODE_MESSAGE, ERR_MSG_MESSAGE);
                 return;
             }
-            if (msg.getContentType() != ContentType.image) {
+            if (msg.getContentType() != ContentType.voice) {
                 mJMessageUtils.handleError(fail, ERR_CODE_MESSAGE, "Wrong message type");
                 return;
             }

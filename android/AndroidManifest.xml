@@ -85,6 +85,12 @@
         </receiver>
 
         <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
+        
+        <!-- Required since JMessage 2.7.0 SDK 核心功能-->
+        <provider
+            android:name="cn.jpush.im.android.helpers.ipc.IMProvider"
+            android:authorities="${applicationId}.IMProvider"
+            android:exported="false" />
     </application>
 
 </manifest>
