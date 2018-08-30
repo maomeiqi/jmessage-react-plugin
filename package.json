@@ -18,7 +18,7 @@
     "url": "https://github.com/jpush/jmessage-react-plugin/issues"
   },
   "peerDependencies": {
-    "jcore-react-native": ">= 1.1.8"
+    "jcore-react-native": ">= 1.2.9"
   },
   "rnpm": {
     "ios": {
