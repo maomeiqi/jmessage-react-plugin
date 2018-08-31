@@ -218,6 +218,30 @@ public class ResultUtils {
                         case group_info_updated:
                             result.putString(Constant.EVENT_TYPE, "group_info_updated");
                             break;
+                        case group_member_keep_silence:
+                            result.putString(Constant.EVENT_TYPE, "group_member_keep_silence");
+                            break;
+                        case group_member_keep_silence_cancel:
+                            result.putString(Constant.EVENT_TYPE, "group_member_keep_silence_cancel");
+                            break;
+                        case group_keeper_added:
+                            result.putString(Constant.EVENT_TYPE, "group_keeper_added");
+                            break;
+                        case group_keeper_removed:
+                            result.putString(Constant.EVENT_TYPE, "group_keeper_removed");
+                            break;
+                        case group_dissolved:
+                            //解散群组事件
+                            result.putString(Constant.EVENT_TYPE, "group_dissolved");
+                            break;
+                        case group_owner_changed:
+                            //移交群组事件
+                            result.putString(Constant.EVENT_TYPE, "group_owner_changed");
+                            break;
+                        case group_type_changed:
+                            //移交群组事件
+                            result.putString(Constant.EVENT_TYPE, "group_type_changed");
+                            break;
                     }
                     break;
                 default:

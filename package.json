@@ -1,6 +1,6 @@
 {
   "name": "jmessage-react-plugin",
-  "version": "2.4.0",
+  "version": "2.4.2",
   "description": "a jmessage plugin for react native application",
   "main": "index.js",
   "repository": {
@@ -18,7 +18,7 @@
     "url": "https://github.com/jpush/jmessage-react-plugin/issues"
   },
   "peerDependencies": {
-    "jcore-react-native": ">= 1.1.8"
+    "jcore-react-native": ">= 1.2.9"
   },
   "rnpm": {
     "ios": {

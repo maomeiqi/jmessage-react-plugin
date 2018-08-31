@@ -224,7 +224,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void getUserInfo(ReadableMap map, final Callback success, final Callback fail) {
         String username = map.getString(Constant.USERNAME);
-        String appKey = map.getString(Constant.APP_KEY);
+        String appKey = map.hasKey(Constant.APP_KEY) ? map.getString(Constant.APP_KEY) : "";
         JMessageClient.getUserInfo(username, appKey, new GetUserInfoCallback() {
             @Override
             public void gotResult(int i, String s, UserInfo userInfo) {
@@ -379,7 +379,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
                     options.setCustomNotificationEnabled(optionMap.getBoolean("isCustomNotificationEnabled"));
                 }
                 if (optionMap.hasKey("notificationTitle")) {
-                    options.setNotificationText(optionMap.getString("notificationTitle"));
+                    options.setNotificationTitle(optionMap.getString("notificationTitle"));
                 }
                 if (optionMap.hasKey("notificationText")) {
                     options.setNotificationText(optionMap.getString("notificationText"));
@@ -1125,7 +1125,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
                 mJMessageUtils.handleError(fail, ERR_CODE_MESSAGE, ERR_MSG_MESSAGE);
                 return;
             }
-            if (msg.getContentType() != ContentType.image) {
+            if (msg.getContentType() != ContentType.voice) {
                 mJMessageUtils.handleError(fail, ERR_CODE_MESSAGE, "Wrong message type");
                 return;
             }
@@ -1710,10 +1710,10 @@ public class JMessageModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void getAllUnreadCount(Callback success) {
-        WritableMap map = Arguments.createMap();
+        // WritableMap map = Arguments.createMap();
         int count = JMessageClient.getAllUnReadMsgCount();
-        map.putInt("count", count);
-        success.invoke(map);
+        // map.putInt("count", count);
+        success.invoke(count);
     }
 
     @ReactMethod

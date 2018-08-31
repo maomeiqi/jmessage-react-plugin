@@ -4,6 +4,8 @@ import android.app.Application;
 import android.util.Log;
 
 import com.facebook.react.ReactApplication;
+import com.rnfs.RNFSPackage;
+import io.jchat.android.JMessageReactPackage;
 
 import cn.jiguang.imui.messagelist.ReactIMUIPackage;
 import cn.jpush.im.android.api.JMessageClient;
