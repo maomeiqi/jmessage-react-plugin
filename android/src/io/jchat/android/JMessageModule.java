@@ -1502,7 +1502,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
                         options.setCustomNotificationEnabled(optionMap.getBoolean("isCustomNotificationEnabled"));
                     }
                     if (optionMap.hasKey("notificationTitle")) {
-                        options.setNotificationText(optionMap.getString("notificationTitle"));
+                        options.setNotificationTitle(optionMap.getString("notificationTitle"));
                     }
                     if (optionMap.hasKey("notificationText")) {
                         options.setNotificationText(optionMap.getString("notificationText"));
