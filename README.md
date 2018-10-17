@@ -15,7 +15,7 @@ react-native link
 在 Podfile 中添加如下代码:
 
 ```
-pod 'JMessageRN', :path => '../node_modules/jmessage-react-native'
+pod 'JMessageRN', :path => '../node_modules/jmessage-react-plugin'
 ```
 
 终端执行如下指令:
