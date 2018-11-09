@@ -404,6 +404,14 @@ export default class Chat extends Component {
       AuroraIController.scrollToBottom(true)
       this.setMessageTarget(msg)
       Alert.alert('send text', JSON.stringify(msg))
+
+      msg.messageSendingOptions = {
+        isShowNotification:  true,
+        isRetainOffline:  true,
+        isCustomNotificationEnabled:  true,
+        notificationTitle: "Title Test",
+        notificationText: "context"
+      };
       
       JMessage.sendMessage(msg, (jmessage) => {
         var auroraMsg = this.convertJMessageToAuroraMsg(jmessage)

@@ -2060,7 +2060,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
         List<Message> list = event.getMessages();
         Log.d(TAG, "收到聊天室消息");
         getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                .emit(RECEIVE_MSG_EVENT, ResultUtils.toJSArray(list));
+                .emit(RECEIVE_CHAT_ROOM_MSG_EVENT, ResultUtils.toJSArray(list));
     }
 
     public void onEvent(GroupApprovalEvent event) {
