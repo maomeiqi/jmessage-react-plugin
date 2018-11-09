@@ -20,7 +20,6 @@ import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
-import com.google.gson.jpush.JsonObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -31,6 +30,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import cn.jmessage.support.google.gson.JsonObject;
 import cn.jpush.im.android.api.ChatRoomManager;
 import cn.jpush.im.android.api.ContactManager;
 import cn.jpush.im.android.api.JMessageClient;
@@ -2060,7 +2060,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
         List<Message> list = event.getMessages();
         Log.d(TAG, "收到聊天室消息");
         getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                .emit(RECEIVE_MSG_EVENT, ResultUtils.toJSArray(list));
+                .emit(RECEIVE_CHAT_ROOM_MSG_EVENT, ResultUtils.toJSArray(list));
     }
 
     public void onEvent(GroupApprovalEvent event) {

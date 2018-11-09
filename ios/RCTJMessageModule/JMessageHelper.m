@@ -200,7 +200,7 @@
             [[NSNotificationCenter defaultCenter] postNotificationName:kJJMessageContactNotify
                                                                 object:@{
                                                                          @"type":@"invite_received",
-                                                                         @"reason":[friendEvent eventDescription],
+                                                                         @"reason":[friendEvent eventDescription] ?: @"",
                                                                          @"fromUsername":[friendEvent getFromUser].username,
                                                                          @"fromUserAppKey":user.appKey}];
         }
@@ -211,7 +211,7 @@
             [[NSNotificationCenter defaultCenter] postNotificationName:kJJMessageContactNotify
                                                                 object:@{
                                                                          @"type":@"invite_accepted",
-                                                                         @"reason":[friendEvent eventDescription],
+                                                                         @"reason":[friendEvent eventDescription] ?: @"",
                                                                          @"fromUsername":[friendEvent getFromUser].username,
                                                                          @"fromUserAppKey":user.appKey}];
         }
@@ -222,7 +222,7 @@
             [[NSNotificationCenter defaultCenter] postNotificationName:kJJMessageContactNotify
                                                                 object:@{
                                                                          @"type":@"invite_declined",
-                                                                         @"reason":[friendEvent eventDescription],
+                                                                         @"reason":[friendEvent eventDescription] ?: @"",
                                                                          @"fromUsername":[friendEvent getFromUser].username,
                                                                          @"fromUserAppKey":user.appKey}];
         }
@@ -233,7 +233,7 @@
             [[NSNotificationCenter defaultCenter] postNotificationName:kJJMessageContactNotify
                                                                 object:@{
                                                                          @"type":@"contact_deleted",
-                                                                         @"reason":[friendEvent eventDescription],
+                                                                         @"reason":[friendEvent eventDescription] ?: @"",
                                                                          @"fromUsername":[friendEvent getFromUser].username,
                                                                          @"fromUserAppKey":user.appKey}];
         }

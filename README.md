@@ -12,10 +12,13 @@ react-native link
 
 ##### （如果是原生应用集成 react-native）使用 CocoaPods 安装
 
+**注意： 如果已经通过 react-native link 链接了插件，则不需要执行下面的步骤。**
+
+
 在 Podfile 中添加如下代码:
 
 ```
-pod 'JPushRN', :path => '../node_modules/jpush-react-native'
+pod 'JMessageRN', :path => '../node_modules/jmessage-react-plugin'
 ```
 
 终端执行如下指令:
