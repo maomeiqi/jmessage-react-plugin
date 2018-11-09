@@ -94,4 +94,5 @@ example/node_modules/*
 example/npm-debug*
 /*/*.iml
 /*/.iml
+/*/bin/
 
