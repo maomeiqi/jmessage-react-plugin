@@ -92,7 +92,6 @@ build-res/
 *.qshell
 example/node_modules/*
 example/npm-debug*
-/*/*.iml
-/*/.iml
-/*/bin/
+/**/bin/
+.vscode/
 
