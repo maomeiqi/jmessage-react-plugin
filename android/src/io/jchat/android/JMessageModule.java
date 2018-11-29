@@ -1870,7 +1870,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
             List<GroupApprovalEvent> groupApprovalEventList = new ArrayList<>();
 
             for (int i = 0; i < array.size(); i++) {
-                GroupApprovalEvent groupApprovalEvent = groupApprovalEventHashMap.get(array.getString(i));
+                GroupApprovalEvent groupApprovalEvent = groupApprovalEventHashMap.remove(array.getString(i));
                 if (groupApprovalEvent == null) {
                     mJMessageUtils.handleError(fail, ERR_CODE_PARAMETER,
                             ERR_MSG_PARAMETER + ": can't get event through " + array.getString(i));
@@ -2065,7 +2065,9 @@ public class JMessageModule extends ReactContextBaseJavaModule {
 
     public void onEvent(GroupApprovalEvent event) {
         Log.d(TAG, "GroupApprovalEvent, event: " + event);
-        groupApprovalEventHashMap.put(event.getEventId() + "", event);
+        GroupApprovalEvent save_event = new GroupApprovalEvent();
+        save_event = event;
+        groupApprovalEventHashMap.put(event.getEventId() + "", save_event);
         GroupApprovalEvent.Type type = event.getType();
         final WritableMap map = Arguments.createMap();
         map.putString(Constant.EVENT_ID, event.getEventId() + "");
