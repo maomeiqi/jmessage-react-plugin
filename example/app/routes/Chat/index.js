@@ -325,7 +325,7 @@ export default class Chat extends Component {
       eventMsg.msgId = message.msgId
       eventMsg.msgType = "event"
       eventMsg.text = "撤回的消息"
-      AuroraIController.updateMessage(message)
+      AuroraIController.updateMessage(eventMsg);
     }, (error) => {
 
     })
