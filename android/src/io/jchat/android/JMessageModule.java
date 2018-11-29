@@ -105,13 +105,13 @@ public class JMessageModule extends ReactContextBaseJavaModule {
 
     private Context mContext;
     private JMessageUtils mJMessageUtils;
-    private HashMap<String, GroupApprovalEvent> groupApprovalEventHashMap;
+    private static HashMap<String, GroupApprovalEvent> groupApprovalEventHashMap;
 
     public JMessageModule(ReactApplicationContext reactContext, boolean shutdownToast) {
         super(reactContext);
         mJMessageUtils = new JMessageUtils(reactContext, shutdownToast);
         mContext = reactContext;
-        groupApprovalEventHashMap = new HashMap<>();
+
     }
 
     @Override
@@ -122,6 +122,13 @@ public class JMessageModule extends ReactContextBaseJavaModule {
     @Override
     public boolean canOverrideExistingModule() {
         return true;
+    }
+
+    @Override
+    public void initialize() {
+        super.initialize();
+        if(groupApprovalEventHashMap == null)
+            groupApprovalEventHashMap = new HashMap<>();
     }
 
     @ReactMethod
