@@ -5,6 +5,8 @@ import android.util.Log;
 
 import com.facebook.react.ReactApplication;
 import com.rnfs.RNFSPackage;
+
+import cn.jiguang.imui.messagelist.BuildConfig;
 import io.jchat.android.JMessageReactPackage;
 
 import cn.jiguang.imui.messagelist.ReactIMUIPackage;
