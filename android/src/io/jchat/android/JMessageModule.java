@@ -105,7 +105,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
 
     private Context mContext;
     private JMessageUtils mJMessageUtils;
-    private static HashMap<String, GroupApprovalEvent> groupApprovalEventHashMap;
+    public static HashMap<String, GroupApprovalEvent> groupApprovalEventHashMap;
 
     public JMessageModule(ReactApplicationContext reactContext, boolean shutdownToast) {
         super(reactContext);
@@ -1900,7 +1900,19 @@ public class JMessageModule extends ReactContextBaseJavaModule {
                         });
 
             } else {
-                // 忽略拒绝处理，直接返回成功信息
+                // 批量处理只有接受，插件做循环单拒绝
+                for (int i = 0; i < groupApprovalEventList.size(); i++) {
+                    GroupApprovalEvent groupApprovalEvent = groupApprovalEventList.get(i);
+                    groupApprovalEvent.refuseGroupApproval(groupApprovalEvent.getFromUsername(),
+                            groupApprovalEvent.getfromUserAppKey(),
+                            reason,
+                            new BasicCallback() {
+                                @Override
+                                public void gotResult(int status, String desc) {
+
+                                }
+                            });
+                }
                 mJMessageUtils.handleCallback(0, "", success, fail);
             }
         } catch (Exception e) {
