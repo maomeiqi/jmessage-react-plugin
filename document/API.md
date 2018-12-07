@@ -460,6 +460,71 @@ JMessage.getGroupInfo(
 
 - id(string): 指定群组
 
+### updateGroupInfo
+
+更新群组信息。
+
+#### 示例
+
+```js
+JMessage.updateGroupInfo({ id: 'groupId' ,newName: 'group_name', newDesc: 'group_desc' },
+  () => {  
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+
+- id (string): 指定操作的群 groupId
+- newName (string): 群组名。不支持 "\n" 和 "\r" 字符，长度限制为 0 ~ 64 Byte。
+- newDesc (string): 群组描述。长度限制为 0 ~ 250 Byte。
+
+### addGroupMembers
+
+批量添加群成员
+
+#### 示例
+```js
+JMessage.addGroupAdmins({ id: 'group_id', usernameArray: ['ex_username1', 'ex_username2'], appKey: 'appkey' },
+  () => {  // 
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+- id (string): 指定操作的群 groupId
+- usernameArray (array<string>): 被添加的的用户名数组。
+- appKey: 被添加用户所属应用的 AppKey。如果不填，默认为当前应用。
+
+### removeGroupMembers
+
+批量删除群成员
+
+#### 示例
+```js
+JMessage.removeGroupMembers({ id: 'group_id', usernameArray: ['ex_username1', 'ex_username2'], appKey: 'appkey' },
+  () => {  // 
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+- id (string): 指定操作的群 groupId
+- usernameArray (array<string>): 被添加的的用户名数组。
+- appKey: 被添加用户所属应用的 AppKey。如果不填，默认为当前应用。
+
 ### addGroupAdmins
 
 批量添加管理员
@@ -547,7 +612,7 @@ JMessage.getPublicGroupInfos({ appKey: 'my_appkey', start: 0, count: 20 },
 
 #### 示例
 ```js
-JMessage.applyJoinGroup({ appKey: 'group_id', reason: 'Hello I from ...' },
+JMessage.applyJoinGroup({ groupId: 'group_id', reason: 'Hello I from ...' },
   () => {  
     // do something.
 
