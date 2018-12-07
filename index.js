@@ -1203,14 +1203,7 @@ export default class JMessage {
     static getChatRoomConversationList(callback) {
         JMessageModule.getChatRoomConversationList(callback);
     }
-
-
     
-
-
-
-
-
 
     /**
      * 获取所有会话未读消息总数
