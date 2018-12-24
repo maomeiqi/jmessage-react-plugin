@@ -1290,5 +1290,54 @@ export default class JMessage {
     static dissolveGroup(param, success, error) {
         JMessageModule.dissolveGroup(param, success, error);
     }
+    /**
+   * 移交群主
+   * @param {object} params = { groupId: string , username: string, appKey: string}
+   * @param {function} success = function = _ => {}
+   * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+   */
+  static transferGroupOwner(param, success, error) {
+    JMessageModule.transferGroupOwner(param, success, error);
+  }
+
+  /**
+   * 设置禁言或解禁用户
+   * @param {object} params = { groupId: string, isSilence: Boolean, username: string, appKey: string }
+   * @param {function} success = _ => {}
+   * @param {function} error  = function ({'code': '错误码', 'description': '错误信息'}) {}
+   */
+  static setGroupMemberSilence(param, success, error) {
+    JMessageModule.setGroupMemberSilence(param, success, error);
+  }
+
+  /**
+   * 判断用户是否被禁言
+   * @param {object} params = { groupId: string, username: string, appKey: string }
+   * @param {function} success = ({isSilence: Boolean}) {}
+   * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+   */
+  static isSilenceMember(param, success, error) {
+    JMessageModule.isSilenceMember(param, success, error);
+  }
+
+  /**
+   * 获取群禁言列表 （注意在获取群列表成功后该方法才有效）
+   * @param {object} params = { groupId: string}
+   * @param {function} success 
+   * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+   */
+  static groupSilenceMembers(param, success, error) {
+    JMessageModule.groupSilenceMembers(param, success, error);
+  }
+
+   /**
+    * 设置群成员昵称
+    * @param {object} params = { nickName: string, groupId: string , username: string, appKey: string}
+    * @param {function} success  = _ => {}
+    * @param {function} error  = function ({'code': '错误码', 'description': '错误信息'}) {}
+    */
+    static setGroupNickname(param, success, error) {
+    JMessageModule.setGroupNickname(param, success, error);
+  }
 
 }
