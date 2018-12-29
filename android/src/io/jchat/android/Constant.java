@@ -121,4 +121,16 @@ public class Constant {
     public static final String EVENTS = "events";
     public static final String APPLY_EVENT_ID = "applyEventId";
 
+    /**
+     * GroupMemberInfo
+     */
+    public static final String USER = "user";
+    public static final String GROUP_NICKNAME = "groupNickname";
+    public static final String MEMBER_TYPE = "memberType";
+    public static final String MEMBER_TYPE_OWNER = "owner";
+    public static final String MEMBER_TYPE_ADMIN = "admin";
+    public static final String MEMBER_TYPE_ORDINARY = "ordinary";
+    public static final String JOIN_GROUP_TIME = "joinGroupTime";
+    public static final String IS_SILENCE = "isSilence";
+
 }

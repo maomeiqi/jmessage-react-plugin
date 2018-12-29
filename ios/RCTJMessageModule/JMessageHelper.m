@@ -501,6 +501,28 @@
 }
 @end
 
+@implementation JMSGGroupMemberInfo (JMessage)
+- (NSMutableDictionary *)memberToDictionary {
+  NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+  dict[@"user"] = [self.user userToDictionary];
+  dict[@"groupNickname"] = [self displayName] ? : @"";
+  
+  switch (self.memberType) {
+    case kJMSGGroupMemberTypeOrdinary:
+      dict[@"memberType"] = @"ordinary";
+      break;
+    case kJMSGGroupMemberTypeOwner:
+      
+      break;
+    case kJMSGGroupMemberTypeAdmin:
+      dict[@"memberType"] = @"admin";
+      break;
+  }
+  dict[@"joinGroupTime"] = @(self.ctime);
+  return dict;
+}
+@end
+
 @implementation JMSGGroupInfo (JMessage)
 -(NSMutableDictionary*)groupToDictionary {
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];

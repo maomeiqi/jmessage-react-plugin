@@ -37,4 +37,5 @@ repositories {
 dependencies {
     api fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.facebook.react:react-native:+'
+    implementation 'com.google.code.gson:gson:2.8.5'
 }
