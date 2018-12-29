@@ -2,6 +2,7 @@
 
 - [UserInfo](#userinfo)
 - [GroupInfo](#groupinfo)
+- [GroupMemberInfo](#groupmemberinfo)
 - [ChatRoomInfo](#chatroominfo)
 - [Conversation](#conversation)
 - [Message](#message)
@@ -50,6 +51,16 @@ maxMemberCount: number,     // 最大成员数
 isNoDisturb?: boolean,       // 是否免打扰
 isBlocked?: boolean          // 是否屏蔽群消息
 ```
+
+## GroupMemberInfo
+
+```js
+user: UserInfo,             // 群成员用户信息
+groupNickname: string,      // 群昵称
+memberType: 'owner' | 'admin' | 'ordinary', // 分别对应：  群主 | 管理员 | 普通
+joinGroupTime: number,      // 进群时间戳（毫秒）
+```
+
 
 ## ChatRoomInfo
 
