@@ -36,6 +36,7 @@ import cn.jpush.im.android.api.model.ChatRoomInfo;
 import cn.jpush.im.android.api.model.Conversation;
 import cn.jpush.im.android.api.model.GroupBasicInfo;
 import cn.jpush.im.android.api.model.GroupInfo;
+import cn.jpush.im.android.api.model.GroupMemberInfo;
 import cn.jpush.im.android.api.model.Message;
 import cn.jpush.im.android.api.model.UserInfo;
 import io.jchat.android.Constant;
@@ -312,6 +313,25 @@ public class ResultUtils {
         return map;
     }
 
+    public static WritableMap toJSObject(GroupMemberInfo groupMemberInfo) {
+        final WritableMap map = Arguments.createMap();
+        try {
+            map.putMap(Constant.USER, toJSObject(groupMemberInfo.getUserInfo()));
+            map.putString(Constant.GROUP_NICKNAME, groupMemberInfo.getNickName());
+            if (groupMemberInfo.getType() == GroupMemberInfo.Type.group_owner) {
+                map.putString(Constant.MEMBER_TYPE, Constant.MEMBER_TYPE_OWNER);
+            } else if (groupMemberInfo.getType() == GroupMemberInfo.Type.group_keeper) {
+                map.putString(Constant.MEMBER_TYPE, Constant.MEMBER_TYPE_ADMIN);
+            } else {
+                map.putString(Constant.MEMBER_TYPE, Constant.MEMBER_TYPE_ORDINARY);
+            }
+            map.putDouble(Constant.JOIN_GROUP_TIME,groupMemberInfo.getJoinGroupTime());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return map;
+    }
+
     public static WritableArray toJSArray(List list) {
         WritableArray array = Arguments.createArray();
         if (list != null) {
@@ -328,6 +348,8 @@ public class ResultUtils {
                     array.pushMap(toJSObject((Conversation) object));
                 } else if (object instanceof ChatRoomInfo) {
                     array.pushMap(toJSObject((ChatRoomInfo) object));
+                } else if (object instanceof GroupMemberInfo) {
+                    array.pushMap(toJSObject((GroupMemberInfo) object));
                 } else {
                     array.pushString(object.toString());
                 }

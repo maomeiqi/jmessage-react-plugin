@@ -26,18 +26,42 @@ import JMessage from 'jmessage-react-plugin';
 
 - [群组](#群组)
   - [createGroup](#creategroup)
-  - [addGroupAdmins](#addgroupadmins)
-  - [removeGroupAdmins](#removegroupadmins)
-  - [changeGroupType](#changegrouptype)
-  - [getPublicGroupInfos](#getpublicgroupinfos)
-  - [applyJoinGroup](#applyjoingroup)
-  - [processApplyJoinGroup](#processapplyjoingroup)
   - [dissolveGroup](#dissolvegroup)
   - [getGroupIds](#getgroupids)
   - [getGroupInfo](#getgroupinfo)
   - [updateGroupInfo](#updategroupinfo)
   - [addGroupMembers](#addgroupmembers)
   - [removeGroupMembers](#removegroupmembers)
+  - [getGroupMembers](#getGroupMembers)
+  - [exitGroup](#exitgroup)
+  - [isGroupBlocked](#isGroupBlocked)
+  - [getBlockedGroupList](#getBlockedGroupList)
+  - [updateGroupAvatar](#updateGroupAvatar)
+  - [downloadThumbGroupAvatar](#downloadThumbGroupAvatar)
+  - [downloadOriginalGroupAvatar](#downloadOriginalGroupAvatar)
+  - [addGroupAdmins](#addgroupadmins)
+  - [removeGroupAdmins](#removegroupadmins)
+  - [changeGroupType](#changegrouptype)
+  - [getPublicGroupInfos](#getpublicgroupinfos)
+  - [applyJoinGroup](#applyjoingroup)
+  - [processApplyJoinGroup](#processapplyjoingroup)
+  - [transferGroupOwner](#transferGroupOwner)
+  - [setGroupMemberSilence](#setGroupMemberSilence)
+  - [isSilenceMember](#isSilenceMember)
+  - [groupSilenceMembers](#groupSilenceMembers)
+  - [setGroupNickname](#setGroupNickname)
+
+- [黑名单](#黑名单)
+  - [addUsersToBlacklist](#addUsersToBlacklist)
+  - [removeUsersFromBlacklist](#removeUsersFromBlacklist)
+  - [getBlacklist](#getBlacklist)
+
+- [免打扰](#免打扰)
+  - [setNoDisturb](#setNoDisturb)
+  - [getNoDisturbList](#getNoDisturbList)
+  - [setNoDisturbGlobal](#setNoDisturbGlobal)
+  - [isNoDisturbGlobal](#isNoDisturbGlobal)
+
 - [聊天](#聊天)
   - [createSendMessage](#createsendmessage)
   - [sendMessage](#sendmessage)
@@ -528,6 +552,142 @@ JMessage.removeGroupMembers({ id: 'group_id', usernameArray: ['ex_username1', 'e
 - usernameArray (array<string>): 被添加的的用户名数组。
 - appKey: 被添加用户所属应用的 AppKey。如果不填，默认为当前应用。
 
+### getGroupMembers
+
+获取群组成员列表
+
+#### 示例
+```js
+JMessage.getGroupMembers({ id: 'group_id'},
+  (groupMemberInfoArray) => {  // 群成员数组
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+- id (string): 指定操作的群 groupId
+
+### exitGroup
+
+退出群组
+
+#### 示例
+```js
+JMessage.exitGroup({ id: 'group_id'},
+  () => {  // 
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+- id (string): 指定操作的群 groupId
+
+### isGroupBlocked
+
+查询指定群组是否被屏蔽
+
+#### 示例
+```js
+JMessage.isGroupBlocked({ id: 'group_id'},
+  (result) => {  
+    var isBlocked = result.isBlocked
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+- id (string): 指定操作的群 groupId
+
+### getBlockedGroupList
+
+获取被当前登录用户屏蔽的群组列表
+
+#### 示例
+```js
+JMessage.getBlockedGroupList((groupArr) => {  
+    for (groupInfo in groupArr) {
+      // do something.
+    }
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+### updateGroupAvatar
+
+ 更新指定群组头像
+
+#### 示例
+```js
+JMessage.updateGroupAvatar({ id: 'group_id'，imagePath:'newAvatar.jpg'},
+  () => {  
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+- id (string): 指定操作的群 groupId
+- imagePath (string): 本地图片绝对路径
+
+### downloadThumbGroupAvatar
+
+ 下载群组头像缩略图，如果已经下载，不会重复下载。
+
+#### 示例
+```js
+JMessage.downloadThumbGroupAvatar({ id: 'group_id'},
+  (result) => {  
+     var id = result.id
+     var filePath = result.filePath
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+- id (string): 指定操作的群 groupId
+
+### downloadOriginalGroupAvatar
+
+ 下载群组头像原图，如果已经下载，不会重复下载。
+
+#### 示例
+```js
+JMessage.downloadOriginalGroupAvatar({ id: 'group_id'},
+  (result) => {  
+     var id = result.id
+     var filePath = result.filePath
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+- id (string): 指定操作的群 groupId
+
+#### 返回值说明
+- groupArr: GroupInfo 数组
+
 ### addGroupAdmins
 
 批量添加管理员
@@ -647,7 +807,266 @@ JMessage.processApplyJoinGroup({ events: ['ex_event_id_1', 'ex_event_id_2'], rea
 - events (array<string>): eventId 数组,当有用户申请入群的时候(或者被要求)会回调一个 event(通过 addReceiveApplyJoinGroupApprovalListener 监听)，每个 event 会有个 id，用于审核入群操作。
 - reason (string): 入群理由。
 
+### transferGroupOwner
 
+移交群主
+
+#### 示例
+```js
+JMessage.transferGroupOwner({ groupId: 'group_id', username: 'ex_username', appKey: 'ex_appKey'},
+  () => {  
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+- groupId (string): 指定操作的群 groupId。
+- username (string): 待移交者用户名。
+- appKey (string): 待移交者 appKey, 若传入空则默认使用本应用 appKey。
+
+### setGroupMemberSilence
+
+设置禁言或解禁用户
+
+#### 示例
+```js
+JMessage.setGroupMemberSilence({ groupId: 'group_id', username: 'ex_username', appKey: 'ex_appKey'，isSilence: true},
+  () => {  
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+- groupId (string): 指定操作的群 groupId。
+- username (string): 待移交者用户名。
+- appKey (string): 待移交者 appKey, 若传入空则默认使用本应用 appKey。
+- isSilence（Boolean）:true 设置禁言， false 取消禁言
+
+### isSilenceMember
+
+判断用户是否被禁言
+
+#### 示例
+```js
+JMessage.isSilenceMember({ groupId: 'group_id', username: 'ex_username', appKey: 'ex_appKey'},
+  (result) => {  
+    var isSilence =result.isSilence
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+- groupId (string): 指定操作的群 groupId。
+- username (string): 待移交者用户名。
+- appKey (string): 待移交者 appKey, 若传入空则默认使用本应用 appKey。
+
+### groupSilenceMembers
+
+获取群禁言列表 （注意在获取群列表成功后该方法才有效）
+
+#### 示例
+```js
+JMessage.groupSilenceMembers({ groupId: 'group_id'},
+  (groupMemberInfoArray) => {  // 群成员数组
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+- groupId (string): 指定操作的群 groupId。
+
+### setGroupNickname
+
+设置群成员昵称
+
+#### 示例
+```js
+JMessage.setGroupNickname({ groupId: 'group_id', username: 'ex_username', appKey: 'ex_appKey', nickName: "ex_nikename"},
+  () => {  
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+- groupId (string): 指定操作的群 groupId。
+- username (string): 待移交者用户名。
+- appKey (string): 待移交者 appKey, 若传入空则默认使用本应用 appKey。
+- nickName (string): 设置的昵称
+
+## 黑名单
+
+### addUsersToBlacklist
+
+批量加入用户到黑名单
+
+#### 示例
+
+```js
+JMessage.addUsersToBlacklist({ usernameArray: ['user1', 'user2'], appKey: 'appKey' },
+  () => {  
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+
+- usernameArray （array<string>）: 待添加的用户名数组。
+- appKey (string): 待添加用户所属应用的 AppKey，如果为空或不填，默认为当前应用。
+
+### removeUsersFromBlacklist
+
+批量将用户从黑名单中移除
+
+#### 示例
+
+```js
+JMessage.removeUsersFromBlacklist({ usernameArray: ['user1', 'user2'], appKey: 'appKey' },
+  () => {  
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+
+- usernameArray （array<string>）: 待移除的用户名数组。
+- appKey (string): 待添加用户所属应用的 AppKey，如果为空或不填，默认为当前应用。
+
+### getBlacklist
+
+批量将用户从黑名单中移除
+
+#### 示例
+
+```js
+JMessage.getBlacklist((userInfoArray) => {  //黑名单中用户的 UserInfo 数组。
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+
+## 免打扰
+
+### setNoDisturb
+
+设置对某个用户或群组是否免打扰
+
+#### 示例
+
+```js
+JMessage.setNoDisturb({ type: 'single', username: 'username', isNoDisturb: true },
+  () => {  
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+
+- type （string）: 'single' / 'group'，指明是用户还是群组。
+- appKey (string): 待添加用户所属应用的 AppKey，如果为空或不填，默认为当前应用。
+- username (string): 用户名。当 type 为 'single' 时必填。
+- groupId (string): 群组 id。当 type 为 'group' 时必填。
+- isNoDisturb (boolean): true: 开启免打扰；false: 关闭免打扰
+
+### getNoDisturbList
+
+设置对某个用户或群组是否免打扰
+
+#### 示例
+
+```js
+JMessage.getNoDisturbList((result) => {  
+    var userInfoArr = result.userInfoArray
+    var groupInfoArr = result.groupInfoArray
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 返回值说明
+
+- result：
+    - userInfoArray （array<UserInfo>）: 处于免打扰状态的用户信息列表；
+    - userInfoArray: 处于免打扰状态的用户信息列表；
+
+### setNoDisturbGlobal
+
+设置全局免打扰。
+
+#### 示例
+
+```js
+JMessage.setNoDisturbGlobal({ isNoDisturb: true },
+  () => {  
+    // do something.
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 参数说明
+
+- isNoDisturb (boolean): true: 开启免打扰；false: 关闭免打扰
+
+### isNoDisturbGlobal
+
+判断当前是否开启了全局免打扰。
+
+#### 示例
+
+```js
+JMessage.isNoDisturbGlobal((result) => {
+  var isNoDisturb = result.isNoDisturb
+
+
+  }, (error) => {
+    var code = error.code
+    var desc = error.description
+  })
+```
+
+#### 返回值说明
+
+- result 
+    - isNoDisturb：是否开启全局免打扰。
 
 ## 聊天
 

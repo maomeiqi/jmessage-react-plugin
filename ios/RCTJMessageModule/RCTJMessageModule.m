@@ -1316,17 +1316,19 @@ RCT_EXPORT_METHOD(getGroupMembers:(NSDictionary *)param
     
     JMSGGroup *group = resultObject;
     
-    [group memberArrayWithCompletionHandler:^(id resultObject, NSError *error) {
+    [group memberInfoList:^(id resultObject, NSError *error) {
       if (error) {
         failCallback(@[[error errorToDictionary]]);
         return ;
       }
-      NSArray *userList = resultObject;
-      NSMutableArray *usernameList = @[].mutableCopy;
-      for (JMSGUser *user in 	userList) {
-        [usernameList addObject:[user username]];
+      
+      NSArray *memberList = resultObject;
+      NSMutableArray *memberInfoList = @[].mutableCopy;
+      for (JMSGGroupMemberInfo *member in memberList) {
+        [memberInfoList addObject:[member memberToDictionary]];
       }
-      successCallback(@[usernameList]);
+      
+      successCallback(@[memberInfoList]);
     }];
   }];
 }
@@ -2790,5 +2792,175 @@ RCT_EXPORT_METHOD(dissolveGroup:(NSDictionary *)param
         
         successCallback(@[]);
     }];
+}
+
+
+RCT_EXPORT_METHOD(transferGroupOwner:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallBack:(RCTResponseSenderBlock)failCallback) {
+  
+  if (param[@"groupId"] == nil ||
+      param[@"username"] == nil) {
+    failCallback(@[[self getParamError]]);
+    return;
+  }
+
+  NSString *appKey = nil;
+  if (param[@"appKey"]) {
+    appKey = param[@"appKey"];
+  } else {
+    appKey = [JMessageHelper shareInstance].JMessageAppKey;
+  }
+  
+  [JMSGGroup groupInfoWithGroupId:param[@"groupId"] completionHandler:^(id resultObject, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+      return;
+    }
+    
+    JMSGGroup *group = resultObject;
+    [group transferGroupOwnerWithUsername:param[@"username"] appKey:appKey completionHandler:^(id resultObject, NSError *error) {
+      if (error) {
+        failCallback(@[[error errorToDictionary]]);
+        return;
+      }
+      successCallback(@[]);
+    }];
+  }];
+}
+
+
+RCT_EXPORT_METHOD(setGroupMemberSilence:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallBack:(RCTResponseSenderBlock)failCallback) {
+  
+  if (param[@"groupId"] == nil ||
+      param[@"username"] == nil ||
+      param[@"isSilence"] == nil) {
+    failCallback(@[[self getParamError]]);
+    return;
+  }
+  
+  NSString *appKey = nil;
+  if (param[@"appKey"]) {
+    appKey = param[@"appKey"];
+  } else {
+    appKey = [JMessageHelper shareInstance].JMessageAppKey;
+  }
+  
+  [JMSGGroup groupInfoWithGroupId:param[@"groupId"] completionHandler:^(id resultObject, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+      return;
+    }
+    
+    JMSGGroup *group = resultObject;
+    [group setGroupMemberSilence:[param[@"isSilence"] boolValue] username:param[@"username"] appKey:appKey handler:^(id resultObject, NSError *error) {
+      if (error) {
+        failCallback(@[[error errorToDictionary]]);
+        return;
+      }
+      successCallback(@[]);
+    }];
+  }];
+}
+
+
+RCT_EXPORT_METHOD(isSilenceMember:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallBack:(RCTResponseSenderBlock)failCallback) {
+  
+  if (param[@"groupId"] == nil ||
+      param[@"username"] == nil) {
+    failCallback(@[[self getParamError]]);
+    return;
+  }
+  
+  NSString *appKey = nil;
+  if (param[@"appKey"]) {
+    appKey = param[@"appKey"];
+  } else {
+    appKey = [JMessageHelper shareInstance].JMessageAppKey;
+  }
+  
+  [JMSGGroup groupInfoWithGroupId:param[@"groupId"] completionHandler:^(id resultObject, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+      return;
+    }
+    
+    JMSGGroup *group = resultObject;
+    
+    BOOL isSilence = [group isSilenceMemberWithUsername:param[@"username"] appKey:appKey];
+    successCallback(@[@{@"isSilence": @(isSilence)}]);
+  }];
+}
+
+RCT_EXPORT_METHOD(groupSilenceMembers:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallBack:(RCTResponseSenderBlock)failCallback) {
+  if (param[@"groupId"] == nil) {
+    failCallback(@[[self getParamError]]);
+    return;
+  }
+  
+  NSString *appKey = nil;
+  if (param[@"appKey"]) {
+    appKey = param[@"appKey"];
+  } else {
+    appKey = [JMessageHelper shareInstance].JMessageAppKey;
+  }
+  
+  [JMSGGroup groupInfoWithGroupId:param[@"groupId"] completionHandler:^(id resultObject, NSError *error) {
+    if (error) {
+      failCallback(@[[error errorToDictionary]]);
+      return;
+    }
+    
+    JMSGGroup *group = resultObject;
+    NSArray *silenceMembers = [group groupSilenceMembers];
+    NSArray *silenceUserDicArr = [silenceMembers mapObjectsUsingBlock:^id(id obj, NSUInteger idx) {
+      JMSGUser *user = obj;
+      return [user userToDictionary];
+    }];
+    successCallback(@[silenceUserDicArr]);
+  }];
+}
+
+RCT_EXPORT_METHOD(setGroupNickname:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallBack:(RCTResponseSenderBlock)failCallback) {
+  
+  if (param[@"groupId"] == nil ||
+      param[@"username"] == nil ||
+      param[@"nickName"] == nil) {
+    failCallback(@[[self getParamError]]);
+    return;
+  }
+  
+  NSString *appKey = nil;
+  if (param[@"appKey"]) {
+    appKey = param[@"appKey"];
+  } else {
+    appKey = [JMessageHelper shareInstance].JMessageAppKey;
+  }
+  
+  [JMSGGroup groupInfoWithGroupId:param[@"groupId"] completionHandler:^(id resultObject, NSError *error) {
+    if (error) {
+      failCallback(@[[self getParamError]]);
+      return;
+    }
+    
+    JMSGGroup *group = resultObject;
+    
+    [group setGroupNickname:param[@"nickName"] username:param[@"username"] appKey:appKey handler:^(id resultObject, NSError *error) {
+      if (error) {
+        failCallback(@[[self getParamError]]);
+        return;
+      }
+      
+      successCallback(@[]);
+    }];
+  }];
 }
 @end
