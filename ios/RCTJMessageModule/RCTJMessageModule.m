@@ -1189,7 +1189,7 @@ RCT_EXPORT_METHOD(updateGroupInfo:(NSDictionary *)param
     
     JMSGGroup *group = resultObject;
     NSString *newName = group.displayName;
-    NSString *newDesc = group.description;
+    NSString *newDesc = group.desc;
     
     if (param[@"newName"]) {
       newName = param[@"newName"];
