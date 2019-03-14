@@ -1764,7 +1764,7 @@ JMessage.resetUnreadMessageCount({ type: 'single', username: 'username', appKey:
 #### 示例
 
 ```js
-JMessageModule.setMsgHaveRead(params,(result) => {
+JMessageModule.setMsgHaveRead(params,(successCallback) =>{},(failCallback) => {
         var code = result.code
         var desc = result.description
     }
@@ -1772,10 +1772,12 @@ JMessageModule.setMsgHaveRead(params,(result) => {
 ```
 
 #### 参数说明
-- username: 用户的username。
-- appKey: 用户所属应用的appkey。
-- id: 本会话中指定local message id。为空时使用serverMessageId
-- serverMessageId: 本会话中指定server message id。不可为空
+- type: 会话类型。可以为 'single' 或 'group' 或 'chatRoom'。
+- username: 对方用户的用户名。当 `type` 为 'single' 时，`username` 为必填。
+- appKey: 对方用户所属应用的 AppKey。如果不填，默认为当前应用。
+- groupId: 对象群组 id。当 `type` 为 'group' 时，`groupId` 为必填。
+- roomId: 对象聊天室 id。当 `type` 为 'chatRoom' 时，`roomId` 为必填。
+- id: mssageId。必填，不填则无法设置消息已读
 
 ## 聊天室
 

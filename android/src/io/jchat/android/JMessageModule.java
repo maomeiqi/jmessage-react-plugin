@@ -2087,10 +2087,14 @@ public class JMessageModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void setMsgHaveRead(ReadableMap map, final Callback successCallback, final Callback failCallback) {
+        final WritableMap failMap = Arguments.createMap();
         try {
             String type = map.getString(Constant.TYPE);
             if (TextUtils.isEmpty(type)) {
-                mJMessageUtils.handleError(failCallback, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);
+                failMap.putInt(Constant.CODE, ERR_CODE_PARAMETER);
+                failMap.putString(Constant.DESCRIPTION, ERR_MSG_PARAMETER);
+                failCallback.invoke(failMap);
+                return;
             }
             Conversation conversation;
             switch (type) {
@@ -2099,37 +2103,49 @@ public class JMessageModule extends ReactContextBaseJavaModule {
                     String appKey = map.getString(Constant.APP_KEY);
                     //如果appKey为空则默认取本应用appKey下对应userName用户的会话。
                     if (TextUtils.isEmpty(userName)) {
-                        mJMessageUtils.handleError(failCallback, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);
+                        failMap.putInt(Constant.CODE, ERR_CODE_PARAMETER);
+                        failMap.putString(Constant.DESCRIPTION, ERR_MSG_PARAMETER);
+                        failCallback.invoke(failMap);
+                        return;
                     }
                     conversation = JMessageClient.getSingleConversation(userName, appKey);
                     break;
                 case Constant.TYPE_GROUP:
                     String groupId = map.getString(Constant.GROUP_ID);
                     if (TextUtils.isEmpty(groupId)) {
-                        mJMessageUtils.handleError(failCallback, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);
+                        failMap.putInt(Constant.CODE, ERR_CODE_PARAMETER);
+                        failMap.putString(Constant.DESCRIPTION, ERR_MSG_PARAMETER);
+                        failCallback.invoke(failMap);
+                        return;
                     }
                     conversation = JMessageClient.getGroupConversation(Long.parseLong(groupId));
                     break;
                 case Constant.TYPE_CHAT_ROOM:
                     String roomId = map.getString(Constant.ROOM_ID);
                     if (TextUtils.isEmpty(roomId)) {
-                        mJMessageUtils.handleError(failCallback, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);
+                        failMap.putInt(Constant.CODE, ERR_CODE_PARAMETER);
+                        failMap.putString(Constant.DESCRIPTION, ERR_MSG_PARAMETER);
+                        failCallback.invoke(failMap);
+                        return;
                     }
                     conversation = JMessageClient.getChatRoomConversation(Long.parseLong(roomId));
                     break;
                 default:
                     conversation = null;
-                    mJMessageUtils.handleError(failCallback, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);
                     break;
             }
             if (conversation == null) {
-                mJMessageUtils.handleError(failCallback, ERR_CODE_CONVERSATION, ERR_MSG_CONVERSATION);
+                failMap.putInt(Constant.CODE, ERR_CODE_CONVERSATION);
+                failMap.putString(Constant.DESCRIPTION, ERR_MSG_CONVERSATION);
+                failCallback.invoke(failMap);
                 return;
             }
             String messageId = map.getString(Constant.ID);
             Message message = conversation.getMessage(Integer.parseInt(messageId));
             if (message == null) {
-                mJMessageUtils.handleError(failCallback, ERR_CODE_MESSAGE, ERR_MSG_MESSAGE);
+                failMap.putInt(Constant.CODE, ERR_CODE_MESSAGE);
+                failMap.putString(Constant.DESCRIPTION, ERR_MSG_MESSAGE);
+                failCallback.invoke(failMap);
                 return;
             }
             if (message.haveRead()) {
@@ -2139,14 +2155,18 @@ public class JMessageModule extends ReactContextBaseJavaModule {
                 @Override
                 public void gotResult(int code, String message) {
                     if (code == 0) {
-                        mJMessageUtils.handleCallback(code, message, successCallback, failCallback);
+                        successCallback.invoke();
                     } else {
-                        mJMessageUtils.handleError(failCallback, code, message);
+                        failMap.putInt(Constant.CODE, code);
+                        failMap.putString(Constant.DESCRIPTION, message);
+                        failCallback.invoke(failMap);
                     }
                 }
             });
         }catch (Throwable throwable){
-            mJMessageUtils.handleError(failCallback, ERR_CODE_EXCEPTION, throwable.getMessage());
+            failMap.putInt(Constant.CODE, ERR_CODE_EXCEPTION);
+            failMap.putString(Constant.DESCRIPTION, throwable.getMessage());
+            failCallback.invoke(failMap);
         }
     }
 

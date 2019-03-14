@@ -202,14 +202,13 @@ export default class Chat extends Component {
 
         console.log("收到消息"+JSON.stringify(message));
         const readParams = {
-          // ...message,
+          type: "single",
           username: message.from.username,
           appKey: message.from.appKey,
           id: message.id,
-          serverMessageId: message.serverMessageId
         }
         
-        JMessage.setMsgHaveRead(readParams,(result) => {})
+        JMessage.setMsgHaveRead(readParams,(successCallback) => {},(failCallback) => {})
         
         if (this.conversation.type === 'single') {
           if (message.target.type === 'user') {
