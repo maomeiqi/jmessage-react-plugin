@@ -133,4 +133,21 @@ public class Constant {
     public static final String JOIN_GROUP_TIME = "joinGroupTime";
     public static final String IS_SILENCE = "isSilence";
 
+    /*
+     * message receiptResult
+     * */
+    public static final String RECEIPT_RESULT = "receiptResult";
+    public static final String UN_RECEIPT_COUNT = "unReceiptCount";
+    public static final String UN_RECEIPT_M_TIME = "unReceiptMTime";
+
+    /**
+     * MessageSendingOptions
+     */
+    public static final String IS_RETAIN_OFFLINE = "isRetainOffline";
+    public static final String IS_SHOW_NOTIFICATION = "isShowNotification";
+    public static final String IS_CUSTOM_NOTIFICATION_ENABLED = "isCustomNotificationEnabled";
+    public static final String NOTIFICATION_TITLE = "notificationTitle";
+    public static final String NOTIFICATION_TEXT = "notificationText";
+    public static final String NEED_READ_RECEIPT = "needReadReceipt";
+
 }

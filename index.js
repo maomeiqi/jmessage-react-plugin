@@ -8,6 +8,7 @@ const JMessageModule = NativeModules.JMessageModule;
 
 const listeners = {};
 const receiveMsgEvent = "JMessage.ReceiveMsgEvent"; // 接收到消息事件
+const receiptMsgEvent = "JMessage.ReceiptMsgEvent"; // 接收已读消息回执事件
 const loginStateChanged = "JMessage.LoginStateChanged"; // 
 const clickMessageNotificationEvent = "JMessage.ClickMessageNotification"; // 点击推送 Android Only
 const syncOfflineMessage = "JMessage.SyncOfflineMessage" // 同步离线消息事件
@@ -861,6 +862,20 @@ export default class JMessage {
     }
 
     /**
+     * 设置消息已读
+     * @param {object} params = {
+     *  'username': String 
+     *  'appKey': String
+     *  'id': String
+     *  'serverMessageId': String
+     * }
+     *  @param {function} result =  function ({'code': '错误码', 'description': '错误信息'}) {}
+     */
+    static setMsgHaveRead(params,result){
+        JMessageModule.setMsgHaveRead(params,result)
+    }
+
+    /**
      * 
      * JMessage Events
      * 
@@ -892,6 +907,40 @@ export default class JMessage {
             listeners[listener].remove();
             listeners[listener] = null;
         }
+
+    /**
+     * 添加收到消息事件监听。
+     *
+     * @param {function} listener = function (result) {}  // 以参数形式返回消息对象。
+     * result = {
+     *      receiptResult = {
+     *          'serverMessageId': String
+     *          'unReceiptCount': int
+     *          'unReceiptMTime': String
+     *      },
+     *      receiptResult = {
+     *          'serverMessageId': String
+     *          'unReceiptCount': int
+     *          'unReceiptMTime': String
+     *      },
+     *      ...
+     * 
+     * }
+     */
+    static addReceiptMessageListener(listener) {
+        listeners[listener] = DeviceEventEmitter.addListener(receiptMsgEvent,
+            (result) => {
+                listener(result);
+            });
+    }
+
+    static removeReceiptMessageListener(listener) {
+            if (!listeners[listener]) {
+                return;
+            }
+            listeners[listener].remove();
+            listeners[listener] = null;
+        }    
 
     /**
      * 添加点击通知栏消息通知事件监听。
