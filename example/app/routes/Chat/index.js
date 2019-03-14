@@ -200,6 +200,17 @@ export default class Chat extends Component {
 
       this.receiveMessageCallBack = (message) => {
 
+        console.log("收到消息"+JSON.stringify(message));
+        const readParams = {
+          // ...message,
+          username: message.from.username,
+          appKey: message.from.appKey,
+          id: message.id,
+          serverMessageId: message.serverMessageId
+        }
+        
+        JMessage.setMsgHaveRead(readParams,(result) => {})
+        
         if (this.conversation.type === 'single') {
           if (message.target.type === 'user') {
             if (message.from.username === this.conversation.username) {
@@ -225,6 +236,7 @@ export default class Chat extends Component {
         }
       }
       JMessage.addReceiveMessageListener(this.receiveMessageCallBack)
+      JMessage.addReceiptMessageListener((result)=>{})
     }
     AuroraIController.addMessageListDidLoadListener(this.messageListDidLoadCallback)
     // this.timer = setTimeout(() => {
@@ -406,6 +418,7 @@ export default class Chat extends Component {
       Alert.alert('send text', JSON.stringify(msg))
 
       msg.messageSendingOptions = {
+        needReadReceipt: true,
         isShowNotification:  true,
         isRetainOffline:  true,
         isCustomNotificationEnabled:  true,

@@ -74,18 +74,21 @@ public class JMessageUtils {
         if (map.hasKey(Constant.SENDING_OPTIONS)) {
             MessageSendingOptions options = new MessageSendingOptions();
             ReadableMap optionMap = map.getMap(Constant.SENDING_OPTIONS);
-            options.setShowNotification(optionMap.getBoolean("isShowNotification"));
-            options.setRetainOffline(optionMap.getBoolean("isRetainOffline"));
 
-            if (optionMap.hasKey("isCustomNotificationEnabled")) {
-                options.setCustomNotificationEnabled(
-                        optionMap.getBoolean("isCustomNotificationEnabled"));
+            options.setShowNotification(optionMap.getBoolean(Constant.IS_SHOW_NOTIFICATION));
+            options.setRetainOffline(optionMap.getBoolean(Constant.IS_RETAIN_OFFLINE));
+
+            if (optionMap.hasKey(Constant.IS_CUSTOM_NOTIFICATION_ENABLED)) {
+                options.setCustomNotificationEnabled(optionMap.getBoolean(Constant.IS_CUSTOM_NOTIFICATION_ENABLED));
             }
-            if (optionMap.hasKey("notificationTitle")) {
-                options.setNotificationTitle(optionMap.getString("notificationTitle"));
+            if (optionMap.hasKey(Constant.NOTIFICATION_TITLE)) {
+                options.setNotificationTitle(optionMap.getString(Constant.NOTIFICATION_TITLE));
             }
-            if (optionMap.hasKey("notificationText")) {
-                options.setNotificationText(optionMap.getString("notificationText"));
+            if (optionMap.hasKey(Constant.NOTIFICATION_TEXT)) {
+                options.setNotificationText(optionMap.getString(Constant.NOTIFICATION_TEXT));
+            }
+            if(optionMap.hasKey(Constant.NEED_READ_RECEIPT)){
+                options.setNeedReadReceipt(optionMap.getBoolean(Constant.NEED_READ_RECEIPT));
             }
             JMessageClient.sendMessage(msg, options);
         }

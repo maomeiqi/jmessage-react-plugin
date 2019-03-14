@@ -61,6 +61,7 @@ import cn.jpush.im.android.api.event.GroupApprovalRefuseEvent;
 import cn.jpush.im.android.api.event.GroupApprovedNotificationEvent;
 import cn.jpush.im.android.api.event.LoginStateChangeEvent;
 import cn.jpush.im.android.api.event.MessageEvent;
+import cn.jpush.im.android.api.event.MessageReceiptStatusChangeEvent;
 import cn.jpush.im.android.api.event.MessageRetractEvent;
 import cn.jpush.im.android.api.event.NotificationClickEvent;
 import cn.jpush.im.android.api.event.OfflineMessageEvent;
@@ -82,6 +83,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
 
     private static final String TAG = "JMessageModule";
     private static final String RECEIVE_MSG_EVENT = "JMessage.ReceiveMsgEvent";
+    private static final String RECEIPT_MSG_EVENT = "JMessage.ReceiptMsgEvent";
     private static final String LOGIN_STATE_CHANGE_EVENT = "JMessage.LoginStateChanged"; //
     private static final String CLICK_NOTIFICATION_EVENT = "JMessage.ClickMessageNotification"; // 点击推送 Android Only
     private static final String SYNC_OFFLINE_EVENT = "JMessage.SyncOfflineMessage"; // 同步离线消息事件
@@ -377,17 +379,20 @@ public class JMessageModule extends ReactContextBaseJavaModule {
             if (map.hasKey(Constant.SENDING_OPTIONS)) {
                 MessageSendingOptions options = new MessageSendingOptions();
                 ReadableMap optionMap = map.getMap(Constant.SENDING_OPTIONS);
-                options.setShowNotification(optionMap.getBoolean("isShowNotification"));
-                options.setRetainOffline(optionMap.getBoolean("isRetainOffline"));
+                options.setShowNotification(optionMap.getBoolean(Constant.IS_SHOW_NOTIFICATION));
+                options.setRetainOffline(optionMap.getBoolean(Constant.IS_RETAIN_OFFLINE));
 
-                if (optionMap.hasKey("isCustomNotificationEnabled")) {
-                    options.setCustomNotificationEnabled(optionMap.getBoolean("isCustomNotificationEnabled"));
+                if (optionMap.hasKey(Constant.IS_CUSTOM_NOTIFICATION_ENABLED)) {
+                    options.setCustomNotificationEnabled(optionMap.getBoolean(Constant.IS_CUSTOM_NOTIFICATION_ENABLED));
                 }
-                if (optionMap.hasKey("notificationTitle")) {
-                    options.setNotificationTitle(optionMap.getString("notificationTitle"));
+                if (optionMap.hasKey(Constant.NOTIFICATION_TITLE)) {
+                    options.setNotificationTitle(optionMap.getString(Constant.NOTIFICATION_TITLE));
                 }
-                if (optionMap.hasKey("notificationText")) {
-                    options.setNotificationText(optionMap.getString("notificationText"));
+                if (optionMap.hasKey(Constant.NOTIFICATION_TEXT)) {
+                    options.setNotificationText(optionMap.getString(Constant.NOTIFICATION_TEXT));
+                }
+                if(optionMap.hasKey(Constant.NEED_READ_RECEIPT)){
+                    options.setNeedReadReceipt(optionMap.getBoolean(Constant.NEED_READ_RECEIPT));
                 }
                 JMessageClient.sendMessage(message, options);
             } else {
@@ -1517,17 +1522,20 @@ public class JMessageModule extends ReactContextBaseJavaModule {
                 if (map.hasKey(Constant.SENDING_OPTIONS)) {
                     options = new MessageSendingOptions();
                     ReadableMap optionMap = map.getMap(Constant.SENDING_OPTIONS);
-                    options.setShowNotification(optionMap.getBoolean("isShowNotification"));
-                    options.setRetainOffline(optionMap.getBoolean("isRetainOffline"));
+                    options.setShowNotification(optionMap.getBoolean(Constant.IS_SHOW_NOTIFICATION));
+                    options.setRetainOffline(optionMap.getBoolean(Constant.IS_RETAIN_OFFLINE));
 
-                    if (optionMap.hasKey("isCustomNotificationEnabled")) {
-                        options.setCustomNotificationEnabled(optionMap.getBoolean("isCustomNotificationEnabled"));
+                    if (optionMap.hasKey(Constant.IS_CUSTOM_NOTIFICATION_ENABLED)) {
+                        options.setCustomNotificationEnabled(optionMap.getBoolean(Constant.IS_CUSTOM_NOTIFICATION_ENABLED));
                     }
-                    if (optionMap.hasKey("notificationTitle")) {
-                        options.setNotificationTitle(optionMap.getString("notificationTitle"));
+                    if (optionMap.hasKey(Constant.NOTIFICATION_TITLE)) {
+                        options.setNotificationTitle(optionMap.getString(Constant.NOTIFICATION_TITLE));
                     }
-                    if (optionMap.hasKey("notificationText")) {
-                        options.setNotificationText(optionMap.getString("notificationText"));
+                    if (optionMap.hasKey(Constant.NOTIFICATION_TEXT)) {
+                        options.setNotificationText(optionMap.getString(Constant.NOTIFICATION_TEXT));
+                    }
+                    if(optionMap.hasKey(Constant.NEED_READ_RECEIPT)){
+                        options.setNeedReadReceipt(optionMap.getBoolean(Constant.NEED_READ_RECEIPT));
                     }
                 }
                 ReadableMap target = map.getMap(Constant.TARGET);
@@ -2076,6 +2084,53 @@ public class JMessageModule extends ReactContextBaseJavaModule {
         }
     }
 
+    @ReactMethod
+    public void setMsgHaveRead(ReadableMap map, final Callback callback) {
+        String userName = map.getString(Constant.USERNAME);
+        String appKey = map.getString(Constant.APP_KEY);
+        String msgId = map.getString(Constant.ID);
+        String serverMsgId = map.getString(Constant.SERVER_ID);
+        WritableMap callbackMap = Arguments.createMap();
+        if(TextUtils.isEmpty(userName)||
+                TextUtils.isEmpty(appKey)||
+                TextUtils.isEmpty(msgId)||
+                TextUtils.isEmpty(serverMsgId)){
+            callbackMap.putInt(Constant.CODE, ERR_CODE_CONVERSATION);
+            callbackMap.putString(Constant.DESCRIPTION, ERR_MSG_CONVERSATION);
+            callback.invoke(callbackMap);
+            return;
+        }
+        Conversation conversation = JMessageClient.getSingleConversation(userName, appKey);
+        if(conversation==null){
+            callbackMap.putInt(Constant.CODE, ERR_CODE_CONVERSATION);
+            callbackMap.putString(Constant.DESCRIPTION, ERR_MSG_CONVERSATION);
+            callback.invoke(callbackMap);
+            return;
+        }
+        //优先使用msgId获取conversation，获取不到再使用serverMsgId获取
+        Message message = conversation.getMessage(Integer.parseInt(msgId));
+        if(message==null){
+            message = conversation.getMessage(Long.parseLong(serverMsgId));
+        }
+        if (message == null){
+            callbackMap.putInt(Constant.CODE, ERR_CODE_MESSAGE);
+            callbackMap.putString(Constant.DESCRIPTION, ERR_MSG_MESSAGE);
+            callback.invoke(callbackMap);
+            return;
+        }
+        if (!message.haveRead()) {
+            message.setHaveRead(new BasicCallback() {
+                @Override
+                public void gotResult(int i, String s) {
+                    WritableMap map = Arguments.createMap();
+                    map.putInt(Constant.CODE, i);
+                    map.putString(Constant.DESCRIPTION, s);
+                    callback.invoke(map);
+                }
+            });
+        }
+    }
+
     public void onEvent(LoginStateChangeEvent event) {
         Logger.d(TAG, "登录状态改变事件：event = " + event.toString());
         WritableMap map = Arguments.createMap();
@@ -2089,6 +2144,23 @@ public class JMessageModule extends ReactContextBaseJavaModule {
         Logger.d(TAG, "收到消息：msg = " + msg.toString());
         getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                 .emit(RECEIVE_MSG_EVENT, ResultUtils.toJSObject(msg));
+    }
+
+    /*
+    * 收到已读回执
+    * */
+    public void onEventMainThread(MessageReceiptStatusChangeEvent event) {
+        WritableMap map = Arguments.createMap();
+        Conversation conv = event.getConversation();
+        for (MessageReceiptStatusChangeEvent.MessageReceiptMeta meta : event.getMessageReceiptMetas()) {
+            WritableMap receiptMap = Arguments.createMap();
+            receiptMap.putString(Constant.SERVER_ID, String.valueOf(meta.getServerMsgId()));
+            receiptMap.putInt(Constant.UN_RECEIPT_COUNT, meta.getUnReceiptCnt());
+            receiptMap.putString(Constant.UN_RECEIPT_M_TIME, String.valueOf(meta.getUnReceiptMtime()));
+            map.putMap(Constant.RECEIPT_RESULT, receiptMap);
+        }
+        getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                .emit(RECEIPT_MSG_EVENT, map);
     }
 
     /**
