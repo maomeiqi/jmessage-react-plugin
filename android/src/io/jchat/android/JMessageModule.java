@@ -100,6 +100,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
     private static final int ERR_CODE_CONVERSATION = 2;
     private static final int ERR_CODE_MESSAGE = 3;
     private static final int ERR_CODE_FILE = 4;
+    private static final int ERR_CODE_EXCEPTION = -1;
 
     private static final String ERR_MSG_PARAMETER = "Parameters error";
     private static final String ERR_MSG_CONVERSATION = "Can't get the conversation";
@@ -2085,49 +2086,67 @@ public class JMessageModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void setMsgHaveRead(ReadableMap map, final Callback callback) {
-        String userName = map.getString(Constant.USERNAME);
-        String appKey = map.getString(Constant.APP_KEY);
-        String msgId = map.getString(Constant.ID);
-        String serverMsgId = map.getString(Constant.SERVER_ID);
-        WritableMap callbackMap = Arguments.createMap();
-        if(TextUtils.isEmpty(userName)||
-                TextUtils.isEmpty(appKey)||
-                TextUtils.isEmpty(msgId)||
-                TextUtils.isEmpty(serverMsgId)){
-            callbackMap.putInt(Constant.CODE, ERR_CODE_CONVERSATION);
-            callbackMap.putString(Constant.DESCRIPTION, ERR_MSG_CONVERSATION);
-            callback.invoke(callbackMap);
-            return;
-        }
-        Conversation conversation = JMessageClient.getSingleConversation(userName, appKey);
-        if(conversation==null){
-            callbackMap.putInt(Constant.CODE, ERR_CODE_CONVERSATION);
-            callbackMap.putString(Constant.DESCRIPTION, ERR_MSG_CONVERSATION);
-            callback.invoke(callbackMap);
-            return;
-        }
-        //优先使用msgId获取conversation，获取不到再使用serverMsgId获取
-        Message message = conversation.getMessage(Integer.parseInt(msgId));
-        if(message==null){
-            message = conversation.getMessage(Long.parseLong(serverMsgId));
-        }
-        if (message == null){
-            callbackMap.putInt(Constant.CODE, ERR_CODE_MESSAGE);
-            callbackMap.putString(Constant.DESCRIPTION, ERR_MSG_MESSAGE);
-            callback.invoke(callbackMap);
-            return;
-        }
-        if (!message.haveRead()) {
+    public void setMsgHaveRead(ReadableMap map, final Callback successCallback, final Callback failCallback) {
+        try {
+            String type = map.getString(Constant.TYPE);
+            if (TextUtils.isEmpty(type)) {
+                mJMessageUtils.handleError(failCallback, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);
+            }
+            Conversation conversation;
+            switch (type) {
+                case Constant.TYPE_SINGLE:
+                    String userName = map.getString(Constant.USERNAME);
+                    String appKey = map.getString(Constant.APP_KEY);
+                    //如果appKey为空则默认取本应用appKey下对应userName用户的会话。
+                    if (TextUtils.isEmpty(userName)) {
+                        mJMessageUtils.handleError(failCallback, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);
+                    }
+                    conversation = JMessageClient.getSingleConversation(userName, appKey);
+                    break;
+                case Constant.TYPE_GROUP:
+                    String groupId = map.getString(Constant.GROUP_ID);
+                    if (TextUtils.isEmpty(groupId)) {
+                        mJMessageUtils.handleError(failCallback, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);
+                    }
+                    conversation = JMessageClient.getGroupConversation(Long.parseLong(groupId));
+                    break;
+                case Constant.TYPE_CHAT_ROOM:
+                    String roomId = map.getString(Constant.ROOM_ID);
+                    if (TextUtils.isEmpty(roomId)) {
+                        mJMessageUtils.handleError(failCallback, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);
+                    }
+                    conversation = JMessageClient.getChatRoomConversation(Long.parseLong(roomId));
+                    break;
+                default:
+                    conversation = null;
+                    mJMessageUtils.handleError(failCallback, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);
+                    break;
+            }
+            if (conversation == null) {
+                mJMessageUtils.handleError(failCallback, ERR_CODE_CONVERSATION, ERR_MSG_CONVERSATION);
+                return;
+            }
+            String messageId = map.getString(Constant.ID);
+            Message message = conversation.getMessage(Integer.parseInt(messageId));
+            if (message == null) {
+                mJMessageUtils.handleError(failCallback, ERR_CODE_MESSAGE, ERR_MSG_MESSAGE);
+                return;
+            }
+            if (message.haveRead()) {
+                return;
+            }
             message.setHaveRead(new BasicCallback() {
                 @Override
-                public void gotResult(int i, String s) {
-                    WritableMap map = Arguments.createMap();
-                    map.putInt(Constant.CODE, i);
-                    map.putString(Constant.DESCRIPTION, s);
-                    callback.invoke(map);
+                public void gotResult(int code, String message) {
+                    if (code == 0) {
+                        mJMessageUtils.handleCallback(code, message, successCallback, failCallback);
+                    } else {
+                        mJMessageUtils.handleError(failCallback, code, message);
+                    }
                 }
             });
+        }catch (Throwable throwable){
+            mJMessageUtils.handleError(failCallback, ERR_CODE_EXCEPTION, throwable.getMessage());
         }
     }
 
