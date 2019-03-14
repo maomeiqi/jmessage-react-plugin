@@ -864,15 +864,29 @@ export default class JMessage {
     /**
      * 设置消息已读
      * @param {object} params = {
+     *   必填，不可为空
+     *  ‘type’: String  single/group/chatroom
+     * 
+     *   type为single时,除了下面的其他值可缺省
      *  'username': String 
      *  'appKey': String
      *  'id': String
-     *  'serverMessageId': String
+     * 
+     *   type为group时,除了下面的其他值可缺省
+     *  'groupId': String
+     *  
+     *   type为chatroom时,除了下面的其他值可缺省
+     *  'roomId': String 
+     *    
+     *    必填，不可为空
+     *   'id': String
+     *  
      * }
-     *  @param {function} result =  function ({'code': '错误码', 'description': '错误信息'}) {}
+     *  @param {function} successCallback =  function () {}
+     *  @param {function} failCallback =  function ({'code': '错误码', 'description': '错误信息'}) {}
      */
-    static setMsgHaveRead(params,result){
-        JMessageModule.setMsgHaveRead(params,result)
+    static setMsgHaveRead(params,successCallback,failCallback){
+        JMessageModule.setMsgHaveRead(params,successCallback,failCallback)
     }
 
     /**

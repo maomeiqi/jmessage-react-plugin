@@ -1139,7 +1139,7 @@ JMessage.createSendMessage({type: 'single', username: 'username', appKey: 'appke
   - isCustomNotificationEnabled: 是否开启自定义接收方通知栏功能，设置为 `true` 后可设置下面的 `notificationTitle` 和 `notificationText`。默认未设置。
   - notificationTitle: 设置此条消息在接收方通知栏所展示通知的标题。
   - notificationText: 设置此条消息在接收方通知栏所展示通知的内容。
-  - needReadReceipt: 设置这条消息的发送是否需要对方发送已读回执 开启之后，对方收到消息后，如果调用了setMsgHaveRead()接口， 则作为消息发送方，会收到已读消息回执事件通知
+  - needReadReceipt: (Android Only)设置这条消息的发送是否需要对方发送已读回执 开启之后，对方收到消息后，如果调用了setMsgHaveRead()接口， 则作为消息发送方，会收到已读消息回执事件通知
 
 ### sendTextMessage
 
@@ -1759,12 +1759,12 @@ JMessage.resetUnreadMessageCount({ type: 'single', username: 'username', appKey:
 
 ### setMsgHaveRead
 
-设置消息已读
+设置消息已读(Android Only)
 
 #### 示例
 
 ```js
-JMessageModule.setMsgHaveRead(params,(result) => {
+JMessageModule.setMsgHaveRead(params,(successCallback) =>{},(failCallback) => {
         var code = result.code
         var desc = result.description
     }
@@ -1772,10 +1772,12 @@ JMessageModule.setMsgHaveRead(params,(result) => {
 ```
 
 #### 参数说明
-- username: 用户的username。
-- appKey: 用户所属应用的appkey。
-- id: 本会话中指定local message id。为空时使用serverMessageId
-- serverMessageId: 本会话中指定server message id。不可为空
+- type: 会话类型。可以为 'single' 或 'group' 或 'chatRoom'。
+- username: 对方用户的用户名。当 `type` 为 'single' 时，`username` 为必填。
+- appKey: 对方用户所属应用的 AppKey。如果不填，默认为当前应用。
+- groupId: 对象群组 id。当 `type` 为 'group' 时，`groupId` 为必填。
+- roomId: 对象聊天室 id。当 `type` 为 'chatRoom' 时，`roomId` 为必填。
+- id: mssageId。必填，不填则无法设置消息已读
 
 ## 聊天室
 
@@ -2130,7 +2132,7 @@ JMessage.removeSyncOfflineMessageListener(listener) // 移除监听(一般在 co
 
 ####  addReceiptMessageListener
 
-已读消息回执事件监听。
+已读消息回执事件监听。（Android Only）
 
 ##### 示例
 
