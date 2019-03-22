@@ -208,7 +208,7 @@ export default class Chat extends Component {
           id: message.id,
         }
         
-        JMessage.setMsgHaveRead(readParams,(successCallback) => {},(failCallback) => {})
+        JMessage.setMsgHaveRead(readParams,(result) => {},(error) => {})
         
         if (this.conversation.type === 'single') {
           if (message.target.type === 'user') {
