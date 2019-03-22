@@ -10,6 +10,7 @@
 #import <JMessage/JMessage.h>
 
 #define kJJMessageReceiveMessage     @"kJJMessageReceiveMessage"
+#define kJJMessageReceiptMessage     @"kJJMessageReceiptMessage"
 #define kJJMessageReceiveChatRoomMessage     @"kJJMessageReceiveChatRoomMessage"
 #define kJJMessageSendMessageRespone @"kJJMessageSendMessageRespone"
 

@@ -18,6 +18,7 @@
 
 
 #define receiveMsgEvent @"JMessage.ReceiveMsgEvent" // 接收到消息事件
+#define receiptMsgEvent @"JMessage.ReceiptMsgEvent" // 接收到已读消息回执事件
 #define receiveChatRoomMsgEvent @"JMessage.ReceiveChatRoomMsgEvent" // 接收到消息事件
 #define conversationChangeEvent @"JMessage.conversationChange" // 会话变更事件
 #define loginStateChangedEvent @"JMessage.LoginStateChanged" // 登录状态变更通知
