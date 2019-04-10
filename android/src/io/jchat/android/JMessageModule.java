@@ -1855,9 +1855,9 @@ public class JMessageModule extends ReactContextBaseJavaModule {
     public void getPublicGroupInfos(final ReadableMap map, final Callback success, final Callback fail) {
         try {
             String appKey = map.hasKey(Constant.APP_KEY) ? map.getString(Constant.APP_KEY) : "";
-            int start = Integer.parseInt(map.getString(Constant.START));
-            int count = Integer.parseInt(map.getString(Constant.COUNT));
-            String reason = map.getString(Constant.REASON);
+            int start = map.getInt(Constant.START);
+            int count = map.getInt(Constant.COUNT);
+            //String reason = map.getString(Constant.REASON);
             JMessageClient.getPublicGroupListByApp(appKey, start, count, new RequestCallback<List<GroupBasicInfo>>() {
                 @Override
                 public void gotResult(int status, String desc, List<GroupBasicInfo> groupBasicInfos) {
