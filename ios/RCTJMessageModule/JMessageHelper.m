@@ -594,6 +594,8 @@
     
     dict[@"createTime"] = self.timestamp;
     
+    NSNumber *unreadCount = @(self.getMessageUnreadCount);
+    dict[@"unreceiptCount"] = unreadCount;
     switch (self.contentType) {
         case kJMSGContentTypeUnknown: {
             dict[@"type"] = @"unknown";
