@@ -1139,7 +1139,7 @@ JMessage.createSendMessage({type: 'single', username: 'username', appKey: 'appke
   - isCustomNotificationEnabled: 是否开启自定义接收方通知栏功能，设置为 `true` 后可设置下面的 `notificationTitle` 和 `notificationText`。默认未设置。
   - notificationTitle: 设置此条消息在接收方通知栏所展示通知的标题。
   - notificationText: 设置此条消息在接收方通知栏所展示通知的内容。
-  - needReadReceipt: (Android Only)设置这条消息的发送是否需要对方发送已读回执 开启之后，对方收到消息后，如果调用了setMsgHaveRead()接口， 则作为消息发送方，会收到已读消息回执事件通知
+  - needReadReceipt: 设置这条消息的发送是否需要对方发送已读回执 开启之后，对方收到消息后，如果调用了setMsgHaveRead()接口， 则作为消息发送方，会收到已读消息回执事件通知
 
 ### sendTextMessage
 
@@ -1759,14 +1759,17 @@ JMessage.resetUnreadMessageCount({ type: 'single', username: 'username', appKey:
 
 ### setMsgHaveRead
 
-设置消息已读(Android Only)
+设置消息已读
 
 #### 示例
 
 ```js
-JMessageModule.setMsgHaveRead(params,(successCallback) =>{},(failCallback) => {
+JMessageModule.setMsgHaveRead(params,(result) =>{
         var code = result.code
         var desc = result.description
+        },(error) => {
+        var code = error.code
+        var desc = error.description
     }
 )
 ```
@@ -2132,7 +2135,7 @@ JMessage.removeSyncOfflineMessageListener(listener) // 移除监听(一般在 co
 
 ####  addReceiptMessageListener
 
-已读消息回执事件监听。（Android Only）
+已读消息回执事件监听。
 
 ##### 示例
 
