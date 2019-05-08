@@ -968,7 +968,7 @@ RCT_EXPORT_METHOD(getHistoryMessages:(NSDictionary *)param
             return;
         }
         
-        if (isDescend) {
+        if (!isDescend) {
             messageDicArr = [[messageDicArr reverseObjectEnumerator] allObjects];
         }
         

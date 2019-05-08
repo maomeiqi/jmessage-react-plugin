@@ -181,7 +181,7 @@ export default class Chat extends Component {
 
       JMessage.getHistoryMessages(parames, (messages) => {
         // Alert.alert('messages',JSON.stringify(messages))
-        console.log(JSON.stringify(messages));
+        console.log("JS getHistoryMessage:"+JSON.stringify(messages));
         this.setState({
           from: this.state.from + 10
         })
