@@ -71,11 +71,13 @@ public class Constant {
     public static final String TEXT = "text";
     public static final String IMAGE = "image";
     public static final String VOICE = "voice";
+    public static final String VIDEO = "video";
     public static final String LOCATION = "location";
     public static final String FILE = "file";
     public static final String CUSTOM = "custom";
     public static final String EXTRAS = "extras";
     public static final String THUMB_PATH = "thumbPath";
+    public static final String THUMB_FORMAT = "thumbFormat";
     public static final String LOCAL_PATH = "localPath";
     public static final String PATH = "path";
     public static final String DURATION = "duration";

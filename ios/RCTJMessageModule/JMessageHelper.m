@@ -620,6 +620,15 @@
             dict[@"duration"] = [voiceContent duration];
             break;
         }
+        case kJMSGContentTypeVideo: {
+            dict[@"type"] = @"video";
+            dict[@"path"] = [self getOriginMediaFilePath];
+            JMSGVideoContent *videoContent = (JMSGVideoContent *) self.content;
+            dict[@"name"] = [videoContent fileName];
+            dict[@"thumbPath"] = [videoContent videoThumbImageLocalPath];
+            dict[@"duration"] = [videoContent duration];
+            break;
+        }
         case kJMSGContentTypeCustom: {
             dict[@"type"] = @"custom";
             JMSGCustomContent *customContent = (JMSGCustomContent *) self.content;

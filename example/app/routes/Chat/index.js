@@ -109,7 +109,6 @@ export default class Chat extends Component {
       user.avatarPath = "ironman"
     }
     auroraMsg.fromUser = user
-    console.log("from user11111: " + JSON.stringify(auroraMsg.fromUser))
     auroraMsg.status = "send_succeed"
 
     auroraMsg.isOutgoing = true
@@ -429,7 +428,25 @@ export default class Chat extends Component {
         var auroraMsg = this.convertJMessageToAuroraMsg(jmessage)
         AuroraIController.updateMessage(auroraMsg)
       }, (error) => {
+
       })
+      
+      // 这里的路径以android为例
+      // var userName = "";
+      // var appKey = "";
+      // var videoFilePath = "sdcard/DCIM/1.mp4";
+      // var videoFileName = "xxxxxx";
+      // var videoImagePath = "sdcard/DCIM/1.png";
+      // var videoImageFormat = "png";
+      // var videoDuration = 10; 
+      // JMessage.sendVideoMessage({'type': 'single','username': userName,'appKey': appKey,
+      //       "path":videoFilePath,"name":videoFileName,"thumbPath":videoImagePath,"thumbFormat":videoImageFormat,"duration":videoDuration},
+      //       (msg) => {
+      //           console.log("sendVideo success");
+      //       },(error) => {
+      //           console.log("sendVideo error:"+error.description);
+      //       });
+
     })
   }
 

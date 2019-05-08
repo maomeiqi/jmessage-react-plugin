@@ -257,6 +257,28 @@ RCT_EXPORT_MODULE();
             content = [[JMSGVoiceContent alloc] initWithVoiceData:[NSData dataWithContentsOfFile: mediaPath] voiceDuration:@(duration)];
             break;
         }
+        case kJMSGContentTypeVideo:{
+            NSString *videoFilePath = nil;
+            NSString *videoFileName = nil;
+            NSString *videoImagePath = nil;
+            NSNumber *number = nil;
+            if(param[@"path"]){
+                videoFilePath = param[@"path"];
+            }
+            if(param[@"name"]){
+                videoFileName = param[@"name"];
+            }
+            if(param[@"thumbPath"]){
+                videoImagePath = param[@"thumbPath"];
+            }
+            if(param[@"duration"]){
+                number = param[@"duration"];
+            }
+            double duration = [number integerValue];
+            content = [[JMSGVideoContent alloc] initWithVideoData:[NSData dataWithContentsOfFile:videoFilePath] thumbData:[NSData dataWithContentsOfFile:videoImagePath] duration:@(duration)];
+            [(JMSGVideoContent *)content setFileName:videoFileName];
+            break;
+        }
         case kJMSGContentTypeLocation:{
             content = [[JMSGLocationContent alloc] initWithLatitude:param[@"latitude"] longitude:param[@"longitude"] scale:param[@"scale"] address: param[@"address"]];
             break;
@@ -330,6 +352,10 @@ RCT_EXPORT_MODULE();
     
     if ([str isEqualToString:@"voice"]) {
         return kJMSGContentTypeVoice;
+    }
+    
+    if ([str isEqualToString:@"video"]) {
+        return kJMSGContentTypeVideo;
     }
     
     if ([str isEqualToString:@"location"]) {
@@ -761,6 +787,37 @@ RCT_EXPORT_METHOD(sendVoiceMessage:(NSDictionary *)param
     }
     
     JMSGMessage *message = [self createMessageWithDictionary:param type:kJMSGContentTypeVoice];
+    
+    if (!message) {
+        NSError *error = [NSError errorWithDomain:@"cannot create message, check your params!" code:1 userInfo:nil];
+        failCallback(@[[error errorToDictionary]]);
+        return;
+    }
+    
+    [self getConversationWithDictionary:param callback:^(JMSGConversation *conversation, NSError *error) {
+        if (error) {
+            failCallback(@[[error errorToDictionary]]);
+            return;
+        }
+        
+        self.SendMsgCallbackDic[message.msgId] = @[successCallback,failCallback];
+        if (messageSendingOptions) {
+            [conversation sendMessage:message optionalContent:messageSendingOptions];
+        } else {
+            [conversation sendMessage:message];
+        }
+    }];
+}
+
+RCT_EXPORT_METHOD(sendVideoMessage:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallback:(RCTResponseSenderBlock)failCallback) {
+    JMSGOptionalContent *messageSendingOptions = nil;
+    if (param[@"messageSendingOptions"] && [param[@"messageSendingOptions"] isKindOfClass: [NSDictionary class]]) {
+        messageSendingOptions = [self convertDicToJMSGOptionalContent:param[@"messageSendingOptions"]];
+    }
+    
+    JMSGMessage *message = [self createMessageWithDictionary:param type:kJMSGContentTypeVideo];
     
     if (!message) {
         NSError *error = [NSError errorWithDomain:@"cannot create message, check your params!" code:1 userInfo:nil];
@@ -1660,7 +1717,7 @@ RCT_EXPORT_METHOD(downloadOriginalImage:(NSDictionary *)param
         }
         
         if (message.contentType != kJMSGContentTypeImage) {
-            failCallback(@[[self getErrorWithLog:@"It is not voice message"]]);
+            failCallback(@[[self getErrorWithLog:@"It is not image message"]]);
             return;
         } else {
             JMSGImageContent *content = (JMSGImageContent *) message.content;
@@ -1718,7 +1775,7 @@ RCT_EXPORT_METHOD(downloadThumbImage:(NSDictionary *)param
         }
         
         if (message.contentType != kJMSGContentTypeImage) {
-            failCallback(@[[self getErrorWithLog:@"It is not voice message"]]);
+            failCallback(@[[self getErrorWithLog:@"It is not image message"]]);
             return;
         } else {
             JMSGImageContent *content = (JMSGImageContent *) message.content;
@@ -1789,6 +1846,64 @@ RCT_EXPORT_METHOD(downloadVoiceFile:(NSDictionary *)param
                 JMSGMediaAbstractContent *mediaContent = (JMSGMediaAbstractContent *) message.content;
                 successCallback(@[@{@"messageId": message.msgId,
                                     @"filePath": [mediaContent originMediaLocalPath] ?: @""}]);
+            }];
+        }
+    }];
+}
+
+RCT_EXPORT_METHOD(downloadVideoFile:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallback:(RCTResponseSenderBlock)failCallback) {
+    if (param[@"messageId"] == nil ||
+        param[@"type"] == nil) {
+        failCallback(@[[self getParamError]]);
+        return;
+    }
+    
+    NSString *appKey = nil;
+    if (param[@"appKey"]) {
+        appKey = param[@"appKey"];
+    } else {
+        appKey = [JMessageHelper shareInstance].JMessageAppKey;
+    }
+    
+    if ([param[@"type"] isEqual: @"single"] && param[@"username"] != nil) {
+        
+    } else {
+        if ([param[@"type"] isEqual: @"group"] && param[@"groupId"] != nil) {
+            
+        } else {
+            failCallback(@[[self getParamError]]);
+            return;
+        }
+    }
+    
+    [self getConversationWithDictionary:param callback:^(JMSGConversation *conversation, NSError *error) {
+        if (error) {
+            failCallback(@[[error errorToDictionary]]);
+            return;
+        }
+        
+        JMSGMessage *message = [conversation messageWithMessageId:param[@"messageId"]];
+        
+        if (message == nil) {
+            failCallback(@[[self getErrorWithLog:@"cann't find this message"]]);
+            return;
+        }
+        
+        if (message.contentType != kJMSGContentTypeVideo) {
+            failCallback(@[[self getErrorWithLog:@"It is not file message"]]);
+            return;
+        } else {
+            JMSGVideoContent *content = (JMSGVideoContent *) message.content;
+            [content videoDataWithProgress:nil completionHandler:^(NSData *data, NSString *objectId, NSError *error) {
+                if (error) {
+                    failCallback(@[[error errorToDictionary]]);
+                    return;
+                }
+                JMSGVideoContent *fileContent = (JMSGVideoContent *) message.content;
+                successCallback(@[@{@"messageId": message.msgId,
+                                    @"filePath":[fileContent originMediaLocalPath] ?: @"" }]);
             }];
         }
     }];
@@ -1994,6 +2109,7 @@ RCT_EXPORT_METHOD(createSendMessage:(NSDictionary *)param
     NSString *mediaPath = @"";
     if ([param[@"messageType"] isEqualToString:@"image"] ||
         [param[@"messageType"] isEqualToString:@"voice"] ||
+        [param[@"messageType"] isEqualToString:@"video"] ||
         [param[@"messageType"] isEqualToString:@"file"]) {
         mediaPath = param[@"path"];
         if([[NSFileManager defaultManager] fileExistsAtPath: mediaPath]){
@@ -2037,6 +2153,28 @@ RCT_EXPORT_METHOD(createSendMessage:(NSDictionary *)param
         content = [[JMSGVoiceContent alloc] initWithVoiceData:[NSData dataWithContentsOfFile: mediaPath] voiceDuration:@(duration)];
         
         
+    }
+    
+    if ([param[@"messageType"] isEqualToString:@"video"]) {
+        NSString *videoFilePath = nil;
+        NSString *videoFileName = nil;
+        NSString *videoImagePath = nil;
+        NSNumber *number = nil;
+        if(param[@"path"]){
+            videoFilePath = param[@"path"];
+        }
+        if(param[@"name"]){
+            videoFileName = param[@"name"];
+        }
+        if(param[@"thumbPath"]){
+            videoImagePath = param[@"thumbPath"];
+        }
+        if(param[@"duration"]){
+            number = param[@"duration"];
+        }
+        double duration = [number integerValue];
+        content = [[JMSGVideoContent alloc] initWithVideoData:[NSData dataWithContentsOfFile:videoFilePath] thumbData:[NSData dataWithContentsOfFile:videoImagePath] duration:@(duration)];
+        [(JMSGVideoContent *)content setFileName:videoFileName];
     }
     
     if ([param[@"messageType"] isEqualToString:@"location"]) {

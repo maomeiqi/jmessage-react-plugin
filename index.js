@@ -250,6 +250,27 @@ export default class JMessage {
 
     /**
      * @param {object} params = {
+     *  'type': String,                                // 'single' / 'group'
+     *  'groupId': String,                             // 当 type = group 时，groupId 不能为空
+     *  'username': String,                            // 当 type = single 时，username 不能为空
+     *  'appKey': String,                              // 当 type = single 时，用于指定对象所属应用的 appKey。如果为空，默认为当前应用。
+     *  'path': String,                                // 本地视频路径
+     *  'name': String,                                // 本地视频名
+     *  'thumbPath': String,                           // 本地视频缩略图路径
+     *  'format': String,                              // 本地视频缩略图格式
+     *  'duration': int,                               // 本地视频播放时长
+     *  'extras': Object,                              // Optional. 自定义键值对 = {'key1': 'value1'}
+     *  'messageSendingOptions': MessageSendingOptions // Optional. MessageSendingOptions 对象
+     * }
+     * @param {function} success = function (msg) {}   // 以参数形式返回消息对象。
+     * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+     */
+    static sendVideoMessage(params, success, error) {
+        JMessageModule.sendVideoMessage(params, success, error)
+    }
+
+    /**
+     * @param {object} params = {
      *  'type': String,           // 'single' / 'group'
      *  'groupId': String,        // 当 type = group 时，groupId 不能为空
      *  'username': String,       // 当 type = single 时，username 不能为空
@@ -672,6 +693,23 @@ export default class JMessage {
      */
     static downloadVoiceFile(params, success, error) {
         JMessageModule.downloadVoiceFile(params, success, error)
+    }
+
+    /**
+     * 下载文件消息文件，如果已经下载，会直接返回本地文件路径，不会重复下载。
+     *
+     * @param {object} params = {
+     *  'type': String,            // 'single' / 'group'
+     *  'groupId': String,         // 目标群组 id。
+     *  'username': String,        // 目标用户名。
+     *  'appKey': String,          // 目标用户所属 AppKey。
+     *  'messageId': String        // 指定消息 id。
+     * }
+     * @param {function} success = function ({'messageId': String, 'filePath': String}) {}
+     * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+     */
+    static downloadVideoFile(params, success, error) {
+        JMessageModule.downloadVideoFile(params, success, error)
     }
 
     /**
