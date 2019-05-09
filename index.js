@@ -357,6 +357,25 @@ export default class JMessage {
         JMessageModule.getHistoryMessages(params, success, error)
     }
 
+
+    /**
+     *
+     * 根据messageId删除消息
+     *
+     * @param {object} params = {
+     *  'type': String,       // 'single' / 'group'
+     *  'groupId': String,    // 当 type = group 时，groupId 不能为空。
+     *  'username': String,   // 当 type = single 时，username 不能为空。
+     *  'appKey': String,     // 当 type = single 时，用于指定对象所属应用的 appKey。如果为空，默认为当前应用。
+     *  'messageId': String   // 消息 id。
+     * }
+     * @param {function} success = function () {}
+     * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+     */
+    static deleteMessage(params,success,error){
+    	JMessageModule.deleteMessage(params,success,error)
+    }
+
     /**
      * 发送好友请求。
      *

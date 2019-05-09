@@ -575,6 +575,26 @@ public class JMessageModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void deleteMessage(ReadableMap map, Callback success, Callback fail){
+        try {
+            Conversation conversation = mJMessageUtils.getConversation(map);
+            if(conversation==null){
+                mJMessageUtils.handleError(fail, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);
+                return;
+            }
+            int messageID = Integer.valueOf(map.getString(Constant.MESSAGE_ID));
+            if(conversation.deleteMessage(messageID)){
+                mJMessageUtils.handleCallback(0, "", success, fail);
+            }else {
+                mJMessageUtils.handleError(fail,ERR_CODE_MESSAGE, ERR_MSG_MESSAGE);
+            }
+        }catch (Throwable throwable){
+            throwable.printStackTrace();
+            mJMessageUtils.handleError(fail,ERR_CODE_EXCEPTION, throwable.getMessage());
+        }
+    }
+    
+    @ReactMethod
     public void sendInvitationRequest(ReadableMap map, final Callback success, final Callback fail) {
         try {
             String username = map.getString(Constant.USERNAME);

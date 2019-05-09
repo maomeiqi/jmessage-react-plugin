@@ -976,6 +976,28 @@ RCT_EXPORT_METHOD(getHistoryMessages:(NSDictionary *)param
     }];
 }
 
+RCT_EXPORT_METHOD(deleteMessage:(NSDictionary *)param
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  failCallback:(RCTResponseSenderBlock)failCallback) {
+    
+    [self getConversationWithDictionary:param callback:^(JMSGConversation *conversation, NSError *error) {
+        if (error) {
+            failCallback(@[[error errorToDictionary]]);
+            return;
+        }
+        if(param[@"messageId"]){
+            if([conversation deleteMessageWithMessageId:param[@"messageId"]]){
+                successCallback(@[@[]]);
+            }else{
+                failCallback(@[[self getParamError]]);
+            }
+        }else{
+            failCallback(@[[self getParamError]]);
+        }
+    }];
+}
+
+
 RCT_EXPORT_METHOD(sendInvitationRequest:(NSDictionary *)param
                   successCallback:(RCTResponseSenderBlock)successCallback
                   failCallback:(RCTResponseSenderBlock)failCallback) {
