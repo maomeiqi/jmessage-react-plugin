@@ -57,6 +57,7 @@ import cn.jpush.im.android.api.content.VideoContent;
 import cn.jpush.im.android.api.content.VoiceContent;
 import cn.jpush.im.android.api.enums.ContentType;
 import cn.jpush.im.android.api.event.ChatRoomMessageEvent;
+import cn.jpush.im.android.api.event.CommandNotificationEvent;
 import cn.jpush.im.android.api.event.ContactNotifyEvent;
 import cn.jpush.im.android.api.event.ConversationRefreshEvent;
 import cn.jpush.im.android.api.event.GroupApprovalEvent;
@@ -98,6 +99,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
     private static final String RECEIVE_APPLY_JOIN_GROUP_APPROVAL_EVENT = "JMessage.ReceiveApplyJoinGroupApprovalEvent"; // 接收到入群申请
     private static final String RECEIVE_GROUP_ADMIN_REJECT_EVENT = "JMessage.ReceiveGroupAdminRejectEvent"; // 接收到管理员拒绝入群申请
     private static final String RECEIVE_GROUP_ADMIN_APPROVAL_EVENT = "JMessage.ReceiveGroupAdminApprovalEvent"; // 接收到管理员同意入群申请
+    private static final String COMMAND_NOTIFICATION_EVENT = "JMessage.CommandNotificationEvent"; // 命令透传事件
 
     private static final int ERR_CODE_PARAMETER = 1;
     private static final int ERR_CODE_CONVERSATION = 2;
@@ -350,7 +352,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
                     String videoImageFormat = map.getString(Constant.THUMB_FORMAT);
                     duration = map.getInt(Constant.DURATION);
                     Bitmap bitmap = BitmapFactory.decodeFile(videoImagePath);
-                    content = new VideoContent(bitmap,videoImageFormat,videoFile,videoName,duration);
+                    content = new VideoContent(bitmap, videoImageFormat, videoFile, videoName, duration);
                     break;
                 case Constant.FILE:
                     path = map.getString(Constant.PATH);
@@ -476,12 +478,12 @@ public class JMessageModule extends ReactContextBaseJavaModule {
     public void sendVideoMessage(ReadableMap map, Callback success, Callback fail) {
         String videoPath = map.getString(Constant.PATH);
         String videoName = map.getString(Constant.NAME);
-        String videoImagePath= map.getString(Constant.THUMB_PATH);
+        String videoImagePath = map.getString(Constant.THUMB_PATH);
         String videoImageFormat = map.getString(Constant.THUMB_FORMAT);
         int duration = map.getInt(Constant.DURATION);
         try {
             Bitmap bitmap = BitmapFactory.decodeFile(videoImagePath);
-            VideoContent videoContent = new VideoContent(bitmap,videoImageFormat,new File(videoPath),videoName,duration);
+            VideoContent videoContent = new VideoContent(bitmap, videoImageFormat, new File(videoPath), videoName, duration);
             mJMessageUtils.sendMessage(map, videoContent, success, fail);
         } catch (IOException e) {
             e.printStackTrace();
@@ -575,25 +577,25 @@ public class JMessageModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void deleteMessage(ReadableMap map, Callback success, Callback fail){
+    public void deleteMessage(ReadableMap map, Callback success, Callback fail) {
         try {
             Conversation conversation = mJMessageUtils.getConversation(map);
-            if(conversation==null){
+            if (conversation == null) {
                 mJMessageUtils.handleError(fail, ERR_CODE_PARAMETER, ERR_MSG_PARAMETER);
                 return;
             }
             int messageID = Integer.valueOf(map.getString(Constant.MESSAGE_ID));
-            if(conversation.deleteMessage(messageID)){
+            if (conversation.deleteMessage(messageID)) {
                 mJMessageUtils.handleCallback(0, "", success, fail);
-            }else {
-                mJMessageUtils.handleError(fail,ERR_CODE_MESSAGE, ERR_MSG_MESSAGE);
+            } else {
+                mJMessageUtils.handleError(fail, ERR_CODE_MESSAGE, ERR_MSG_MESSAGE);
             }
-        }catch (Throwable throwable){
+        } catch (Throwable throwable) {
             throwable.printStackTrace();
-            mJMessageUtils.handleError(fail,ERR_CODE_EXCEPTION, throwable.getMessage());
+            mJMessageUtils.handleError(fail, ERR_CODE_EXCEPTION, throwable.getMessage());
         }
     }
-    
+
     @ReactMethod
     public void sendInvitationRequest(ReadableMap map, final Callback success, final Callback fail) {
         try {
@@ -2342,7 +2344,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
             int lastMediaMsgIndex = -1;
             for (int i = offlineMsgList.size() - 1; i >= 0; i--) {
                 Message message = offlineMsgList.get(i);
-                if (message.getContentType() == ContentType.image || message.getContentType() == ContentType.voice|| message.getContentType() == ContentType.video) {
+                if (message.getContentType() == ContentType.image || message.getContentType() == ContentType.voice || message.getContentType() == ContentType.video) {
                     lastMediaMsgIndex = i;
                     break;
                 }
@@ -2501,5 +2503,39 @@ public class JMessageModule extends ReactContextBaseJavaModule {
         });
         getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                 .emit(RECEIVE_GROUP_ADMIN_REJECT_EVENT, map);
+    }
+
+    public void onEvent(CommandNotificationEvent event) {
+        Logger.d(TAG, "CommandNotificationEvent, event: " + event);
+        final WritableMap map = Arguments.createMap();
+        String msg = event.getMsg();
+        CommandNotificationEvent.Type type = event.getType();
+        map.putString(Constant.TYPE,type.toString());
+        map.putString(Constant.MESSAGE,msg);
+        event.getSenderUserInfo(new GetUserInfoCallback() {
+            @Override
+            public void gotResult(int i, String s, UserInfo userInfo) {
+                //获取命令透传消息发送者的UserInfo
+                if (i == 0) {
+                    map.putMap(Constant.SEND, ResultUtils.toJSObject(userInfo));
+                }
+            }
+        });
+        event.getTargetInfo(new CommandNotificationEvent.GetTargetInfoCallback() {
+            @Override
+            public void gotResult(int i, String s, Object o, CommandNotificationEvent.Type type) {
+                if (i == 0) {
+                    if (type.equals(CommandNotificationEvent.Type.single)) {
+                        UserInfo userInfo = (UserInfo) o;
+                        map.putMap(Constant.TARGET, ResultUtils.toJSObject(userInfo));
+                    } else if (type.equals(CommandNotificationEvent.Type.group)) {
+                        GroupInfo groupInfo = (GroupInfo) o;
+                        map.putMap(Constant.TARGET, ResultUtils.toJSObject(groupInfo));
+                    }
+                }
+            }
+        });
+        getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                .emit(COMMAND_NOTIFICATION_EVENT, map);
     }
 }

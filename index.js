@@ -18,6 +18,7 @@ const contactNotify = "JMessage.ContactNotify" // 收到好友请求消息事件
 const uploadProgress = "JMessage.UploadProgress" // 收到好友请求消息事件
 const conversationChange = "JMessage.conversationChange" // 会话变更事件
 const chatRoomMsgEvent = "JMessage.ReceiveChatRoomMsgEvent"; // 收到聊天室消息事件
+const CommandNotificationEvent = "JMessage.CommandNotificationEvent"; // 收到聊天室消息事件 
 
 const receiveApplyJoinGroupApprovalEvent = "JMessage.ReceiveApplyJoinGroupApprovalEvent" // 接收到入群申请
 const receiveGroupAdminRejectEvent = "JMessage.ReceiveGroupAdminRejectEvent" // 接收到管理员拒绝入群申请
@@ -1185,6 +1186,33 @@ export default class JMessage {
         listeners[listener].remove();
         listeners[listener] = null;
     }
+
+    /**
+     * 接收命令透传消息
+      * @param {function} listener  = function (result) {}
+     *  result = {
+     *  type = String, //类型，single:单聊;group:群聊;self:自己已登录设备间的命令透传
+     *  send = {userInfo}, //命令透传消息发送者的UserInfo
+     *  target = {userInfo/groupInfo} //type为'single'时userInfo,type为‘groupInfo’时groupInfo
+     *  message = String // 命令透传消息的实际内容
+     *  
+     * }
+     */
+    static addCommandNotificationListener(listener) {
+        listeners[listener] = DeviceEventEmitter.addListener(CommandNotificationEvent,
+            (messages) => {
+                listener(messages);
+            });
+    }
+
+    static removeCommandNotificationListener(listener) {
+        if (!listeners[listener]) {
+            return;
+        }
+        listeners[listener].remove();
+        listeners[listener] = null;
+    }
+
 
     /**
      * 监听接收入群申请事件

@@ -280,6 +280,23 @@
  */
 - (void)onReceiveMessageTransparentEvent:(JMSGMessageTransparentEvent *)transparentEvent {
     
+    NSMutableDictionary *dict = @{}.mutableCopy;
+    JMSGTransMessageType type = transparentEvent.transMessageType;
+    if(type==kJMSGTransMessageTypeSingle){
+        dict[@"type"] = @"single";
+        JMSGUser *user = transparentEvent.target;
+         dict[@"target"] = [user userToDictionary];
+    }else if(type==kJMSGTransMessageTypeGroup){
+        dict[@"type"] = @"group";
+        JMSGGroup *group = transparentEvent.target;
+        dict[@"target"] = [group groupToDictionary];
+    }else if(type==kJMSGTransMessageTypeCrossDevice){
+        dict[@"type"] = @"self";
+    }
+    dict[@"message"] = @[transparentEvent.transparentText];
+    JMSGUser *sendUser =  transparentEvent.sendUser;
+    dict[@"send"] = [sendUser userToDictionary];
+    [[NSNotificationCenter defaultCenter] postNotificationName:kJJMessageTransparentEvent object:dict];
 }
 
 
