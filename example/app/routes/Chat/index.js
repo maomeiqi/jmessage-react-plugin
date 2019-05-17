@@ -161,6 +161,12 @@ export default class Chat extends Component {
     }
 
     AuroraIController.appendMessages(messages)
+    var customMessage = {'type':"single",'username':'Wicked002','appKey':'58067d5678c387f20831a956','customObject':{'key':'value'}}
+    JMessage.sendCustomMessage(customMessage,success => {
+      console.log('JS sendCustomMessage success:'+JSON.stringify(success))
+    },error => {
+      console.log('JS sendCustomMessage error:'+JSON.stringify(error))
+    })
   }
 
   componentDidMount() {
@@ -402,8 +408,10 @@ export default class Chat extends Component {
     var message = this.getNormalMessage()
     message.text = text
     message.messageType = "text"
-
+    // message.messageType = "custom"
+    // message.customObject = {'key':'value'}
     JMessage.createSendMessage(message, (msg) => {
+      console.log('JS createSendMessage success:'+JSON.stringify(msg))
       var auroraMsg = this.convertJMessageToAuroraMsg(msg)
       if (auroraMsg.msgType === undefined) {
         return
@@ -427,8 +435,9 @@ export default class Chat extends Component {
       JMessage.sendMessage(msg, (jmessage) => {
         var auroraMsg = this.convertJMessageToAuroraMsg(jmessage)
         AuroraIController.updateMessage(auroraMsg)
+        console.log('JS sendMessage success:'+JSON.stringify(jmessage))
       }, (error) => {
-
+        console.log('JS sendMessage error:'+JSON.stringify(error))
       })
       
       // 这里的路径以android为例
