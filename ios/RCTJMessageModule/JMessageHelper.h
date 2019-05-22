@@ -13,6 +13,7 @@
 #define kJJMessageReceiptMessage     @"kJJMessageReceiptMessage"
 #define kJJMessageReceiveChatRoomMessage     @"kJJMessageReceiveChatRoomMessage"
 #define kJJMessageSendMessageRespone @"kJJMessageSendMessageRespone"
+#define kJJMessageTransparentEvent     @"kJJMessageTransparentEvent"
 
 //Conversation 回调
 #define kJJMessageConversationChanged @"kJJMessageConversationChanged"
