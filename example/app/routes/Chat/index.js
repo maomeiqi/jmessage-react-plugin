@@ -205,7 +205,7 @@ export default class Chat extends Component {
 
       this.receiveMessageCallBack = (message) => {
 
-        console.log("收到消息"+JSON.stringify(message));
+        console.log("JS receiveMessage:"+JSON.stringify(message));
         const readParams = {
           type: "single",
           username: message.from.username,
@@ -221,7 +221,7 @@ export default class Chat extends Component {
               var msg = this.convertJMessageToAuroraMsg(message)
               AuroraIController.appendMessages([msg])
             }
-            Alert.alert('message.target.username', message.target.username)
+            Alert.alert('message.from.username', message.from.username+",message:"+message.text)
           }
         } else if (this.conversation.type === 'group') {
           if (message.target.type === 'group') {
@@ -404,19 +404,52 @@ export default class Chat extends Component {
   }
 
   onSendText = (text) => {
+    // JMessage.createGroup({'name':'群','desc':'描述','groupType':'public'},success => {
+    //   console.log('JS createGroup success:'+JSON.stringify(success))
+    // },error => {
+    //   console.log('JS createGroup error:'+JSON.stringify(error))
+    // })
 
+    // 34863871
+
+    // JMessage.addGroupMembers({'id':'34863871','usernameArray':['wicked','wicked001','qqqqqq'],'appKey':'58067d5678c387f20831a956'},success => {
+    //   console.log('JS addGroupMembers success:'+JSON.stringify(success))
+    // },error => {
+    //   console.log('JS addGroupMembers error:'+JSON.stringify(error))
+    // })
+
+    // JMessage.createSendMessage({'type':'group','groupId':'34863871','username':'wwwwww','appKey':'58067d5678c387f20831a956','messageType':'text','text':'123456','groupAt':true,'usernames':['wicked','qqqqqq']},
+    // message => {console.log('JS createSendMessage groupAt:'+JSON.stringify(message))
+
+    //   var groupAtMessage = {
+    //     'type' : 'group',
+    //     'groupId' : message.target.id,
+    //     'appKey':'58067d5678c387f20831a956',
+    //     'id' : ''+ message.id,
+    //     'messageType' : message.type,
+    //     'text' : message.text,
+    //   }
+      
+    //   JMessage.sendMessage(groupAtMessage, success => {
+    //     console.log('JS sendMessage success groupAt:'+JSON.stringify(success))
+    //   }, error => {
+    //     console.log('JS sendMessage error groupAt:'+JSON.stringify(error))
+    //   })
+    //   }
+    // )
+    
     var message = this.getNormalMessage()
     message.text = text
     message.messageType = "text"
     // message.messageType = "custom"
     // message.customObject = {'key':'value'}
     JMessage.createSendMessage(message, (msg) => {
-      console.log('JS createSendMessage success:'+JSON.stringify(msg))
+      console.log('JS createSendMessage:'+JSON.stringify(msg))
       var auroraMsg = this.convertJMessageToAuroraMsg(msg)
       if (auroraMsg.msgType === undefined) {
         return
       }
-
+      
       auroraMsg.status = 'send_going'
       AuroraIController.appendMessages([auroraMsg])
       AuroraIController.scrollToBottom(true)

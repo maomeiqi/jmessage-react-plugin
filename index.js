@@ -154,6 +154,8 @@ export default class JMessage {
      *  'address': String,                             // Optional 详细地址信息
      *  'customObject': {'key1': 'value1'}  // Optional. Optional 自定义键值对
      *  'extras': Object,                              // Optional. 自定义键值对 = {'key1': 'value1'}
+     *  'groupAt' : Object                             // 赋值则具有群@功能(需要type为'group'，'atMe'，'atAll'和‘atUsers’在sendMessage的success callback中返回)
+     *   'usernames': stringArray                      // 需要@的人,为空则@全部
      * }
      * @param {function} callback = function (msg) {}   // 以参数形式返回消息对象。
      */

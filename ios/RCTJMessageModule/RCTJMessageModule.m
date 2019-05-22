@@ -2228,21 +2228,52 @@ RCT_EXPORT_METHOD(createSendMessage:(NSDictionary *)param
     } else {
         appKey = [JMessageHelper shareInstance].JMessageAppKey;
     }
-    
+    //NSLog(@"param:%@",param);
     [self getConversationWithDictionary:param callback:^(JMSGConversation *conversation, NSError *error) {
         if (error) {
             callback(@[[error errorToDictionary]]);
             return;
         }
-        
-        JMSGMessage *message = [conversation createMessageWithContent:content];
+        JMSGMessage *message = nil;
+        if(param[@"groupAt"]){
+            NSString *groupID = nil;
+            if(param[@"groupId"]){
+                groupID = param[@"groupId"];
+            }
+            if(param[@"usernames"]){
+                  [JMSGUser userInfoArrayWithUsernameArray:param[@"usernames"] appKey:appKey completionHandler:^(id resultObject, NSError *error) {
+                    if (!error) {
+                        NSArray *users = resultObject;
+                        JMSGMessage *message = [JMSGMessage createGroupMessageWithContent:content groupId:groupID at_list:users];
+                        if (param[@"extras"] && [param[@"extras"] isKindOfClass: [NSDictionary class]]) {
+                            NSDictionary *extras = param[@"extras"];
+                            for (NSString *key in extras.allKeys) {
+                                [message.content addStringExtra:extras[key] forKey:key];
+                            }
+                        }
+                        //NSLog(@"message:%@",message);
+                        callback(@[[message messageToDictionary]]);
+                        return;
+                    } else {
+                        callback(@[[error errorToDictionary]]);
+                        return;
+                    }
+                }];
+            }else{
+                  message = [JMSGMessage createGroupAtAllMessageWithContent:content groupId:groupID];
+            }
+        }else {
+            message = [conversation createMessageWithContent:content];
+        }
         if (param[@"extras"] && [param[@"extras"] isKindOfClass: [NSDictionary class]]) {
             NSDictionary *extras = param[@"extras"];
             for (NSString *key in extras.allKeys) {
                 [message.content addStringExtra:extras[key] forKey:key];
             }
         }
-        callback(@[[message messageToDictionary]]);
+        if(message){
+          callback(@[[message messageToDictionary]]);
+        }
     }];
 }
 
@@ -2256,13 +2287,13 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)param
     } else {
         appKey = [JMessageHelper shareInstance].JMessageAppKey;
     }
-    
+    NSLog(@"sendMessage param:%@",param);
     [self getConversationWithDictionary:param callback:^(JMSGConversation *conversation, NSError *error) {
         if (error) {
             failCallback(@[[error errorToDictionary]]);
             return;
         }
-        
+        //NSLog(@"sendMessage id:%@",param[@"id"]);
         JMSGMessage *message = [conversation messageWithMessageId: param[@"id"]];
         
         if (!message) {
@@ -2274,6 +2305,7 @@ RCT_EXPORT_METHOD(sendMessage:(NSDictionary *)param
             JMSGMediaAbstractContent *content = (JMSGMediaAbstractContent *)message.content;
             content.uploadHandler = ^(float percent, NSString *msgID) {
                 
+
                 [self.bridge.eventDispatcher sendAppEventWithName:uploadProgressEvent body:@{@"messageId": msgID,
                                                                                              @"progress": @(percent)}];
             };

@@ -59,6 +59,7 @@ public class Constant {
     public static final String COUNT = "count";
     public static final String IS_RESPOND_INVITER = "isRespondInviter";
     public static final String SEND = "send";
+    public static final String GROUP_AT = "groupAt";
 
     /**
      * Message

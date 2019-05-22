@@ -322,10 +322,10 @@ public class JMessageModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void createSendMessage(ReadableMap map, Callback callback) {
+    public void createSendMessage(ReadableMap map,Callback callback) {
         try {
-            MessageContent content;
-            Conversation conversation = mJMessageUtils.getConversation(map);
+            final MessageContent content;
+            final Conversation conversation = mJMessageUtils.getConversation(map);
             String type = map.getString(Constant.MESSAGE_TYPE);
             switch (type) {
                 case Constant.TEXT:
@@ -375,11 +375,21 @@ public class JMessageModule extends ReactContextBaseJavaModule {
             if (type.equals(Constant.CUSTOM)) {
                 CustomContent customContent = new CustomContent();
                 customContent.setAllValues(ResultUtils.fromMap(map.getMap(Constant.CUSTOM_OBJECT)));
-                Message message = conversation.createSendMessage(customContent);
+                Message message;
+                if(map.hasKey(Constant.GROUP_AT)){
+                    message = createGroupAtMessage(conversation,customContent,map,callback);
+                }else {
+                    message = conversation.createSendMessage(customContent);
+                }
                 callback.invoke(ResultUtils.toJSObject(message));
             } else {
-                Message message = conversation.createSendMessage(content);
-                callback.invoke(ResultUtils.toJSObject(message));
+                Message message;
+                if(map.hasKey(Constant.GROUP_AT)){
+                   createGroupAtMessage(conversation,content,map,callback);
+                }else {
+                    message = conversation.createSendMessage(content);
+                    callback.invoke(ResultUtils.toJSObject(message));
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -387,17 +397,54 @@ public class JMessageModule extends ReactContextBaseJavaModule {
         }
     }
 
+    private Message createGroupAtMessage(final Conversation conversation, final MessageContent content, final ReadableMap map, final Callback callback){
+        long groupId = Long.valueOf(map.getString(Constant.GROUP_ID));
+        final Message[] message = {null};
+        JMessageClient.getGroupInfo(groupId, new GetGroupInfoCallback() {
+            @Override
+            public void gotResult(int code, String des, GroupInfo groupInfo) {
+                if(code==0){
+                    String appKey = map.hasKey(Constant.APP_KEY) ? map.getString(Constant.APP_KEY) : "";
+                    String customFromName = map.hasKey(Constant.FROM) ? map.getString(Constant.FROM) : "";
+                    if(map.hasKey(Constant.USERNAMES)){
+                        ReadableArray array = map.getArray(Constant.USERNAMES);
+                        final List<UserInfo> userInfos = new ArrayList<>();
+                        for (int i = 0; i < array.size(); i++) {
+                            userInfos.add(groupInfo.getGroupMemberInfo(array.getString(i), appKey));
+                        }
+                        message[0] = conversation.createSendMessage(content, userInfos, customFromName);
+                    }else {
+                        message[0] = conversation.createSendMessage(content, customFromName);
+                    }
+                    callback.invoke(ResultUtils.toJSObject(message[0]));
+                }else {
+                    mJMessageUtils.handleError(callback, code, des);
+                }
+            }
+        });
+        return message[0];
+    }
+
     @ReactMethod
     public void sendMessage(ReadableMap map, final Callback success, final Callback fail) {
         try {
             Conversation conversation = mJMessageUtils.getConversation(map);
+            Logger.d(TAG, "sendMessage id:"+map.getString(Constant.ID) );
             final Message message = conversation.getMessage(Integer.parseInt(map.getString(Constant.ID)));
+            final boolean atMe = message.isAtMe();
+            final boolean atAll = message.isAtAll();
+            final WritableArray[] writableArray = new WritableArray[1];
+            message.getAtUserList(new GetUserInfoListCallback() {
+                @Override
+                public void gotResult(int i, String s, List<UserInfo> list) {
+                    writableArray[0] = ResultUtils.toJSArray(list);
+                }
+            });
             if (map.hasKey(Constant.SENDING_OPTIONS)) {
                 MessageSendingOptions options = new MessageSendingOptions();
                 ReadableMap optionMap = map.getMap(Constant.SENDING_OPTIONS);
                 options.setShowNotification(optionMap.getBoolean(Constant.IS_SHOW_NOTIFICATION));
                 options.setRetainOffline(optionMap.getBoolean(Constant.IS_RETAIN_OFFLINE));
-
                 if (optionMap.hasKey(Constant.IS_CUSTOM_NOTIFICATION_ENABLED)) {
                     options.setCustomNotificationEnabled(optionMap.getBoolean(Constant.IS_CUSTOM_NOTIFICATION_ENABLED));
                 }
@@ -429,8 +476,12 @@ public class JMessageModule extends ReactContextBaseJavaModule {
             message.setOnSendCompleteCallback(new BasicCallback() {
                 @Override
                 public void gotResult(int status, String desc) {
+                    WritableMap writableMap = ResultUtils.toJSObject(message);
+                    writableMap.putBoolean("atMe",atMe);
+                    writableMap.putBoolean("atAll",atAll);
+                    writableMap.putArray("atUsers",writableArray[0]);
                     mJMessageUtils.handleCallbackWithObject(status, desc, success, fail,
-                            ResultUtils.toJSObject(message));
+                            writableMap);
                 }
             });
         } catch (Exception e) {
