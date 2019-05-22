@@ -280,6 +280,23 @@
  */
 - (void)onReceiveMessageTransparentEvent:(JMSGMessageTransparentEvent *)transparentEvent {
     
+    NSMutableDictionary *dict = @{}.mutableCopy;
+    JMSGTransMessageType type = transparentEvent.transMessageType;
+    if(type==kJMSGTransMessageTypeSingle){
+        dict[@"type"] = @"single";
+        JMSGUser *user = transparentEvent.target;
+         dict[@"target"] = [user userToDictionary];
+    }else if(type==kJMSGTransMessageTypeGroup){
+        dict[@"type"] = @"group";
+        JMSGGroup *group = transparentEvent.target;
+        dict[@"target"] = [group groupToDictionary];
+    }else if(type==kJMSGTransMessageTypeCrossDevice){
+        dict[@"type"] = @"self";
+    }
+    dict[@"message"] = @[transparentEvent.transparentText];
+    JMSGUser *sendUser =  transparentEvent.sendUser;
+    dict[@"send"] = [sendUser userToDictionary];
+    [[NSNotificationCenter defaultCenter] postNotificationName:kJJMessageTransparentEvent object:dict];
 }
 
 
@@ -568,7 +585,9 @@
     dict[@"id"] = self.msgId;
     dict[@"serverMessageId"] = self.serverMessageId;
     dict[@"from"] = [self.fromUser userToDictionary];
-    
+    dict[@"atMe"] = @(self.isAtMe);
+    dict[@"atAll"] = @(self.isAtAll);
+    // [self getAt_List:^(id resultObject, NSError *error) {}];
     if (self.content.extras != nil) {
         dict[@"extras"] = self.content.extras;
     }
@@ -618,6 +637,15 @@
             dict[@"path"] = [self getOriginMediaFilePath];
             JMSGVoiceContent *voiceContent = (JMSGVoiceContent *) self.content;
             dict[@"duration"] = [voiceContent duration];
+            break;
+        }
+        case kJMSGContentTypeVideo: {
+            dict[@"type"] = @"video";
+            dict[@"path"] = [self getOriginMediaFilePath];
+            JMSGVideoContent *videoContent = (JMSGVideoContent *) self.content;
+            dict[@"name"] = [videoContent fileName];
+            dict[@"thumbPath"] = [videoContent videoThumbImageLocalPath];
+            dict[@"duration"] = [videoContent duration];
             break;
         }
         case kJMSGContentTypeCustom: {

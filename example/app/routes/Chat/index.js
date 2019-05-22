@@ -109,7 +109,6 @@ export default class Chat extends Component {
       user.avatarPath = "ironman"
     }
     auroraMsg.fromUser = user
-    console.log("from user11111: " + JSON.stringify(auroraMsg.fromUser))
     auroraMsg.status = "send_succeed"
 
     auroraMsg.isOutgoing = true
@@ -162,6 +161,12 @@ export default class Chat extends Component {
     }
 
     AuroraIController.appendMessages(messages)
+    var customMessage = {'type':"single",'username':'Wicked002','appKey':'58067d5678c387f20831a956','customObject':{'key':'value'}}
+    JMessage.sendCustomMessage(customMessage,success => {
+      console.log('JS sendCustomMessage success:'+JSON.stringify(success))
+    },error => {
+      console.log('JS sendCustomMessage error:'+JSON.stringify(error))
+    })
   }
 
   componentDidMount() {
@@ -182,7 +187,7 @@ export default class Chat extends Component {
 
       JMessage.getHistoryMessages(parames, (messages) => {
         // Alert.alert('messages',JSON.stringify(messages))
-        console.log(JSON.stringify(messages));
+        console.log("JS getHistoryMessage:"+JSON.stringify(messages));
         this.setState({
           from: this.state.from + 10
         })
@@ -200,7 +205,7 @@ export default class Chat extends Component {
 
       this.receiveMessageCallBack = (message) => {
 
-        console.log("收到消息"+JSON.stringify(message));
+        console.log("JS receiveMessage:"+JSON.stringify(message));
         const readParams = {
           type: "single",
           username: message.from.username,
@@ -216,7 +221,7 @@ export default class Chat extends Component {
               var msg = this.convertJMessageToAuroraMsg(message)
               AuroraIController.appendMessages([msg])
             }
-            Alert.alert('message.target.username', message.target.username)
+            Alert.alert('message.from.username', message.from.username+",message:"+message.text)
           }
         } else if (this.conversation.type === 'group') {
           if (message.target.type === 'group') {
@@ -399,17 +404,69 @@ export default class Chat extends Component {
   }
 
   onSendText = (text) => {
+    // JMessage.createGroup({'name':'群','desc':'描述','groupType':'public'},success => {
+    //   console.log('JS createGroup success:'+JSON.stringify(success))
+    // },error => {
+    //   console.log('JS createGroup error:'+JSON.stringify(error))
+    // })
+
+    // 34863871
+
+    // JMessage.addGroupMembers({'id':'34863871','usernameArray':['wicked','wicked001','qqqqqq'],'appKey':'58067d5678c387f20831a956'},success => {
+    //   console.log('JS addGroupMembers success:'+JSON.stringify(success))
+    // },error => {
+    //   console.log('JS addGroupMembers error:'+JSON.stringify(error))
+    // })
+
+    // var parames = {
+    //   'type':'group',
+    //   'groupId':'34863871',
+    //   'username':'wwwwww',
+    //   'appKey':'58067d5678c387f20831a956',
+    //   'messageType':'text',
+    //   'text':'123456',
+    //   'groupAt':true,
+    //   'usernames':['wicked','qqqqqq']
+    // }
+
+    // JMessage.sendGroupAtMessage(parames,success => {
+    //   console.log('JS sendGroupAtMessage success:'+JSON.stringify(success))
+    // },error => {
+    //   console.log('JS sendGroupAtMessage error:'+JSON.stringify(error))
+    // })
+
+    // JMessage.createSendMessage(parames,
+    // message => {console.log('JS createSendMessage groupAt:'+JSON.stringify(message))
+
+    //   var groupAtMessage = {
+    //     'type' : 'group',
+    //     'groupId' : message.target.id,
+    //     'appKey':'58067d5678c387f20831a956',
+    //     'id' : ''+ message.id,
+    //     'messageType' : message.type,
+    //     'text' : message.text,
+    //   }
+      
+    //   JMessage.sendMessage(groupAtMessage, success => {
+    //     console.log('JS sendMessage success groupAt:'+JSON.stringify(success))
+    //   }, error => {
+    //     console.log('JS sendMessage error groupAt:'+JSON.stringify(error))
+    //   })
+    //   }
+    // )
 
     var message = this.getNormalMessage()
     message.text = text
     message.messageType = "text"
-
+    // message.messageType = "custom"
+    // message.customObject = {'key':'value'}
     JMessage.createSendMessage(message, (msg) => {
+      console.log('JS createSendMessage:'+JSON.stringify(msg))
       var auroraMsg = this.convertJMessageToAuroraMsg(msg)
       if (auroraMsg.msgType === undefined) {
         return
       }
-
+      
       auroraMsg.status = 'send_going'
       AuroraIController.appendMessages([auroraMsg])
       AuroraIController.scrollToBottom(true)
@@ -428,9 +485,28 @@ export default class Chat extends Component {
       JMessage.sendMessage(msg, (jmessage) => {
         var auroraMsg = this.convertJMessageToAuroraMsg(jmessage)
         AuroraIController.updateMessage(auroraMsg)
+        console.log('JS sendMessage success:'+JSON.stringify(jmessage))
       }, (error) => {
+        console.log('JS sendMessage error:'+JSON.stringify(error))
       })
-    })
+      
+      // 这里的路径以android为例
+      // var userName = "";
+      // var appKey = "";
+      // var videoFilePath = "sdcard/DCIM/1.mp4";
+      // var videoFileName = "xxxxxx";
+      // var videoImagePath = "sdcard/DCIM/1.png";
+      // var videoImageFormat = "png";
+      // var videoDuration = 10; 
+      // JMessage.sendVideoMessage({'type': 'single','username': userName,'appKey': appKey,
+      //       "path":videoFilePath,"name":videoFileName,"thumbPath":videoImagePath,"thumbFormat":videoImageFormat,"duration":videoDuration},
+      //       (msg) => {
+      //           console.log("sendVideo success");
+      //       },(error) => {
+      //           console.log("sendVideo error:"+error.description);
+      //       });
+
+    // })
   }
 
   onTakePicture = (media) => {

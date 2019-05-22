@@ -18,6 +18,7 @@ const contactNotify = "JMessage.ContactNotify" // 收到好友请求消息事件
 const uploadProgress = "JMessage.UploadProgress" // 收到好友请求消息事件
 const conversationChange = "JMessage.conversationChange" // 会话变更事件
 const chatRoomMsgEvent = "JMessage.ReceiveChatRoomMsgEvent"; // 收到聊天室消息事件
+const CommandNotificationEvent = "JMessage.CommandNotificationEvent"; // 收到聊天室消息事件 
 
 const receiveApplyJoinGroupApprovalEvent = "JMessage.ReceiveApplyJoinGroupApprovalEvent" // 接收到入群申请
 const receiveGroupAdminRejectEvent = "JMessage.ReceiveGroupAdminRejectEvent" // 接收到管理员拒绝入群申请
@@ -153,12 +154,42 @@ export default class JMessage {
      *  'address': String,                             // Optional 详细地址信息
      *  'customObject': {'key1': 'value1'}  // Optional. Optional 自定义键值对
      *  'extras': Object,                              // Optional. 自定义键值对 = {'key1': 'value1'}
+     *  'groupAt' : Object                             // 赋值则具有群@功能(only android 需要type为'group')
+     *   'usernames': stringArray                      // 需要@的人,不传则@全部（only android， 'atMe'，'atAll在收到消息的callback中返回）
      * }
      * @param {function} callback = function (msg) {}   // 以参数形式返回消息对象。
      */
     static createSendMessage(params, callback) {
         JMessageModule.createSendMessage(params, callback);
     }
+
+    /**
+     * only ios
+     * @param {object} params = {
+     *  'type': String,                                // 'single' / 'group'
+     *  'messageType': String,                         // 'text', 'image', 'voice', 'location', 'file', 'custom'
+     *  'groupId': String,                             // 当 type = group 时，groupId 不能为空
+     *  'username': String,                            // 当 type = single 时，username 不能为空
+     *  'appKey': String,                              // 当 type = single 时，用于指定对象所属应用的 appKey。如果为空，默认为当前应用。
+     *  'text': String,                                // Optional 消息内容
+     *  'path': String                                 // Optional 资源路径
+     *  'fileName': String,                            // Optional 文件名
+     *  'latitude': Number,                            // Optional 纬度信息
+     *  'longitude': Number,                           // Optional 经度信息
+     *  'scale': Number,                               // Optional 地图缩放比例
+     *  'address': String,                             // Optional 详细地址信息
+     *  'customObject': {'key1': 'value1'}  // Optional. Optional 自定义键值对
+     *  'extras': Object,                              // Optional. 自定义键值对 = {'key1': 'value1'}
+     *   'usernames': stringArray                      // 需要@的人,不传则@全部 （'atMe'，'atAll在收到消息的callback中返回）
+     * }
+     * @param {function} callback = function (msg) {}   // 以参数形式返回消息对象。
+     */
+    static sendGroupAtMessage(params, success, error){
+        if(Platform.OS === "ios"){
+            JMessageModule.sendGroupAtMessage(params,success,error)
+        }
+    }
+
 
     /**
      * @param {object} params = {
@@ -250,6 +281,27 @@ export default class JMessage {
 
     /**
      * @param {object} params = {
+     *  'type': String,                                // 'single' / 'group'
+     *  'groupId': String,                             // 当 type = group 时，groupId 不能为空
+     *  'username': String,                            // 当 type = single 时，username 不能为空
+     *  'appKey': String,                              // 当 type = single 时，用于指定对象所属应用的 appKey。如果为空，默认为当前应用。
+     *  'path': String,                                // 本地视频路径
+     *  'name': String,                                // 本地视频名
+     *  'thumbPath': String,                           // 本地视频缩略图路径
+     *  'format': String,                              // 本地视频缩略图格式
+     *  'duration': int,                               // 本地视频播放时长
+     *  'extras': Object,                              // Optional. 自定义键值对 = {'key1': 'value1'}
+     *  'messageSendingOptions': MessageSendingOptions // Optional. MessageSendingOptions 对象
+     * }
+     * @param {function} success = function (msg) {}   // 以参数形式返回消息对象。
+     * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+     */
+    static sendVideoMessage(params, success, error) {
+        JMessageModule.sendVideoMessage(params, success, error)
+    }
+
+    /**
+     * @param {object} params = {
      *  'type': String,           // 'single' / 'group'
      *  'groupId': String,        // 当 type = group 时，groupId 不能为空
      *  'username': String,       // 当 type = single 时，username 不能为空
@@ -334,6 +386,25 @@ export default class JMessage {
      */
     static getHistoryMessages(params, success, error) {
         JMessageModule.getHistoryMessages(params, success, error)
+    }
+
+
+    /**
+     *
+     * 根据messageId删除消息
+     *
+     * @param {object} params = {
+     *  'type': String,       // 'single' / 'group'
+     *  'groupId': String,    // 当 type = group 时，groupId 不能为空。
+     *  'username': String,   // 当 type = single 时，username 不能为空。
+     *  'appKey': String,     // 当 type = single 时，用于指定对象所属应用的 appKey。如果为空，默认为当前应用。
+     *  'messageId': String   // 消息 id。
+     * }
+     * @param {function} success = function () {}
+     * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+     */
+    static deleteMessage(params,success,error){
+    	JMessageModule.deleteMessage(params,success,error)
     }
 
     /**
@@ -672,6 +743,23 @@ export default class JMessage {
      */
     static downloadVoiceFile(params, success, error) {
         JMessageModule.downloadVoiceFile(params, success, error)
+    }
+
+    /**
+     * 下载文件消息文件，如果已经下载，会直接返回本地文件路径，不会重复下载。
+     *
+     * @param {object} params = {
+     *  'type': String,            // 'single' / 'group'
+     *  'groupId': String,         // 目标群组 id。
+     *  'username': String,        // 目标用户名。
+     *  'appKey': String,          // 目标用户所属 AppKey。
+     *  'messageId': String        // 指定消息 id。
+     * }
+     * @param {function} success = function ({'messageId': String, 'filePath': String}) {}
+     * @param {function} error = function ({'code': '错误码', 'description': '错误信息'}) {}
+     */
+    static downloadVideoFile(params, success, error) {
+        JMessageModule.downloadVideoFile(params, success, error)
     }
 
     /**
@@ -1128,6 +1216,33 @@ export default class JMessage {
         listeners[listener].remove();
         listeners[listener] = null;
     }
+
+    /**
+     * 接收命令透传消息
+      * @param {function} listener  = function (result) {}
+     *  result = {
+     *  type = String, //类型，single:单聊;group:群聊;self:自己已登录设备间的命令透传
+     *  send = {userInfo}, //命令透传消息发送者的UserInfo
+     *  target = {userInfo/groupInfo} //type为'single'时userInfo,type为‘groupInfo’时groupInfo
+     *  message = String // 命令透传消息的实际内容
+     *  
+     * }
+     */
+    static addCommandNotificationListener(listener) {
+        listeners[listener] = DeviceEventEmitter.addListener(CommandNotificationEvent,
+            (messages) => {
+                listener(messages);
+            });
+    }
+
+    static removeCommandNotificationListener(listener) {
+        if (!listeners[listener]) {
+            return;
+        }
+        listeners[listener].remove();
+        listeners[listener] = null;
+    }
+
 
     /**
      * 监听接收入群申请事件

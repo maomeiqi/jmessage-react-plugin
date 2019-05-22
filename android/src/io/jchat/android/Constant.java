@@ -58,6 +58,8 @@ public class Constant {
     public static final String START = "start";
     public static final String COUNT = "count";
     public static final String IS_RESPOND_INVITER = "isRespondInviter";
+    public static final String SEND = "send";
+    public static final String GROUP_AT = "groupAt";
 
     /**
      * Message
@@ -71,11 +73,13 @@ public class Constant {
     public static final String TEXT = "text";
     public static final String IMAGE = "image";
     public static final String VOICE = "voice";
+    public static final String VIDEO = "video";
     public static final String LOCATION = "location";
     public static final String FILE = "file";
     public static final String CUSTOM = "custom";
     public static final String EXTRAS = "extras";
     public static final String THUMB_PATH = "thumbPath";
+    public static final String THUMB_FORMAT = "thumbFormat";
     public static final String LOCAL_PATH = "localPath";
     public static final String PATH = "path";
     public static final String DURATION = "duration";
