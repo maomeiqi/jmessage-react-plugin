@@ -585,7 +585,9 @@
     dict[@"id"] = self.msgId;
     dict[@"serverMessageId"] = self.serverMessageId;
     dict[@"from"] = [self.fromUser userToDictionary];
-    
+    dict[@"atMe"] = @(self.isAtMe);
+    dict[@"atAll"] = @(self.isAtAll);
+    // [self getAt_List:^(id resultObject, NSError *error) {}];
     if (self.content.extras != nil) {
         dict[@"extras"] = self.content.extras;
     }

@@ -154,14 +154,42 @@ export default class JMessage {
      *  'address': String,                             // Optional 详细地址信息
      *  'customObject': {'key1': 'value1'}  // Optional. Optional 自定义键值对
      *  'extras': Object,                              // Optional. 自定义键值对 = {'key1': 'value1'}
-     *  'groupAt' : Object                             // 赋值则具有群@功能(需要type为'group'，'atMe'，'atAll'和‘atUsers’在sendMessage的success callback中返回)
-     *   'usernames': stringArray                      // 需要@的人,为空则@全部
+     *  'groupAt' : Object                             // 赋值则具有群@功能(only android 需要type为'group')
+     *   'usernames': stringArray                      // 需要@的人,不传则@全部（only android， 'atMe'，'atAll在收到消息的callback中返回）
      * }
      * @param {function} callback = function (msg) {}   // 以参数形式返回消息对象。
      */
     static createSendMessage(params, callback) {
         JMessageModule.createSendMessage(params, callback);
     }
+
+    /**
+     * only ios
+     * @param {object} params = {
+     *  'type': String,                                // 'single' / 'group'
+     *  'messageType': String,                         // 'text', 'image', 'voice', 'location', 'file', 'custom'
+     *  'groupId': String,                             // 当 type = group 时，groupId 不能为空
+     *  'username': String,                            // 当 type = single 时，username 不能为空
+     *  'appKey': String,                              // 当 type = single 时，用于指定对象所属应用的 appKey。如果为空，默认为当前应用。
+     *  'text': String,                                // Optional 消息内容
+     *  'path': String                                 // Optional 资源路径
+     *  'fileName': String,                            // Optional 文件名
+     *  'latitude': Number,                            // Optional 纬度信息
+     *  'longitude': Number,                           // Optional 经度信息
+     *  'scale': Number,                               // Optional 地图缩放比例
+     *  'address': String,                             // Optional 详细地址信息
+     *  'customObject': {'key1': 'value1'}  // Optional. Optional 自定义键值对
+     *  'extras': Object,                              // Optional. 自定义键值对 = {'key1': 'value1'}
+     *   'usernames': stringArray                      // 需要@的人,不传则@全部 （'atMe'，'atAll在收到消息的callback中返回）
+     * }
+     * @param {function} callback = function (msg) {}   // 以参数形式返回消息对象。
+     */
+    static sendGroupAtMessage(params, success, error){
+        if(Platform.OS === "ios"){
+            JMessageModule.sendGroupAtMessage(params,success,error)
+        }
+    }
+
 
     /**
      * @param {object} params = {

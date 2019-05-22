@@ -22,6 +22,7 @@ import cn.jmessage.support.google.gson.JsonElement;
 import cn.jmessage.support.google.gson.JsonObject;
 import cn.jmessage.support.google.gson.JsonParser;
 import cn.jpush.im.android.api.JMessageClient;
+import cn.jpush.im.android.api.callback.GetUserInfoListCallback;
 import cn.jpush.im.android.api.content.CustomContent;
 import cn.jpush.im.android.api.content.EventNotificationContent;
 import cn.jpush.im.android.api.content.FileContent;
@@ -135,12 +136,21 @@ public class ResultUtils {
     }
 
     public static WritableMap toJSObject(Message msg) {
-        WritableMap result = Arguments.createMap();
+        final WritableMap result = Arguments.createMap();
         try {
             result.putString(Constant.ID, String.valueOf(msg.getId()));
             result.putString(Constant.SERVER_ID, String.valueOf(msg.getServerMessageId()));
             result.putMap(Constant.FROM, toJSObject(msg.getFromUser()));
-
+            result.putBoolean("atMe",msg.isAtMe());
+            result.putBoolean("atAll",msg.isAtAll());
+//            msg.getAtUserList(new GetUserInfoListCallback() {
+//                @Override
+//                public void gotResult(int i, String s, List<UserInfo> list) {
+//                    if(i==0){
+//                        result.putArray("atUsers",toJSArray(list));
+//                    }
+//                }
+//            });
             switch (msg.getTargetType()) {
                 case group:
                     result.putMap(Constant.TARGET, toJSObject((GroupInfo) msg.getTargetInfo()));

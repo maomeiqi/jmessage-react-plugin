@@ -418,7 +418,24 @@ export default class Chat extends Component {
     //   console.log('JS addGroupMembers error:'+JSON.stringify(error))
     // })
 
-    // JMessage.createSendMessage({'type':'group','groupId':'34863871','username':'wwwwww','appKey':'58067d5678c387f20831a956','messageType':'text','text':'123456','groupAt':true,'usernames':['wicked','qqqqqq']},
+    // var parames = {
+    //   'type':'group',
+    //   'groupId':'34863871',
+    //   'username':'wwwwww',
+    //   'appKey':'58067d5678c387f20831a956',
+    //   'messageType':'text',
+    //   'text':'123456',
+    //   'groupAt':true,
+    //   'usernames':['wicked','qqqqqq']
+    // }
+
+    // JMessage.sendGroupAtMessage(parames,success => {
+    //   console.log('JS sendGroupAtMessage success:'+JSON.stringify(success))
+    // },error => {
+    //   console.log('JS sendGroupAtMessage error:'+JSON.stringify(error))
+    // })
+
+    // JMessage.createSendMessage(parames,
     // message => {console.log('JS createSendMessage groupAt:'+JSON.stringify(message))
 
     //   var groupAtMessage = {
@@ -437,7 +454,7 @@ export default class Chat extends Component {
     //   })
     //   }
     // )
-    
+
     var message = this.getNormalMessage()
     message.text = text
     message.messageType = "text"
@@ -489,7 +506,7 @@ export default class Chat extends Component {
       //           console.log("sendVideo error:"+error.description);
       //       });
 
-    })
+    // })
   }
 
   onTakePicture = (media) => {

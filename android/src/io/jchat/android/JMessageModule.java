@@ -431,15 +431,6 @@ public class JMessageModule extends ReactContextBaseJavaModule {
             Conversation conversation = mJMessageUtils.getConversation(map);
             Logger.d(TAG, "sendMessage id:"+map.getString(Constant.ID) );
             final Message message = conversation.getMessage(Integer.parseInt(map.getString(Constant.ID)));
-            final boolean atMe = message.isAtMe();
-            final boolean atAll = message.isAtAll();
-            final WritableArray[] writableArray = new WritableArray[1];
-            message.getAtUserList(new GetUserInfoListCallback() {
-                @Override
-                public void gotResult(int i, String s, List<UserInfo> list) {
-                    writableArray[0] = ResultUtils.toJSArray(list);
-                }
-            });
             if (map.hasKey(Constant.SENDING_OPTIONS)) {
                 MessageSendingOptions options = new MessageSendingOptions();
                 ReadableMap optionMap = map.getMap(Constant.SENDING_OPTIONS);
@@ -476,12 +467,8 @@ public class JMessageModule extends ReactContextBaseJavaModule {
             message.setOnSendCompleteCallback(new BasicCallback() {
                 @Override
                 public void gotResult(int status, String desc) {
-                    WritableMap writableMap = ResultUtils.toJSObject(message);
-                    writableMap.putBoolean("atMe",atMe);
-                    writableMap.putBoolean("atAll",atAll);
-                    writableMap.putArray("atUsers",writableArray[0]);
                     mJMessageUtils.handleCallbackWithObject(status, desc, success, fail,
-                            writableMap);
+                            ResultUtils.toJSObject(message));
                 }
             });
         } catch (Exception e) {
@@ -2316,7 +2303,7 @@ public class JMessageModule extends ReactContextBaseJavaModule {
 
     public void onEvent(MessageEvent event) {
         Message msg = event.getMessage();
-        Logger.d(TAG, "收到消息：msg = " + msg.toString());
+        Logger.d(TAG, "recive：msg = " + msg.toString());
         getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                 .emit(RECEIVE_MSG_EVENT, ResultUtils.toJSObject(msg));
     }
