@@ -23,6 +23,8 @@
 /*!
  * @abstract 监听好友相关事件
  *
+ * @param event 好友事件
+ *
  * @discussion 可监听：加好友、删除好友、好友更新等事件
  *
  * @since 3.5.0
@@ -67,7 +69,7 @@
 /*!
  * @abstract 聊天室管理员变更通知
  *
- * @param event 管理员事件列表
+ * @param events 管理员事件列表
  *
  * @discussion 事件具体相关属性请查看 JMSGChatRoomAdminChangeEvent 类
  *
@@ -78,7 +80,7 @@
 /*!
  * @abstract 聊天室黑名单变更通知
  *
- * @param event 黑名单事件列表
+ * @param events 黑名单事件列表
  *
  * @discussion 事件具体相关属性请查看 JMSGChatRoomBlacklisChangetEvent 类
  *
@@ -86,6 +88,16 @@
  */
 - (void)onReceiveChatRoomBlacklistChangeEvents:(NSArray<__kindof JMSGChatRoomBlacklisChangetEvent*>*)events;
 
+/*!
+ * @abstract 聊天室禁言通知
+ *
+ * @param events 禁言事件列表
+ *
+ * @discussion 事件具体相关属性请查看 JMSGChatRoomSilenceEvent 类
+ *
+ * @since 3.8.1
+ */
+- (void)onReceiveChatRoomSilenceEvents:(NSArray<__kindof JMSGChatRoomSilenceEvent*>*)events;
 
 ///----------------------------------------------------
 /// @name 以下是已经过期方法，请使用提示的新方法

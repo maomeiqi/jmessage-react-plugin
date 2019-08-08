@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5C4EF2F722FC22F8000A182E /* JMessage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 629543EF21E86C10000314E4 /* JMessage.framework */; };
 		6212EB1A1F3C34BB00BDF51A /* RCTJMessageModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 6212EB191F3C34BB00BDF51A /* RCTJMessageModule.m */; };
 		6212EB1B1F3C34BB00BDF51A /* RCTJMessageModule.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6212EB181F3C34BB00BDF51A /* RCTJMessageModule.h */; };
-		629543F021E86C10000314E4 /* JMessage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 629543EF21E86C10000314E4 /* JMessage.framework */; };
 		62D683E21F4469820083CDF6 /* JMessageHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 62D683E11F4469820083CDF6 /* JMessageHelper.m */; };
 /* End PBXBuildFile section */
 
@@ -40,18 +40,26 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				629543F021E86C10000314E4 /* JMessage.framework in Frameworks */,
+				5C4EF2F722FC22F8000A182E /* JMessage.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5C4EF2F622FC22F8000A182E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		6212EB0C1F3C34BB00BDF51A = {
 			isa = PBXGroup;
 			children = (
 				6212EB171F3C34BB00BDF51A /* RCTJMessageModule */,
 				6212EB161F3C34BB00BDF51A /* Products */,
+				5C4EF2F622FC22F8000A182E /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -116,6 +124,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = 6212EB0C1F3C34BB00BDF51A;

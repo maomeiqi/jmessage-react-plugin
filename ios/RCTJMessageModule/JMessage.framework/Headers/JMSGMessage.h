@@ -167,6 +167,7 @@ JMSG_ASSUME_NONNULL_BEGIN
  *
  * @param text 文本内容
  * @param username 单聊对象 username
+ * @param userAppKey 单聊对象 appkey
  *
  * @discussion 快捷方法，不需要先创建消息而直接发送。
  */
@@ -190,6 +191,7 @@ JMSG_ASSUME_NONNULL_BEGIN
  *
  * @param imageData 图片数据
  * @param username 单聊对象 username
+ * @param userAppKey 单聊对象 appkey
  *
  * @discussion 快捷方法，不需要先创建消息而直接发送。
  */
@@ -216,6 +218,7 @@ JMSG_ASSUME_NONNULL_BEGIN
  * @param voiceData 语音数据
  * @param duration 语音时长
  * @param username 单聊对象 username
+ * @param userAppKey 单聊对象 appkey
  *
  * @discussion 快捷方法，不需要先创建消息而直接发送。
  */
@@ -243,6 +246,7 @@ JMSG_ASSUME_NONNULL_BEGIN
  * @param fileData 文件数据数据
  * @param fileName 文件名
  * @param username 单聊对象 username
+ * @param userAppKey 单聊对象 appkey
  *
  * @discussion 快捷方法，不需要先创建消息而直接发送。
  */
@@ -328,8 +332,8 @@ JMSG_ASSUME_NONNULL_BEGIN
  * @discussion 快捷方法，不需要先创建消息而直接发送。
  */
 + (void)sendGroupFileMessage:(NSData *)fileData
-                fileName:(NSString *)fileName
-                      toGroup:(NSString *)groupId;
+                    fileName:(NSString *)fileName
+                     toGroup:(NSString *)groupId;
 
 /*!
  * @abstract 发送群聊地理位置消息
@@ -337,7 +341,7 @@ JMSG_ASSUME_NONNULL_BEGIN
  * @param longitude 经度
  * @param scale 缩放比例
  * @param address 详细地址
-* @param groupId 群聊目标群组ID
+ * @param groupId 群聊目标群组ID
  */
 + (void)sendGroupLocationMessage:(NSNumber *)latitude
                         longitude:(NSNumber *)longitude
@@ -605,6 +609,15 @@ JMSG_ASSUME_NONNULL_BEGIN
  * 注意：只有发送方调用 [+sendMessage:optionalContent:] 方法设置 message 需要已读回执，此方法才有意义。
  */
 - (void)messageReadDetailHandler:(void(^)(NSArray *JMSG_NULLABLE readUsers, NSArray *JMSG_NULLABLE unreadUsers, NSError *JMSG_NULLABLE error))handler;
+
+/*!
+ * @abstract 取消正在发送的消息
+ *
+ * @discussion 在消息发送结果监听 [JMSGMessageDelegate onSendMessageResponse:error:] 里会返回对应的错误信息和错误码。
+ *
+ * @since 3.8.1
+ */
+- (void)cancelSendingMessage;
 
 /*!
  * @abstract 设置消息的 fromName(即:通知栏的展示名称)

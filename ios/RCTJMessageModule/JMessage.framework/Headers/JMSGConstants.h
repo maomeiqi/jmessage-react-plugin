@@ -177,6 +177,8 @@ typedef NS_ENUM(NSInteger, JMSGMessageStatus) {
   kJMSGMessageStatusReceiveDownloadFailed = 7,
   /// 接收消息成功
   kJMSGMessageStatusReceiveSucceed = 8,
+  /// 消息已被取消发送
+  kJMSGMessageStatusCanceledSend = 9,
 };
 
 
@@ -361,6 +363,10 @@ typedef NS_ENUM(NSInteger, JMSGChatRoomEventType) {
   kJMSGEventNotificationChatRoomAddBlacklist = 132,
   /// 事件类型：删除黑名单
   kJMSGEventNotificationChatRoomDelBlacklist = 133,
+  /// 事件类型：添加禁言通知
+  kJMSGEventNotificationChatRoomAddSilence = 135,
+  /// 事件类型：解除禁言通知
+  kJMSGEventNotificationChatRoomDelSilence = 136,
 };
 
 ///----------------------------------------------------
@@ -476,6 +482,10 @@ typedef NS_ENUM(NSInteger, JMSGSDKErrorCode) {
   kJMSGErrorSDKMessageProtocolContentTypeNotSupport = 865009,
   /// 消息状态不合法
   kJMSGErrorSDKMessageStatusNotLegal = 865010,
+  /// 取消发送消息
+  kJMSGErrorSDKMessageCancelSend = 865011,
+  /// 取消下载消息多媒体文件
+  kJMSGErrorSDKMessageCancelDownload = 865012,
 
 
   // ------------------------ Conversation (866xxx)
@@ -593,6 +603,8 @@ typedef NS_ENUM(NSUInteger, JMSGTcpErrorCode) {
   kJMSGErrorTcpUserHasInChatRoomAdminList = 7130002,
   /// 目标用户不在聊天室管理员列表里
   kJMSGErrorTcpUserNotInChatRoomAdminList = 7131002,
+  /// 禁言时间不在允许范围内
+  kJMSGErrorTcpMemberSilenceTimesOverLimit = 765003,
 };
 
 
