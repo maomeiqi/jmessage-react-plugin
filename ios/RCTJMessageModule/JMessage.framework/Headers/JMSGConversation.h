@@ -192,7 +192,7 @@ JMSG_ASSUME_NONNULL_BEGIN
 /*!
  * @abstract 获取当前所有会话的未读消息的总数
  *
- * @discussion 获取所有会话未读消息总数，开启免打扰的会话未读数不会加入计数
+ * @discussion 获取所有会话未读消息总数，开启免打扰的会话未读数不会加入计数；此接口有可能会阻塞线程，请在子线程使用。
  */
 + (NSNumber *)getAllUnreadCount;
 
@@ -274,6 +274,17 @@ JMSG_ASSUME_NONNULL_BEGIN
  * 注意: 这里的 msgId 概念同 [JMSGMessage msgId], 是本地生成的消息ID, 而非 [JMSGMessage serverMessageId]
  */
 - (JMSGMessage * JMSG_NULLABLE)messageWithMessageId:(NSString *)msgId;
+
+/*!
+ * @abstract 获取某条消息
+ *
+ * @param serverMessageId 服务器下发的消息ID
+ *
+ * @discussion 这个接口在正常场景下不需要单独使用到. 获取消息一般应使用 [JSMGConversation messageArrayFromNewestWithOffset::]
+ *
+ * 注意: 这里的 serverMessageId 概念同 [JMSGMessage serverMessageId], 是服务端生成的消息ID
+ */
+- (JMSGMessage * JMSG_NULLABLE)messageWithServerMessageId:(NSString *)serverMessageId;
 
 /*!
  * @abstract 同步分页获取最新的消息

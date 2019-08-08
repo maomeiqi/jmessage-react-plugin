@@ -259,22 +259,28 @@
 @end
 
 
+#pragma mark - 聊天室事件
+
+@interface JMSGChatRoomEvent : JMSGNotificationEvent
+
+/// 聊天室
+@property(nonatomic, strong, readonly) JMSGChatRoom *chatRoom;
+/// 事件操作者
+@property(nonatomic, strong, readonly) JMSGUser *fromUser;
+/// 事件作用的用户列表
+@property(nonatomic, strong, readonly) NSArray <__kindof JMSGUser *>*targetList;
+
+@end
+
 #pragma mark - 聊天室管理员变更事件
 
 
 /*!
  * @abstract 聊天室管理员变更事件
  *
- * @discussion 收到事件后根据 eventType 判断类型，取相应的数据，上层通过 [JMSGGroupDelegate onReceiveChatRoomAdminChangeEvents:] 监听。
+ * @discussion 收到事件后根据 eventType 判断类型，取相应的数据，上层通过 [JMSGEventDelegate onReceiveChatRoomAdminChangeEvents:] 监听。
  */
-@interface JMSGChatRoomAdminChangeEvent : JMSGNotificationEvent
-
-/// 聊天室
-@property(nonatomic, strong, readonly) JMSGChatRoom *chatRoom;
-/// 事件操作者
-@property(nonatomic, strong, readonly) JMSGUser *fromUser;
-/// 被添加/被删除 聊天室管理员的用户列表
-@property(nonatomic, strong, readonly) NSArray <__kindof JMSGUser *>*targetList;
+@interface JMSGChatRoomAdminChangeEvent : JMSGChatRoomEvent
 
 @end
 
@@ -285,15 +291,19 @@
 /*!
  * @abstract 聊天室黑名单变更事件
  *
- * @discussion 收到事件后根据 eventType 判断类型，取相应的数据，上层通过 [JMSGGroupDelegate onReceiveChatRoomBlacklistChangeEvents:] 监听。
+ * @discussion 收到事件后根据 eventType 判断类型，取相应的数据，上层通过 [JMSGEventDelegate onReceiveChatRoomBlacklistChangeEvents:] 监听。
  */
-@interface JMSGChatRoomBlacklisChangetEvent : JMSGNotificationEvent
+@interface JMSGChatRoomBlacklisChangetEvent : JMSGChatRoomEvent
 
-/// 聊天室
-@property(nonatomic, strong, readonly) JMSGChatRoom *chatRoom;
-/// 事件操作者
-@property(nonatomic, strong, readonly) JMSGUser *fromUser;
-/// 被添加/被删除 聊天室黑名单的用户列表
-@property(nonatomic, strong, readonly) NSArray <__kindof JMSGUser *>*targetList;
+@end
+
+#pragma mark - 聊天室禁言事件
+
+/*!
+ * @abstract 聊天室禁言事件
+ *
+ * @discussion 收到事件后根据 eventType 判断类型，取相应的数据，上层通过 [JMSGEventDelegate onReceiveChatRoomSilenceEvents:] 监听。
+ */
+@interface JMSGChatRoomSilenceEvent : JMSGChatRoomEvent
 
 @end

@@ -81,7 +81,7 @@
 /*!
  * @abstract 群公告变更通知
  *
- * @param event 群公告事件列表
+ * @param events 群公告事件列表
  *
  * @discussion 事件具体相关属性请查看 JMSGGroupAnnouncementEvent 类
  *
@@ -93,7 +93,7 @@
 /*!
  * @abstract 群组黑名单变更通知
  *
- * @param event 群组黑名单事件列表
+ * @param events 群组黑名单事件列表
  *
  * @discussion 事件具体相关属性请查看 JMSGGroupBlacklistChangeEvent 类
  *
